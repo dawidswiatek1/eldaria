@@ -3,7 +3,8 @@ document.addEventListener('click',e=>{if(_lp){_lp=false;e.preventDefault();retur
  if(el.id==='modal'){if(e.target.closest('.box'))return;closeModal();return}
  switch(a){
  case 'close':closeModal();break;
- case 'new':if(hasSave()&&!confirm('Rozpocząć nową grę? Obecny postęp zostanie utracony.'))return;modal(creatorHtml());break;
+ case 'new':if(hasSave()){modal(`<h2>${ic('flag',20)} Nowa gra?</h2><p>Obecny postęp zostanie utracony.</p><div class="actions"><button class="btn-red" data-act="newok">Tak, zacznij od nowa</button><button data-act="close">Anuluj</button></div>`);return}modal(creatorHtml());break;
+ case 'newok':modal(creatorHtml());break;
  case 'continue':{const s=load();if(!s){render();return}S=s;save();screen=S.exp?'exp':'camp';tab='team';render();if(loadMsg){modal(`<h2>${ic('xp',20)} Aktualizacja gry</h2><p>${esc(loadMsg)}</p><button class="btn-main" data-act="close">Dobrze!</button>`);loadMsg=''}break}
  case 'tab':tab=el.dataset.t;townView=null;render();window.scrollTo(0,0);break;
  case 'town':tab='town';townView=el.dataset.v||null;render();window.scrollTo(0,0);break;
@@ -36,7 +37,8 @@ document.addEventListener('click',e=>{if(_lp){_lp=false;e.preventDefault();retur
  case 'fs':goFull();break;
  case 'menu':modal(`<h2>${ic('gear',20)} Menu</h2><p>Wygrane walki: ${S.wins} · Rekord: etap ${best()}<br>Kraina: ${esc(biomeOf(S.stage).n)}</p><div class="actions"><button data-act="snd">${ic('sk_ballada',18)} Dźwięk i muzyka</button><button data-act="speed">${ic('speed',18)} Prędkość animacji: ×${SET.speed}</button>${canFs()?`<button data-act="fs">${ic('speed',18)} Pełny ekran</button>`:''}<button data-act="totitle">${ic('back',18)} Ekran tytułowy</button><button class="btn-red" data-act="reset">${ic('skull',18)} Zacznij od nowa</button><button data-act="close">Zamknij</button></div>`);break;
  case 'totitle':closeModal();screen='title';render();break;
- case 'reset':if(confirm('Na pewno? Cały postęp zostanie usunięty.')){localStorage.removeItem(SAVE_KEY);S=null;screen='title';render();modal(creatorHtml())}break;
+ case 'reset':modal(`<h2>${ic('skull',20)} Usunąć postęp?</h2><p>Cały postęp zostanie usunięty. Tego nie da się cofnąć.</p><div class="actions"><button class="btn-red" data-act="resetok">Tak, usuń wszystko</button><button data-act="menu">Anuluj</button></div>`);break;
+ case 'resetok':localStorage.removeItem(SAVE_KEY);S=null;screen='title';render();modal(creatorHtml());break;
  case 'speed':SET.speed=SET.speed===1?2:SET.speed===2?3:1;saveSet();applySpeed();if(screen==='battle')refreshBattle();else{closeModal();render()}break;
  case 'logt':{SET.logOpen=!SET.logOpen;saveSet();const l=document.getElementById('log');if(l){l.classList.toggle('open',!!SET.logOpen);l.scrollTop=l.scrollHeight}break}
  case 'auto':SET.auto=!SET.auto;saveSet();refreshBattle();if(SET.auto&&B&&B.awaiting)autoAct(B.active);break;
