@@ -1,0 +1,54 @@
+/* ===== GRAFIKA ELDARII (generowane przez src/art/v/vart.py) ===== */
+/* Ścieżki do obrazków w assets/ (mapy, panoramy, portrety…). Portrety: wersja v19 w palecie PAL19 – src/art/style19/por19.py */
+const VART={
+ "world":"assets/maps/world.webp",
+ "velesia":"assets/maps/velesia.webp",
+ "p_weleszow":"assets/towns/panorama-weleszow.webp",
+ "p_dabrowa":"assets/towns/panorama-dabrowa.webp",
+ "p_kregoszew":"assets/towns/panorama-kregoszew.webp",
+ "p_sanow":"assets/towns/panorama-sanow.webp",
+ "p_kurhanow":"assets/towns/panorama-kurhanow.webp",
+ "p_mglista":"assets/towns/panorama-mglista.webp",
+ "emblem":"assets/ui/emblem.png",
+ "emblem_s":"assets/ui/emblem-s.png",
+ "n_wlodar":"assets/portraits/wlodar.png",
+ "n_szeptucha":"assets/portraits/szeptucha.png",
+ "n_starszy":"assets/portraits/starszy.png",
+ "n_szlachcianka":"assets/portraits/szlachcianka.png",
+ "n_intrygant":"assets/portraits/intrygant.png",
+ "n_husarz":"assets/portraits/husarz.png",
+ "n_kupiec":"assets/portraits/kupiec.png",
+ "n_lowczyni":"assets/portraits/lowczyni.png",
+ "n_magnat":"assets/portraits/magnat.png",
+ "n_kasztelan":"assets/portraits/kasztelan.png",
+ "n_szpieg":"assets/portraits/szpieg.png",
+ "n_duch":"assets/portraits/duch.png",
+ "n_herszt":"assets/portraits/herszt.png",
+ "n_dziewczyna":"assets/portraits/dziewczyna.png",
+ "n_kaplan":"assets/portraits/kaplan.png",
+ "n_bestia":"assets/portraits/bestia.png",
+ "n_rycerz":"assets/portraits/rycerz.png",
+ "n_straznik":"assets/portraits/straznik.png",
+ "n_luczniczka":"assets/portraits/luczniczka.png",
+ "n_szeptunka2":"assets/portraits/szeptunka2.png",
+ "n_rusalka":"assets/portraits/rusalka.png",
+ "n_poludnica":"assets/portraits/poludnica.png",
+ "n_babajaga":"assets/portraits/babajaga.png",
+ "n_leszy":"assets/portraits/leszy.png",
+ "n_utopiec":"assets/portraits/utopiec.png",
+ "n_strzyga":"assets/portraits/strzyga.png",
+ "e_husarz":"assets/events/husarz.png"
+};
+/* grafika v18 (mapa Velesii, miasta, tła walk) – generowane przez src/art/v18/v18art.py */
+const VART18={
+ "map":"assets/maps/velesia-large.webp",
+ "t_weleszow":"assets/towns/scene-weleszow.webp",
+ "t_dabrowa":"assets/towns/scene-dabrowa.webp",
+ "t_kregoszew":"assets/towns/scene-kregoszew.webp",
+ "t_sanow":"assets/towns/scene-sanow.webp",
+ "t_kurhanow":"assets/towns/scene-kurhanow.webp",
+ "bg_bagno":"assets/backgrounds/bagno.webp",
+ "bg_pola":"assets/backgrounds/pola.webp",
+ "bg_chata":"assets/backgrounds/chata.webp"
+};
+document.head.insertAdjacentHTML('beforeend','<style>'+['bagno','pola','chata'].map(k=>`.bg-${k} .ly-sky{background:#111 url(${VART18['bg_'+k]}) center bottom/cover no-repeat;image-rendering:pixelated}.bg-${k} .ly-far,.bg-${k} .ly-mid,.bg-${k} .ly-gr,.bg-${k} .ly-cl{background:none!important}`).join('')+'</style>');
