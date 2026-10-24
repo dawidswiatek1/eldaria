@@ -48,6 +48,8 @@ assets/
 2. **Every function and data table is defined in one place.** To change behaviour, edit the original
    definition. Don't add a later file that replaces or wraps it (`const _f=f; f=function(){…}`) or
    `Object.assign`s into another file's data: that is how the old single file grew hard to follow.
+   The one exception is `js/audio/sound.js`, which hooks sound effects onto a few game functions
+   so that all sound stays in one file.
 3. **The game starts in `js/main.js`.** It waits until every file, sprite, the font and all images are loaded,
    then shows the first screen.
 4. **Styles.** Each `css/*.css.js` file is normal CSS wrapped in `` css`…` ``. Edit it like any CSS.
