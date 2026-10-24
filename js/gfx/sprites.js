@@ -2,7 +2,7 @@ const RCOL=['#c9c9c9','#4a9dff','#b45cff','#ff9a2a'];
 const hexI=c=>parseInt(c.slice(1),16);
 let GFX_READY=false;
 function loadImg(o){return new Promise(res=>{const im=new Image();const done=()=>{try{const c=document.createElement('canvas');c.width=o.w;c.height=o.h;const x=c.getContext('2d');x.drawImage(im,0,0);o._d=x.getImageData(0,0,o.w,o.h).data}catch(e){o._d=new Uint8ClampedArray(o.w*o.h*4)}o._t=new Set((o.t||[]).map(hexI));res()};im.onload=done;im.onerror=()=>{o._d=new Uint8ClampedArray(o.w*o.h*4);o._t=new Set();res()};im.src=o.u})}
-async function loadGfx(){const all=[...Object.values(GFX.L),...Object.values(GFX.S),...(typeof HSPR!=='undefined'?Object.values(HSPR):[]),...Object.values(GFX.F),GFX.I,GFX.town];await Promise.all(all.map(loadImg));GFX_READY=true}
+async function loadGfx(){const all=[...Object.values(GFX.L),...Object.values(GFX.S),...(typeof HSPR!=='undefined'?Object.values(HSPR):[]),...Object.values(GFX.F),GFX.I];await Promise.all(all.map(loadImg));GFX_READY=true}
 function tintFn(tint){const t=[1,3,5].map(i=>parseInt(tint.slice(i,i+2),16));return (r,g,b)=>{const L=(r*.299+g*.587+b*.114)/255,k=.2+1.15*L;return t.map(v=>Math.max(0,Math.min(255,Math.round(v*k))))}}
 /* składanie warstw; fw>0 => odbicie każdej klatki osobno */
 function composeData(list,w,h,fw){const out=new ImageData(w,h),D=out.data;
@@ -50,4 +50,3 @@ let _icAt=null;
 function icon(n){const ck='I|'+n;if(_sprCache[ck])return _sprCache[ck];const A=GFX.I,i=A.names.indexOf(n);if(i<0)return '';
  if(!_icAt)_icAt=composeData([[A,null]],A.w,A.h,0);return _sprCache[ck]=dataURL(_icAt,i*14,0,14,14)}
 const ic=(n,s,cls)=>`<img class="px ic ${cls||''}" src="${icon(n)}" alt="" style="width:${s||18}px;height:${s||18}px">`;
-let _townUrl=null;const townImg=()=>_townUrl||(_townUrl=dataURL(composeData([[GFX.town,null]],GFX.town.w,GFX.town.h,0),0,0,GFX.town.w,GFX.town.h));

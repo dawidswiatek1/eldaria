@@ -1,12 +1,5 @@
 /* ===== LOS BOHATERÓW: bohater główny, skraj śmierci, szpital, trwałe urazy ===== */
 const DD={second:.25,exec:.15,execKill:.35,wipe:.6,injCap:4};
-/* trwałe urazy (p:1) – nie znikają same; w Szpitalu można je złagodzić (proteza = połowa kary) */
-Object.assign(INJ,{
- oko:{n:'Utrata oka',p:1,ic:'oko',tr:'Opaska i ćwiczenia',d:'−10% kryt., 10% szansy na pudło',f:{crit:-10,miss:.1}},
- kikut:{n:'Utrata ręki',p:1,tr:'Proteza ręki',d:'−20% ataku, −10% obrony (nie utrzyma tarczy)',f:{atkP:-.2,defP:-.1}},
- kulawy:{n:'Utrata nogi',p:1,tr:'Drewniana noga',d:'−3 szybkości, −10% obrony',f:{spd:-3,defP:-.1}},
- blizny:{n:'Blizny',p:1,ic:'st_bleed',tr:'Maści i okłady',d:'−8% PŻ',f:{hpP:-.08}},
- trauma:{n:'Trauma wojenna',p:1,m:1,tr:'Terapia u kapłana',d:'−8% ataku, −1 szybkości',f:{atkP:-.08,spd:-1}}});
 const injIc=k=>INJ[k].ic||(INJ[k].m?'mind':'injury');
 const injKind=k=>INJ[k].p?'trwały':'tymczasowy';
 /* korona bohatera głównego – mały pixel-art rysowany w locie */

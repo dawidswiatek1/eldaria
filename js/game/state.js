@@ -28,7 +28,10 @@ function newGame(cls,name,g){S={v:SAVE_VER,gold:230,stage:1,roster:[],team:[],sl
  const hero=makeHero(CLASSES[cls]?cls:'wojownik',g);if(name)hero.name=name;hero.main=true;S.roster.push(hero);S.team.push(hero.id);
  S.inv.push(makeItem(1,0,'kaftan'),makeItem(1,0,'pierscien'));townOk();save();screen='camp';tab='town';townView='tavern';render()}
 function makeHero(cls,g){const c=CLASSES[cls],v=()=>rnd(.9,1.1);g=g==='k'||g==='m'?g:(Math.random()<.5?'k':'m');const fn=pick(g==='k'?NAMES_K:NAMES_M);let ep=pick(EPI);if(g==='k'&&!/^z /.test(ep))ep=ep.replace(/[yi]$/,'a');
- const h={id:S.nextId++,name:fn+' '+ep,g,cls,lvl:1,xp:0,base:{hp:Math.round(c.hp*v()),atk:Math.round(c.atk*v()),def:Math.round(c.def*v()),spd:Math.round(c.spd*v()*10)/10},pts:{hp:0,atk:0,def:0,spd:0},free:0,tal:{},eq:{bron:null,zbroja:null,helm:null,amulet:null},kills:0};syncLoad(h);h.hp=stats(h).maxHp;return h}
+ const h={id:S.nextId++,name:fn+' '+ep,g,cls,lvl:1,xp:0,base:{hp:Math.round(c.hp*v()),atk:Math.round(c.atk*v()),def:Math.round(c.def*v()),spd:Math.round(c.spd*v()*10)/10},pts:{hp:0,atk:0,def:0,spd:0},free:0,tal:{},eq:{bron:null,zbroja:null,helm:null,amulet:null},kills:0};syncLoad(h);h.hp=stats(h).maxHp;
+ /* wygląd rekrutów: łuczniczki, strażnicy grodu, rycerze Velesii */
+ const fem=h.g==='k';
+ if(cls==='lucznik'&&fem&&Math.random()<.5)h.skin='luczniczka';else if(cls==='wojownik'&&!fem&&Math.random()<.3)h.skin='straznik';else if(cls==='paladyn'&&!fem&&Math.random()<.35)h.skin='rycerz';return h}
 /* v20: płeć bohaterów (g:'m'|'k') i imiona dopasowane do płci */
 const NAMES_M=['Bogdan','Mieszko','Jarek','Zbyszko','Bolko','Radek','Witold','Leszek','Ziemowit','Przemko','Kazko','Bronek','Stach','Wojmir','Dobromir','Gniewko','Sambor','Racibor','Lech','Mirosław','Sobiesław','Borzywoj','Wszebor','Dobek'];
 const NAMES_K=['Wanda','Jadwiga','Dobrawa','Kasia','Sława','Gosia','Mirka','Bożena','Ludmiła','Hela','Ola','Danuta','Bogna','Rada','Jagna','Mila','Zofia','Wiesława','Dobromiła','Lubomira','Marzanna','Świętosława','Gorzysława','Milena'];
@@ -39,8 +42,11 @@ function heroG(h){return (h.skin&&typeof SKIN!=='undefined'&&SKIN[h.skin]&&SKIN[
 /* forma gramatyczna: gf(postać,'męska','żeńska'); działa dla bohatera, jednostki w walce (u.hero) i wroga (po nazwie) */
 function gf(x,m,k){const g=x?(x.hero&&x.hero.g)||x.g||(x.hero?heroG(x.hero):genderOf(x.name)):'m';return g==='k'?k:m}
 const EPI=['Śmiały','Ponury','Szybki','z Sanowa','Żelazny','Mądry','Cichy','Rudy','Krzepki','Bezlitosny','z Gór','Wesoły','Stary','Młody'];
-function genOffers(){const keys=Object.keys(CLASSES);S.offers=[];const sh=keys.slice().sort(()=>Math.random()-.5);const L=tl('karczma');for(let i=0;i<8;i++){const h=makeHero(i<3?sh[i]:pick(keys));let x=0;if(L>=2&&Math.random()<.5)x=xpNeed(1)*(L>=3?2.2:1);if(x)gainXp(h,Math.round(x));h.hp=stats(h).maxHp;S.offers.push({hero:h,cost:Math.round(55+rnd(0,20)+(S.stage-1)*8+(h.lvl-1)*25)})}}
-function genShop(){S.shop=[];const L=tl('kowal'),luck=Math.min(.25,S.stage*.02)+(L-1)*.05;for(let i=0;i<4+2*L;i++){const it=makeItem(S.stage,rollRar(luck),i<2?pick(BASES.filter(b=>b.s==='bron')).k:null);it.price=Math.round(it.price*1.15);S.shop.push(it)}}
+function genOffers(){const keys=Object.keys(CLASSES);S.offers=[];const sh=keys.slice().sort(()=>Math.random()-.5);const L=tl('karczma');for(let i=0;i<8;i++){const h=makeHero(i<3?sh[i]:pick(keys));let x=0;if(L>=2&&Math.random()<.5)x=xpNeed(1)*(L>=3?2.2:1);if(x)gainXp(h,Math.round(x));h.hp=stats(h).maxHp;S.offers.push({hero:h,cost:Math.round(55+rnd(0,20)+(S.stage-1)*8+(h.lvl-1)*25)})}
+ /* reputacja u ludu zmienia ceny werbunku */
+ const m=repMul('lud',1);if(m!==1)S.offers.forEach(o=>o.cost=Math.round(o.cost*m))}
+function genShop(){S.shop=[];const L=tl('kowal'),luck=Math.min(.25,S.stage*.02)+(L-1)*.05;for(let i=0;i<4+2*L;i++){const it=makeItem(S.stage,rollRar(luck),i<2?pick(BASES.filter(b=>b.s==='bron')).k:null);it.price=Math.round(it.price*1.15);S.shop.push(it)}
+ S.shopLoc=null}/* shopLoc: towar kowala w innych miastach – shopLocal() w js/world/velesia-towns.js */
 const getHero=id=>S.roster.find(h=>h.id===id);
 const xpNeed=l=>50+l*30;
 const heroSkills=h=>['atak',...syncLoad(h)];

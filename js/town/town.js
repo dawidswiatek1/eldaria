@@ -28,46 +28,21 @@ function renderTown(){townOk();if(S.loc&&S.loc!=='weleszow'){renderSmallTown();r
  <h2>${emb(20)} Weleszów <small class="tsub">stolica Velesii</small></h2><button class="btn-small" data-act="journal">${ic('contract',18)}<span class="lbl"> Dziennik</span>${qBadge()}</button><span class="pill gold">${ic('gold',18)} ${S.gold}</span><button class="btn-small" data-act="menu" aria-label="Menu">${ic('gear',18)}</button><button class="btn-main tgo" data-act="map" ${S.team.length?'':'disabled'}>${ic(S.exp?'walk':'map',20)} ${S.exp?'Wyprawa':'Mapa'}</button></div>
  <div class="tscroll" id="tscroll"><div class="tmap" id="tmap"></div></div><div class="thint">${ic('walk',12)} Przesuń, by rozejrzeć się po mieście · dotknij budynku</div></div>`;
  layoutTown()}
-function layoutTown(){const sc=document.getElementById('tscroll'),m=document.getElementById('tmap');if(!sc||!m)return;const TM=GFX.TM;
- const s=Math.max(.5,sc.clientHeight/TM.H),W=Math.round(TM.W*s),H=Math.round(TM.H*s);
- m.style.width=W+'px';m.style.height=H+'px';
- let h=`<img class="px tbase" src="${TM.base}" style="width:${W}px;height:${H}px" alt=""><canvas class="tfx" id="tfx" width="${TM.W}" height="${TM.H}" style="width:${W}px;height:${H}px"></canvas>`;
- Object.keys(TM.pos).sort((a,b)=>TM.pos[a][1]-TM.pos[b][1]).forEach(k=>{const B=BUILD[k],o=TM.b[k][3],[x,y]=TM.pos[k],w=o.w*s,hh=o.h*s,l=(x-o.ax)*s,t=(y-o.ay)*s;
-  const lab=B.t,hot=bldAlert(k);
-  h+=`<img class="px tb" src="${o.u}" style="left:${Math.round(l)}px;top:${Math.round(t)}px;width:${Math.round(w)}px;height:${Math.round(hh)}px;z-index:${y}" alt="">`;
-  h+=`<button class="tlab" data-act="tbld" data-k="${k}" style="left:${Math.round(x*s)}px;top:${Math.round(Math.max(16,t+hh*.12))}px;z-index:${600+y}">${ic(B.ic,11)}<b>${B.n}</b><span>${lab}</span>${hot?'<em>!</em>':''}</button>`;
-  const bw=w*.8,bh=Math.max(hh*.75,o.ay*s*.6);h+=`<button class="thit" data-act="tbld" data-k="${k}" aria-label="${B.n}" style="left:${Math.round(x*s-bw/2)}px;top:${Math.round(y*s-bh)}px;width:${Math.round(bw)}px;height:${Math.round(bh)}px;z-index:${400+y}"></button>`});
- m.innerHTML=h;
- if(_tScroll==null)_tScroll=Math.max(0,TM.pos.zamek[0]*s-sc.clientWidth/2);sc.scrollLeft=_tScroll;
- const ls=[...m.querySelectorAll('.tlab')].sort((a,b)=>a.offsetTop-b.offsetTop),R=[];ls.forEach(e=>{let r=e.getBoundingClientRect();for(let n=0;n<4;n++){const o=R.find(q=>r.left<q.right&&q.left<r.right&&r.top<q.bottom&&q.top<r.bottom);if(!o)break;e.style.top=(e.offsetTop+(o.bottom-r.top)/UIZ+1)+'px';r=e.getBoundingClientRect()}R.push(r)});
- townAnim()}
-/* --- ożywienie mapy: mieszkańcy na drogach i migotanie wody --- */
-let _tAnimId=0;
-function townAnim(){const cv=document.getElementById('tfx');if(!cv)return;const TM=GFX.TM,x=cv.getContext('2d'),id=++_tAnimId,P=TM.paths||[],Wt=TM.water||[];
- const COL=['#7a2f2f','#2f4f7a','#3f6a35','#6a4a8a','#8a6a2f','#5a5a5a','#a04a20','#2f6a6a'],HAIR=['#2a1a10','#6a3a1a','#c8a050','#e8e0d0','#3a2a20'],SK=['#f0c8a0','#d8a878','#a87050'];
- const seg=p=>{let L=[0];for(let i=1;i<p.length;i++)L.push(L[i-1]+Math.hypot(p[i][0]-p[i-1][0],p[i][1]-p[i-1][1]));return L};
- const PL=P.map(seg),rnd=a=>a[Math.floor(Math.random()*a.length)];
- const ppl=[];P.forEach((p,i)=>{const n=PL[i][PL[i].length-1]>120?3:2;for(let j=0;j<n;j++)ppl.push({p:i,d:Math.random()*PL[i][PL[i].length-1],v:(Math.random()<.5?-1:1)*(4+Math.random()*4),c:rnd(COL),h:rnd(HAIR),s:rnd(SK),w:0,hat:Math.random()<.3})});
- const at=(o)=>{const p=P[o.p],L=PL[o.p];let i=1;while(i<L.length-1&&L[i]<o.d)i++;const f=(o.d-L[i-1])/((L[i]-L[i-1])||1);return [p[i-1][0]+(p[i][0]-p[i-1][0])*f,p[i-1][1]+(p[i][1]-p[i-1][1])*f]};
- const red=matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;let last=performance.now(),fr=0;
- function man(o,X,Y,st){X=Math.round(X);Y=Math.round(Y);x.fillStyle='rgba(0,0,0,.28)';x.fillRect(X-2,Y,5,1);
-  x.fillStyle='#1a120e';x.fillRect(X-2,Y-9,5,8);x.fillRect(X-1,Y-10,3,1);
-  x.fillStyle=o.hat?'#8a5a2a':o.h;x.fillRect(X-1,Y-9,3,2);if(o.hat){x.fillRect(X-2,Y-8,5,1)}
-  x.fillStyle=o.s;x.fillRect(X-1,Y-7,3,1);
-  x.fillStyle=o.c;x.fillRect(X-1,Y-6,3,3);
-  x.fillStyle='#2a2018';const a=st%2;x.fillRect(X-1,Y-3,1,2+a);x.fillRect(X+1,Y-3,1,3-a);x.clearRect(X-2,Y-1,5,1);x.fillStyle='rgba(0,0,0,.28)';x.fillRect(X-2,Y,5,1);x.fillStyle='#2a2018';x.fillRect(X-1+(a?0:2),Y-1,1,1)}
- function draw(t){x.clearRect(0,0,TM.W,TM.H);
-  for(let i=0;i<Wt.length;i++){const q=Wt[i],v=Math.sin(t/700+i*2.39)*Math.sin(t/1300+i*.7);if(v>.82){x.fillStyle=v>.93?'#ffffff':'#cfe8ff';x.fillRect(q[0],q[1],1,1);if(v>.95){x.fillStyle='#e8f6ff';x.fillRect(q[0]-1,q[1],3,1)}}}
-  ppl.sort((a,b)=>a._y-b._y).forEach(o=>{const [X,Y]=at(o);o._y=Y;man(o,X,Y,o.w?0:Math.floor(t/220+o.d))})}
- function step(now){if(id!==_tAnimId||!document.body.contains(cv))return;const dt=Math.min(.2,(now-last)/1000);
-  if(now-last>=90){last=now;ppl.forEach(o=>{if(o.w>0){o.w-=dt;return}const L=PL[o.p][PL[o.p].length-1];o.d+=o.v*dt;if(o.d<0||o.d>L){o.v=-o.v;o.d=Math.max(0,Math.min(L,o.d));if(Math.random()<.5)o.w=1+Math.random()*3}else if(Math.random()<.003)o.w=1+Math.random()*2});draw(now)}
-  requestAnimationFrame(step)}
- draw(performance.now());if(!red)requestAnimationFrame(step)}
+/* Weleszów: nowa mapa miasta (przewijana poziomo) – sceny i hotspoty: SCN w js/world/velesia-towns.js */
+function layoutTown(){const sc=document.getElementById('tscroll'),m=document.getElementById('tmap');if(!sc||!m)return;const H=sc.clientHeight,W=Math.round(H*16/9);
+ m.style.width=W+'px';m.style.height=H+'px';const D=SCN.weleszow;let h=`<img class="px tbase" src="${VART18.t_weleszow}" style="width:${W}px;height:${H}px" alt="" draggable="false">`;
+ for(const k in D.b){const B=BUILD[k],r=D.b[k],hot=bldAlert(k);h+=`<button class="thit" data-act="tbld" data-k="${k}" aria-label="${B.n}" style="left:${r[0]}%;top:${r[1]}%;width:${r[2]}%;height:${r[3]}%;z-index:${400+r[5]}"></button>`;
+  h+=`<button class="tlab" data-act="tbld" data-k="${k}" style="left:${r[4]}%;top:${r[5]}%;z-index:${600+r[5]}">${ic(B.ic,11)}<b>${B.n}</b><span>${B.t}</span>${hot?'<em>!</em>':''}</button>`}
+ D.x.forEach(o=>{const X=XNAME[o.v],r=o.r;h+=`<button class="tlab tx" data-act="town" data-v="${o.v}" style="left:${r[4]}%;top:${r[5]}%;z-index:${600+r[5]}">${ic(X[1],11)}<b>${X[0]}</b><span>zlecenia</span>${tabAlert()?'<em>!</em>':''}</button>`});
+ D.g.forEach((g,i)=>{h+=`<button class="snpc" data-act="rumor" data-i="${i}" style="left:${g.x}%;top:${g.y}%;height:${g.h}%;z-index:${500+g.y}" aria-label="Strażnik">${sprFrame(g.s)}<span>${ic('event',10)}</span></button>`});
+ m.innerHTML=h;{let bl=sc.querySelector('.sblur');if(W<sc.clientWidth-2){if(!bl)sc.insertAdjacentHTML('afterbegin',`<img class="sblur" src="${VART18.t_weleszow}" alt="" aria-hidden="true">`)}else if(bl)bl.remove()}
+ if(_tScroll==null)_tScroll=Math.max(0,W*.5-sc.clientWidth/2);sc.scrollLeft=_tScroll;
+ const ls=[...m.querySelectorAll('.tlab')].sort((a,b)=>a.offsetTop-b.offsetTop),R=[];ls.forEach(e=>{let r=e.getBoundingClientRect();for(let n=0;n<4;n++){const o=R.find(q=>r.left<q.right&&q.left<r.right&&r.top<q.bottom&&q.top<r.bottom);if(!o)break;e.style.top=(e.offsetTop+(o.bottom-r.top)/UIZ+1)+'px';r=e.getBoundingClientRect()}R.push(r)})}
 addEventListener('scroll',e=>{if(e.target&&e.target.id==='tscroll')_tScroll=e.target.scrollLeft},true);
 addEventListener('resize',()=>{if(screen==='camp'&&tab==='town'&&!townView)setTimeout(layoutTown,120)});
 /* --- nagłówek budynku (usługa) --- */
 function bldAlert(k){if(!S)return false;if(k==='zamek')return S.con.act.some(c=>c.ok);if(k==='lecznica')return S.roster.some(h=>h.hosp>0);if(k==='gildia')return (S.bnt||[]).some(t=>(S.tro[t.k]||0)>=t.n);return false}
-function bldHead(k){townOk();const B=BUILD[k],o=GFX.TM.b[k][3],sc=Math.min(2,64/o.h,96/o.w);
+function bldHead(k){townOk();const B=BUILD[k],o=GFX.BLD[k],sc=Math.min(2,64/o.h,96/o.w);
  return `<div class="bhead"><div class="bimg"><img class="px" src="${o.u}" style="width:${Math.round(o.w*sc)}px;height:${Math.round(o.h*sc)}px" alt=""></div><div class="binf"><div class="row1"><button class="btn-small" data-act="town" data-v="">${ic('back',16)}<span class="lbl"> ${S.loc&&NODES[S.loc]?NODES[S.loc].n:'Miasto'}</span></button><h2>${ic(B.ic,20)} ${bName(k)}</h2></div>
  <div class="sub">${B.d}</div><div class="sub gold">${ic('flag',12)} ${B.s}</div></div></div>`}
 function bldView(v){const k=BV[v];let b=bldHead(k);
@@ -86,7 +61,7 @@ function conGen(){regOk();const R=S.reg,open=R.lv.map((l,i)=>l?i:-1).filter(i=>i
  opts.push({t:'exp',n:2,g:G(40+st*8),txt:'Ukończ 2 wyprawy',s:'Dowolne krainy i poziomy'});
  const c=pick(opts);c.id=++S.con.n;c.p=0;return c}
 function rollCon(){S.con.av=[];const seen=new Set();let t=0;while(S.con.av.length<3&&t++<30){const c=conGen(),key=c.t+(c.e||'')+(c.r!=null?c.r:'');if(seen.has(key))continue;seen.add(key);S.con.av.push(c)}}
-function conEv(type,d){if(!S||!S.con)return;const done=[];S.con.act.forEach(c=>{if(c.ok)return;
+function conEv(type,d){if(S&&S.con){const done=[];S.con.act.forEach(c=>{if(c.ok)return;
  if(type==='kill'&&c.t==='kill'&&c.e===d)c.p++;
  else if(type==='boss'&&c.t==='boss'&&c.r===d)c.p=1;
  else if(type==='elite'&&c.t==='elite')c.p++;
@@ -94,7 +69,9 @@ function conEv(type,d){if(!S||!S.con)return;const done=[];S.con.act.forEach(c=>{
  else if(type==='tro'&&c.t==='tro')c.p+=d||1;
  else if(type==='exp'){if(c.t==='exp')c.p++;if(c.t==='clean'&&d.r===c.r&&d.L>=c.L&&!d.lost)c.p=1;if(c.t==='gold'&&d.gold>=c.n)c.p=c.n}
  c.p=Math.min(c.p,c.n);if(c.p>=c.n){c.ok=1;done.push(c)}});
- if(done.length)setTimeout(()=>toast(`${'✔'} Kontrakt wykonany: ${done[0].txt}! Odbierz nagrodę w Zamku.`),400);return done}
+ if(done.length)setTimeout(()=>toast(`${'✔'} Kontrakt wykonany: ${done[0].txt}! Odbierz nagrodę w Zamku.`),400)}
+ /* zadania z Dziennika też liczą zabicia */
+ if(type==='kill')questKill(d)}
 function conCard(c,act){const pr=c.t==='gold'?(c.p>=c.n?'✔':'0/1'):`${c.p}/${c.n}`;return `<div class="con ${c.ok?'ok':''}"><div class="ci">${ic('contract',28)}</div><div class="cinf"><b>${esc(c.txt)}</b><small>${esc(c.s||'')}</small><small class="rw">${ic('gold',12)} ${c.g}${c.it?` + przedmiot (${RAR[c.it].n.toLowerCase()}+)`:''}</small>${act?`<i class="bar xp"><i style="width:${(c.t==='gold'?(c.ok?1:0):c.p/c.n)*100}%"></i></i><small>Postęp: ${pr}</small>`:''}</div>
  ${act?(c.ok?`<button class="btn-small btn-gold" data-act="conclaim" data-id="${c.id}">Odbierz</button>`:`<button class="btn-small" data-act="condrop" data-id="${c.id}" aria-label="Porzuć">✕</button>`):`<button class="btn-small btn-green" data-act="contake" data-id="${c.id}" ${S.con.act.length>=CON_N()?'disabled':''}>Przyjmij</button>`}</div>`}
 function castleHtml(){const L=tl('zamek'),cap=[0,300,1000,3000][L],rate=[0,5,8,12][L];
@@ -119,7 +96,14 @@ function trainPayout(){const o=[];S.roster.filter(h=>h.tr).forEach(h=>{const l=h
 const INJ={
  reka:{n:'Złamana ręka',d:'−15% ataku',f:{atkP:-.15}},noga:{n:'Skręcona noga',d:'−2 szybkości',f:{spd:-2}},zebra:{n:'Złamane żebra',d:'−15% PŻ',f:{hpP:-.15}},
  glowa:{n:'Wstrząs mózgu',d:'−10% ataku, −1 szybkości',f:{atkP:-.1,spd:-1}},rana:{n:'Głęboka rana',d:'−10% PŻ i obrony',f:{hpP:-.1,defP:-.1}},
- lek:{n:'Lęk',m:1,d:'−15% obrony',f:{defP:-.15}},koszmary:{n:'Koszmary',m:1,d:'−10% PŻ, −1 szybkości',f:{hpP:-.1,spd:-1}},gniew:{n:'Ślepy gniew',m:1,d:'+10% ataku, −20% obrony',f:{atkP:.1,defP:-.2}}};
+ lek:{n:'Lęk',m:1,d:'−15% obrony',f:{defP:-.15}},koszmary:{n:'Koszmary',m:1,d:'−10% PŻ, −1 szybkości',f:{hpP:-.1,spd:-1}},gniew:{n:'Ślepy gniew',m:1,d:'+10% ataku, −20% obrony',f:{atkP:.1,defP:-.2}},
+ /* trwałe urazy (p:1) – nie znikają same; w Szpitalu można je złagodzić (proteza = połowa kary) */
+ oko:{n:'Utrata oka',p:1,ic:'oko',tr:'Opaska i ćwiczenia',d:'−10% kryt., 10% szansy na pudło',f:{crit:-10,miss:.1}},
+ kikut:{n:'Utrata ręki',p:1,tr:'Proteza ręki',d:'−20% ataku, −10% obrony (nie utrzyma tarczy)',f:{atkP:-.2,defP:-.1}},
+ kulawy:{n:'Utrata nogi',p:1,tr:'Drewniana noga',d:'−3 szybkości, −10% obrony',f:{spd:-3,defP:-.1}},
+ blizny:{n:'Blizny',p:1,ic:'st_bleed',tr:'Maści i okłady',d:'−8% PŻ',f:{hpP:-.08}},
+ trauma:{n:'Trauma wojenna',p:1,m:1,tr:'Terapia u kapłana',d:'−8% ataku, −1 szybkości',f:{atkP:-.08,spd:-1}}
+};
 function injFx(h){const o={atkP:0,hpP:0,defP:0,spd:0,crit:0,miss:0};(h.inj||[]).forEach(k=>{const f=INJ[k]&&INJ[k].f;if(!f)return;const m=h.injT&&h.injT[k]?.5:1;for(const s in f)o[s]+=f[s]*m});return o}
 const injChips=h=>(h.inj||[]).filter(k=>INJ[k]).map(k=>`<span class="inj ${INJ[k].m?'m':''} ${INJ[k].p?'p':''}" title="${INJ[k].n} (${injKind(k)}${h.injT&&h.injT[k]?', złagodzony':''}): ${INJ[k].d}">${ic(injIc(k),12)}${INJ[k].n}</span>`).join('');
 function rollInjuries(){const out=[];if(!B)return out;const red=.8;
@@ -128,10 +112,19 @@ function rollInjuries(){const out=[];if(!B)return out;const red=.8;
 /* --- TARG i ZAPASY --- */
 const SUP={
  pochodnia:{n:'Pochodnia',ic:'torch',p:12,lv:1,d:'Oświetla 2 kolejne komnaty: widzisz je na mapie, a pułapki i zasadzki w nich zostaną wykryte.',w:'exp'},
- bandaz:{n:'Bandaż',ic:'bandaz',p:10,lv:1,d:'Leczy 20% PŻ jednego bohatera i tamuje krwawienie lub truciznę.',w:'one'},
+ bandaz:{n:'Bandaż',ic:'bandaz',p:10,lv:1,d:'Leczy 20% PŻ jednego bohatera i tamuje krwawienie lub truciznę.',w:'one',h:.2},
  prowiant:{n:'Prowiant',ic:'prowiant',p:8,lv:1,d:'Drużyna odzyskuje 10% PŻ. Przy ognisku: odpoczynek leczy 60% zamiast 35%.',w:'exp'},
- mikstura:{n:'Mikstura lecznicza',ic:'mikstura',p:28,lv:2,d:'Leczy 45% PŻ jednego bohatera.',w:'one'},
- ziola:{n:'Zioła lecznicze',ic:'ziola',p:40,lv:3,d:'Cała drużyna odzyskuje 25% PŻ (także w walce).',w:'all'}};
+ mikstura:{n:'Mikstura lecznicza',ic:'mikstura',p:28,lv:2,d:'Leczy 45% PŻ jednego bohatera.',w:'one',h:.45},
+ ziola:{n:'Zioła lecznicze',ic:'ziola',p:40,lv:3,d:'Cała drużyna odzyskuje 25% PŻ (także w walce).',w:'all',h:.25},
+ /* Alchemik (src:'alch'): mikstury i eliksiry na wyprawę */
+ wmikstura:{n:'Wielka mikstura',ic:'mikstura',p:55,lv:1,src:'alch',w:'one',h:.7,d:'Leczy 70% PŻ jednego bohatera.'},
+ e_ogien:{n:'Eliksir ognioodporności',ic:'st_burn',p:35,lv:1,src:'alch',w:'buff',fx:{res:{ogien:35}},d:'+35% odporności na ogień dla drużyny do końca wyprawy.'},
+ e_trucizna:{n:'Eliksir przeciw truciźnie',ic:'st_poison',p:35,lv:1,src:'alch',w:'buff',fx:{res:{trucizna:35}},d:'+35% odporności na truciznę do końca wyprawy.'},
+ e_mrok:{n:'Eliksir światła',ic:'st_dark',p:45,lv:2,src:'alch',w:'buff',fx:{res:{mrok:35}},d:'+35% odporności na mrok do końca wyprawy.'},
+ e_lod:{n:'Eliksir żaru',ic:'sk_lod',p:45,lv:2,src:'alch',w:'buff',fx:{res:{lod:35}},d:'+35% odporności na lód do końca wyprawy.'},
+ e_sila:{n:'Eliksir siły',ic:'atk',p:60,esc:1,lv:2,src:'alch',w:'buff',fx:{atkP:.15},d:'+15% ataku drużyny do końca wyprawy.'},
+ e_skora:{n:'Eliksir żelaznej skóry',ic:'def',p:60,esc:1,lv:3,src:'alch',w:'buff',fx:{defP:.2},d:'+20% obrony drużyny do końca wyprawy.'}
+};
 const bagCap=()=>4+2*tl('targ');
 const bagN=()=>Object.values(S.sup||{}).reduce((a,b)=>a+b,0);
 const bagB=()=>Object.keys(SUP).filter(k=>SUP[k].w!=='exp').reduce((a,k)=>a+((S.sup||{})[k]||0),0);

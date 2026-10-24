@@ -34,7 +34,7 @@ assets/
   backgrounds/        battle backgrounds (far / mid / ground layers)
   maps/               world map, Velesia maps, regions map
   towns/              town panoramas and town scenes
-  town-map/           bird's-eye town map and its buildings (4 variants each)
+  buildings/          building pictures shown at the top of each town service
   portraits/          NPC portraits
   objects/            chests, camp, shrine… shown in expedition rooms
   events/             event illustrations
@@ -44,28 +44,36 @@ assets/
 
 1. **Script order matters.** All `js/` files share one global scope, just like the old single file.
    A file can only use, at load time, what was defined in files above it in `index.html`.
-   Files that wrap or patch existing functions (for example `game/actions.js`, `world/velesia-map.js`)
-   must stay after the files that define those functions. A new file gets its own `<script>` line
-   in the right place in `index.html`, before `js/main.js`.
-2. **The game starts in `js/main.js`.** It waits until every file, sprite, the font and all images are loaded,
+   A new file gets its own `<script>` line in the right place in `index.html`, before `js/main.js`.
+2. **Every function and data table is defined in one place.** To change behaviour, edit the original
+   definition. Don't add a later file that replaces or wraps it (`const _f=f; f=function(){…}`) or
+   `Object.assign`s into another file's data: that is how the old single file grew hard to follow.
+3. **The game starts in `js/main.js`.** It waits until every file, sprite, the font and all images are loaded,
    then shows the first screen.
-3. **Styles.** Each `css/*.css.js` file is normal CSS wrapped in `` css`…` ``. Edit it like any CSS.
+4. **Styles.** Each `css/*.css.js` file is normal CSS wrapped in `` css`…` ``. Edit it like any CSS.
    They are not plain `.css` files on purpose: on large monitors the game rescales its `@media`
    rules by rewriting the style text (`scaleMQ` in `js/core/viewport.js`), and browsers don't let
    scripts read separate `.css` files when the game is opened from disk. The order of these files
    in `index.html` is the CSS cascade order.
-4. **Images.** To change a picture, replace the file in `assets/` and keep its name.
+5. **Images.** To change a picture, replace the file in `assets/` and keep its name.
    Image lists live in `js/data/art.js` (maps, panoramas, portraits), `js/data/gfx-misc.js`
-   (town map, room objects) and `css/assets.css.js` (frames, textures, battle backgrounds).
-5. **Sprite sheets stay inside JS.** Hero layers, enemies, icons, battle effects and unique heroes
+   (buildings, room objects) and `css/assets.css.js` (frames, textures, battle backgrounds).
+6. **Sprite sheets stay inside JS.** Hero layers, enemies, icons, battle effects and unique heroes
    (`js/data/gfx-heroes.js`, `gfx-enemies.js`, `gfx-misc.js`, `sprites-v19.js`) are still stored
    as base64 text. The game reads their pixels to tint and combine layers, and browsers block that
    for separate image files opened from disk. These files are generated data: replace whole entries
    rather than editing them by hand.
 
-## What changed compared to the single file
+## History
 
-Every line of game code was copied unchanged. The only differences:
+**Cleanup (October 2026).** Over many versions, later code had been patching earlier code:
+functions replaced or wrapped from other files, data tables overwritten after they were defined.
+All of that was merged into the original definitions, and code that could never run (the old town
+map and its animation, the old camp town view, unused building pictures) was removed.
+Behaviour is unchanged: checked side by side against the previous version with repeatable
+randomness (game data, each merged function, forced battles and a long playthrough).
+
+**Split from the single file.** Every line of game code was copied unchanged. The only differences:
 
 - Embedded images and the font are now real files in `assets/` (same bytes, same pictures).
   Older portrait versions that the game always overwrote were not kept.

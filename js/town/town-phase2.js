@@ -1,13 +1,4 @@
 /* ===== MIASTO – FAZA 2: Alchemik, Zaklinacz, Cmentarz, Gildia łowców, trofea, materiały, efekty wypraw ===== */
-Object.assign(SUP,{
- wmikstura:{n:'Wielka mikstura',ic:'mikstura',p:55,lv:1,src:'alch',w:'one',h:.7,d:'Leczy 70% PŻ jednego bohatera.'},
- e_ogien:{n:'Eliksir ognioodporności',ic:'st_burn',p:35,lv:1,src:'alch',w:'buff',fx:{res:{ogien:35}},d:'+35% odporności na ogień dla drużyny do końca wyprawy.'},
- e_trucizna:{n:'Eliksir przeciw truciźnie',ic:'st_poison',p:35,lv:1,src:'alch',w:'buff',fx:{res:{trucizna:35}},d:'+35% odporności na truciznę do końca wyprawy.'},
- e_mrok:{n:'Eliksir światła',ic:'st_dark',p:45,lv:2,src:'alch',w:'buff',fx:{res:{mrok:35}},d:'+35% odporności na mrok do końca wyprawy.'},
- e_lod:{n:'Eliksir żaru',ic:'sk_lod',p:45,lv:2,src:'alch',w:'buff',fx:{res:{lod:35}},d:'+35% odporności na lód do końca wyprawy.'},
- e_sila:{n:'Eliksir siły',ic:'atk',p:60,esc:1,lv:2,src:'alch',w:'buff',fx:{atkP:.15},d:'+15% ataku drużyny do końca wyprawy.'},
- e_skora:{n:'Eliksir żelaznej skóry',ic:'def',p:60,esc:1,lv:3,src:'alch',w:'buff',fx:{defP:.2},d:'+20% obrony drużyny do końca wyprawy.'}});
-SUP.bandaz.h=.2;SUP.mikstura.h=.45;SUP.ziola.h=.25;
 const alchPrice=k=>Math.round(SUP[k].p*(S&&S.loc==='dabrowa'?.8:1));
 /* --- efekty wyprawy (eliksiry, duchy) --- */
 function expAddFx(E,fx,name){const F=E.fx=E.fx||{atkP:0,defP:0,crit:0,heal:0,gold:0,res:{},l:[]};for(const k in fx){if(k==='res'){for(const r in fx.res)F.res[r]=(F.res[r]||0)+fx.res[r]}else F[k]=(F[k]||0)+fx[k]}F.l.push(name)}
@@ -15,7 +6,9 @@ function buffUnit(u,fx){if(!fx||u.side!=='h')return;if(fx.atkP)u.atk=Math.round(
  if(fx.res&&Object.keys(fx.res).length){u.res=Object.assign({},u.res);for(const k in fx.res)u.res[k]=Math.min(RES_CAP,(u.res[k]||0)+fx.res[k])}}
 const fxChips=E=>E&&E.fx&&E.fx.l.length?`<button class="btn-small xfx" data-act="fxinfo" title="Aktywne efekty">${ic('xp',14)}<span>${E.fx.l.length}</span></button>`:'';
 function fxDesc(F){const o=[];if(F.atkP)o.push(`+${Math.round(F.atkP*100)}% ataku`);if(F.defP)o.push(`+${Math.round(F.defP*100)}% obrony`);if(F.crit)o.push(`+${F.crit}% kryt.`);if(F.heal)o.push(`po walce +${Math.round(F.heal*100)}% PŻ`);if(F.gold)o.push(`+${Math.round(F.gold*100)}% złota z walk`);for(const k in F.res)o.push(`${DT[k].n}: +${F.res[k]}%`);return o.join(' · ')}
-function expStartTown(E){if(S.spirit){expAddFx(E,S.spirit.fx,'Duch: '+S.spirit.name);S.spirit=null}}
+function expStartTown(E){if(S.spirit){expAddFx(E,S.spirit.fx,'Duch: '+S.spirit.name);S.spirit=null}
+ /* błogosławieństwo (droga, obrzędy) i efekty unikalnych towarzyszy */
+ if(S.bless){expAddFx(E,S.bless.fx,S.bless.name);S.bless=null}partyHeroes().forEach(h=>{const U=h.uniq&&UNIQ[h.uniq];if(U)expAddFx(E,U.fx,U.fxn)})}
 /* --- łupy z walk: trofea, materiały --- */
 function expDrops(boss){const E=S.exp,tro={},o=[];let odl=(Math.random()<.6?1:0)+(B.elite?1:0)+(boss?3:0),esc=(Math.random()<(B.elite?.5:.15)?1:0)+(boss?2:0),n=0;
  B.units.filter(u=>u.side==='e').forEach(u=>{S.kills[u.key]=(S.kills[u.key]||0)+1;if(Math.random()<(u.boss?1:B.elite?.35:.22)){S.tro[u.key]=(S.tro[u.key]||0)+1;tro[u.key]=(tro[u.key]||0)+1;n++}});

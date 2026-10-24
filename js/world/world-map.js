@@ -11,27 +11,50 @@ const KINGDOMS=[
  {k:'wschod',n:'Nieznane Ziemie',d:'Za Wielkim Grzbietem kończą się mapy. Nikt stamtąd nie wrócił.',x:90,y:24}
 ];
 const NODES={
- weleszow:{n:'Weleszów',t:'Stolica Velesii',ty:'town',x:52.5,y:21,ic:'b_zamek',d:'Murowane miasto z zamkiem na wzgórzu nad rzeką: targi, świątynie i dwór królewski. Renesansowe kamienice mieszają się tu ze starszymi drewnianymi dzielnicami.'},
- dabrowa:{n:'Dąbrowa',t:'Miasto leśne',ty:'town',x:16.5,y:46,ic:'ziola',d:'Osada przy starym gaju, słynna z szeptunów i handlu ziołami. Nieopodal stoją kamienne kręgi.'},
- kregoszew:{n:'Kręgoszew',t:'Gród graniczny',ty:'town',x:19,y:79,ic:'b_koszary',d:'Warownia na skraju puszczy, broniąca Velesii przed najazdami z Martwych Ziem.'},
- sanow:{n:'Sanów',t:'Port rzeczny',ty:'town',x:62.5,y:55,ic:'tavern',d:'Port rzeczny pełen spichlerzy i warsztatów. Najlepsze miejsce, by znaleźć nowych towarzyszy.'},
- kurhanow:{n:'Kurhanów',t:'Osada przy kurhanach',ty:'town',x:51,y:76,ic:'b_cmentarz',d:'Mała osada wokół starych mogił. Mieszkańcy strzegą tajemnic przodków.'},
- polana:{n:'Mglista Polana',t:'Sekretna lokacja',ty:'site',hidden:1,x:17.5,y:17,ic:'event',d:'Przeklęta – a może święta – polana w głębi lasu, związana z duchami i pieczęciami Asterionu.'},
- puszcza:{n:'Mroczna Puszcza',t:'Wyprawa · kraina I',ty:'site',r:0,x:33,y:30,home:'dabrowa',d:'Prastara puszcza na północ od Dąbrowy. Gobliny, wilki i coś, co porusza się między drzewami.'},
- trakt:{n:'Trakt Bandytów',t:'Wyprawa · kraina II',ty:'site',r:1,x:41,y:46,home:'sanow',d:'Kupiecki trakt między Weleszowem a Sanowem, od lat nękany przez bandy zbójców.'},
- kurhany:{n:'Kurhany Przodków',t:'Wyprawa · kraina III',ty:'site',r:2,x:66,y:86,home:'kurhanow',d:'Kurhany i krypty pod nimi. Niektórzy przodkowie nie śpią spokojnie.'},
- grzbiet:{n:'Wielki Grzbiet',t:'Wyprawa · kraina IV',ty:'site',r:3,x:79,y:23,home:'sanow',d:'Mgliste turnie granicznego pasma. Orkowie, harpie i kamienne olbrzymy.'},
- jama:{n:'Smocza Jama',t:'Wyprawa · kraina V',ty:'site',r:4,x:86,y:39,home:'sanow',d:'Rozżarzona pieczara w zboczu Wielkiego Grzbietu. Leże smoka.'},
- poludnie:{n:'Równiny Południowe',t:'ku Avarii',ty:'exit',x:86,y:82,ic:'lock',d:'Szeroki trakt na południe, ku stepom Avarii. Granica jest na razie zamknięta – wkrótce.'}
-};
-const EDGES=[['weleszow','trakt'],['trakt','sanow'],['weleszow','puszcza'],['puszcza','dabrowa'],['trakt','dabrowa'],['dabrowa','kregoszew'],['dabrowa','polana'],['kregoszew','kurhanow'],['sanow','kurhanow'],['kurhanow','kurhany'],['sanow','grzbiet'],['grzbiet','jama'],['weleszow','grzbiet'],['sanow','poludnie']];
-const SITE_OF_R=['puszcza','trakt','kurhany','grzbiet','jama'];
+ weleszow:{n:'Weleszów',t:'Stolica Velesii',ty:'town',x:53,y:17,ic:'b_zamek',d:'Zamek na skalistym wzgórzu nad Veleską, rynek z fontanną, kościół z czerwonej cegły i port rzeczny. Serce królestwa.'},
+ dabrowa:{n:'Dąbrowa',t:'Osada w świętym gaju',ty:'town',x:35.5,y:30.5,ic:'ziola',d:'Osada przy prastarym dębie, słynna z szeptunów i handlu ziołami. Wokół stoją kamienne kręgi.'},
+ kregoszew:{n:'Kręgoszew',t:'Gród graniczny',ty:'town',x:75,y:53,ic:'b_koszary',d:'Drewniana warownia na skale, ostatnia straż przed Martwymi Ziemiami. Kowale, koszary i kontrakty graniczne.'},
+ sanow:{n:'Sanów',t:'Miasto kupców',ty:'town',x:46,y:62.5,ic:'tavern',d:'Ruchliwe miasto targowe na skrzyżowaniu traktów. Spichlerze, przystań i najwięcej najemników w Velesii.'},
+ kurhanow:{n:'Kurhanów',t:'Osada przy kurhanach',ty:'town',x:60.5,y:63,ic:'b_cmentarz',d:'Mała osada u stóp starych mogił. Mieszkańcy strzegą pamięci przodków.'},
+ brzezina:{n:'Brzezina',t:'Wieś',ty:'town',vil:1,x:41,y:42,ic:'nav_town',d:'Spokojna wieś wśród brzóz. Karczma, plotki i kilku chętnych do wojaczki.'},
+ olszynow:{n:'Olszynów',t:'Wieś rolnicza',ty:'town',vil:1,x:62,y:36,ic:'nav_town',hidden:1,d:'Bogata wieś wśród złotych pól. Chłopi szepczą o białej pani, która chodzi w południe po zbożu.'},
+ mokradla:{n:'Mokradła',t:'Wieś na grobli',ty:'town',vil:1,x:22,y:68,ic:'nav_town',hidden:1,d:'Chaty na palach na skraju Bagna Czarnego. Zielarze i rybacy, którzy nie chodzą nad wodę po zmroku.'},
+ mlyn:{n:'Młyn nad Veleską',t:'Ciekawe miejsce',ty:'poi',x:29.5,y:49.5,ic:'event',hidden:1,d:'Stary młyn wodny. Młynarz podobno ma układ z wodnikiem.'},
+ kapliczka:{n:'Leśna kapliczka',t:'Ciekawe miejsce',ty:'poi',x:18,y:41,ic:'temple',hidden:1,d:'Drewniana kapliczka na rozstaju leśnych dróg. Wędrowcy zostawiają tu dary.'},
+ krag:{n:'Krąg Kamienny',t:'Ciekawe miejsce',ty:'poi',x:26,y:22,ic:'event',hidden:1,d:'Omszałe głazy ustawione w krąg. Szeptunki przychodzą tu w noc Kupały.'},
+ straznica:{n:'Strażnica',t:'Ciekawe miejsce',ty:'poi',x:84,y:40,ic:'flag',hidden:1,d:'Opuszczona wieża sygnałowa u stóp gór. Z jej szczytu widać Martwe Ziemie.'},
+ ruiny:{n:'Ruiny Asterionu',t:'Ciekawe miejsce',ty:'poi',x:61.5,y:73,ic:'event',hidden:1,d:'Kolumny i łuki z czasów dawnych magów. Na kamieniach wciąż widać runy.'},
+ doliny:{n:'Mgliste Doliny',t:'Ciekawe miejsce',ty:'poi',x:77,y:27,ic:'event',hidden:1,d:'Doliny wiecznie spowite mgłą. Ludzie słyszą tu głosy zmarłych.'},
+ rozlewiska:{n:'Rozlewiska Utopców',t:'Ciekawe miejsce',ty:'poi',x:28,y:59,ic:'event',hidden:1,d:'Zalane łąki nad Veleską. Rusałki i utopce wciągają tu nieostrożnych.'},
+ polana:{n:'Mglista Polana',t:'Sekretna lokacja',ty:'site',hidden:1,x:13,y:11,ic:'event',d:'Krąg runicznych kamieni w mgle – miejsce pieczęci Asterionu.'},
+ puszcza:{n:'Mroczna Puszcza',t:'Wyprawa · kraina I',ty:'site',r:0,x:11,y:30,home:'dabrowa',d:'Prastara puszcza na zachodzie. Gobliny, wilki, dziki – i Leszy, pan lasu.'},
+ trakt:{n:'Trakt Bandytów',t:'Wyprawa · kraina II',ty:'site',r:1,x:13,y:50,home:'dabrowa',hidden:1,d:'Leśny trakt kupiecki, od lat nękany przez zbójców. Biesy podobno im pomagają.'},
+ kurhany:{n:'Kurhany Przodków',t:'Wyprawa · kraina III',ty:'site',r:2,x:50,y:85,home:'kurhanow',hidden:1,d:'Kurhany i krypty pod nimi. Strzygi i szeptuni nie dają spać przodkom.'},
+ grzbiet:{n:'Wielki Grzbiet',t:'Wyprawa · kraina IV',ty:'site',r:3,x:68,y:8,home:'weleszow',hidden:1,d:'Ośnieżone turnie granicznego pasma. Orkowie, harpie, wilkołaki i bazyliszki.'},
+ jama:{n:'Smocza Jama',t:'Wyprawa · kraina V',ty:'site',r:4,x:87.5,y:20,home:'kregoszew',hidden:1,d:'Rozżarzona pieczara w zboczu gór. Leże Żmija.'},
+ bagno:{n:'Bagno Czarne',t:'Wyprawa · bagna',ty:'site',r:5,x:11,y:79,home:'mokradla',hidden:1,d:'Czarna woda, martwe drzewa i błędne ogniki. Królestwo Utopca Starszego.'},
+ pola:{n:'Pola Południcy',t:'Wyprawa · pola',ty:'site',r:6,x:37,y:71,home:'sanow',hidden:1,d:'Złote łany, gdzie w samo południe nikt nie odważy się pracować.'},
+ chata:{n:'Chata na kurzej stopce',t:'Sekretna wyprawa',ty:'site',r:7,x:5,y:60,home:'mokradla',hidden:1,d:'Płot z czaszek, a za nim chata, która obraca się na kurzej nodze. Dom Baby Jagi.'},
+ jary:{n:'Wilcze Jary',t:'Łowisko',ty:'site',r:8,x:31,y:10,home:'dabrowa',hidden:1,d:'Głębokie jary w północnej puszczy. Wataha wilkołaka Alfy poluje tu każdej pełni.'},
+ poludnie:{n:'Równiny Południowe',t:'ku Avarii',ty:'exit',x:82,y:88,ic:'lock',hidden:1,d:'Szeroki trakt na południe, ku stepom Avarii. Granica zamknięta – wkrótce.'},
+ martwe:{n:'Martwe Ziemie',t:'granica',ty:'exit',x:93,y:56,ic:'skull',hidden:1,d:'Spękana, wymarła ziemia za wschodnią granicą. Stąd przychodzi zło – wkrótce.'}};
+const EDGES=[['weleszow','dabrowa'],['weleszow','brzezina'],['weleszow','olszynow'],['weleszow','grzbiet'],['dabrowa','puszcza'],['dabrowa','jary'],['dabrowa','krag'],['dabrowa','kapliczka'],['dabrowa','brzezina'],['dabrowa','polana'],['krag','polana'],['kapliczka','trakt'],['kapliczka','mlyn'],['trakt','chata'],['brzezina','mlyn'],['brzezina','sanow'],['mlyn','rozlewiska'],['rozlewiska','mokradla'],['rozlewiska','pola'],['mokradla','bagno'],['mokradla','chata'],['sanow','pola'],['sanow','kurhanow'],['sanow','kurhany'],['kurhanow','ruiny'],['kurhanow','kregoszew'],['ruiny','poludnie'],['kurhanow','poludnie'],['olszynow','kregoszew'],['olszynow','doliny'],['kregoszew','straznica'],['kregoszew','martwe'],['straznica','jama'],['straznica','doliny'],['doliny','grzbiet']];
+const SITE_OF_R=['puszcza','trakt','kurhany','grzbiet','jama','bagno','pola','chata','jary'];
 const nodeOk=k=>NODES[k]&&(!NODES[k].hidden||(S.found&&S.found[k]));
 const nbrs=k=>EDGES.filter(e=>e.includes(k)).map(e=>e[0]===k?e[1]:e[0]).filter(nodeOk);
 function pathTo(a,b){if(a===b)return [a];const prev={[a]:null},q=[a];while(q.length){const c=q.shift();for(const n of nbrs(c)){if(n in prev)continue;prev[n]=c;if(n===b){const p=[b];let x=c;while(x){p.unshift(x);x=prev[x]}return p}if(NODES[n].ty!=='exit')q.push(n)}}return null}
 const hereNode=()=>S.exp&&S.exp.site?S.exp.site:S.loc;
 /* --- stan świata (domyślne wartości + migracja) --- */
-function wOk(){if(!S)return;if(!S.loc||!NODES[S.loc]||NODES[S.loc].ty!=='town')S.loc='weleszow';if(!S.rep)S.rep={dwor:0,lud:0,duchy:0};if(!S.q)S.q={};if(!S.found)S.found={};if(!S.fl)S.fl={};if(!S.lore)S.lore=['velesia'];if(S.bless===undefined)S.bless=null;if(!wOk._l){wOk._l=1;if(S.pend&&!S.exp){if(NODES[S.pend.to]&&NODES[S.pend.to].ty==='town')S.loc=S.pend.to;S.pend=null}}}
+/* krainy, które otwierają się same po odkryciu na mapie (bagno, pola, jary) */
+const OPEN_ON_FIND=[5,6,8];
+function wOk(){if(!S)return;if(!S.found)S.found={};
+ /* kompania stoi w mieście, wsi albo ciekawym miejscu */
+ const ok=S.loc&&NODES[S.loc]&&NODES[S.loc].ty!=='exit'&&NODES[S.loc].ty!=='site';if(!ok)S.loc='weleszow';
+ if(!S.rep)S.rep={dwor:0,lud:0,duchy:0};if(!S.q)S.q={};if(!S.fl)S.fl={};if(!S.lore)S.lore=['velesia'];if(S.bless===undefined)S.bless=null;
+ /* po wczytaniu gry: przerwana podróż przepada */
+ if(!wOk._l){wOk._l=1;if(S.pend&&!S.exp)S.pend=null}
+ if(!NODES[S.loc]||NODES[S.loc].ty!=='town'&&NODES[S.loc].ty!=='poi')S.loc='weleszow';if(!S.day)S.day=1;if(!S.poi)S.poi={};regFix(S);if(!S._rv){S._rv=1;reveal(S.loc,1)}SITE_OF_R.forEach((k,r)=>{if(k&&S.reg.lv[r]&&!S.found[k]){S.found[k]=1;}});routeFix();
+ if(!S.reg)return;OPEN_ON_FIND.forEach(r=>{const k=SITE_OF_R[r];if(k&&S.found[k]&&!S.reg.lv[r])S.reg.lv[r]=1})}
 /* --- mapa świata --- */
 let wSel='velesia',rSel=null,_trav=false;
 function fitBox(id,ar){const el=document.getElementById(id);if(!el)return;const W=el.clientWidth,H=el.clientHeight;let w=W,h=W/ar;if(h>H){h=H;w=H*ar}const m=el.querySelector('.wmap');m.style.width=Math.floor(w)+'px';m.style.height=Math.floor(h)+'px'}
@@ -40,40 +63,23 @@ function renderWorld(){const K=KINGDOMS.find(k=>k.k===wSel)||KINGDOMS[0];
  <div class="wbody"><div class="wfit" id="wfit"><div class="wmap world"><img class="px" src="${VART.world}" alt="Mapa Eldarii">${KINGDOMS.map(k=>`<button class="kpin ${k.open?'op':'lk'} ${k.k===wSel?'on':''}" data-act="ksel" data-k="${k.k}" style="left:${k.x}%;top:${k.y}%">${k.open?emb(16):ic('lock',12)}<b>${k.n}</b></button>`).join('')}<div class="fog"></div></div></div>
  <aside class="wside"><h2>${K.open?emb(20):ic('lock',18)} ${K.n}</h2><p>${K.d}</p>${K.open?`<button class="btn-main" data-act="region">${ic('map',20)} Wejdź do Velesii</button>`:`<div class="soon">${ic('lock',16)} Wkrótce</div><p class="sub">To królestwo pojawi się w kolejnych rozdziałach kroniki.</p>`}</aside></div></div>`;
  fitBox('wfit',16/9)}
-/* --- mapa Velesii --- */
-function nodeIc(k){const N=NODES[k];if(N.ty==='site'&&N.r!=null&&!S.reg.lv[N.r])return ic('lock',14);if(N.ty==='site'&&N.r!=null&&S.reg.done[N.r])return ic('flag',14);return ic(N.ic||(N.ty==='site'?'fight':'nav_town'),14)}
+/* --- mapa Velesii (widok: js/world/velesia-map.js) --- */
 function qMark(k){return Object.keys(S.q).some(id=>{const q=S.q[id];if(q.done)return false;const st=QD[id]&&QD[id].st[q.s];return st&&st.obj&&(st.obj.go===k||st.obj.site===k||(st.obj.exp&&SITE_OF_R[st.obj.exp.r]===k))})||(NODES[k].ty==='town'&&talkNew(k))}
-function renderRegion(){regOk();wOk();const here=hereNode();if(!rSel||!nodeOk(rSel))rSel=here;const ks=Object.keys(NODES).filter(nodeOk);
- const P=k=>NODES[k],roads=EDGES.filter(e=>nodeOk(e[0])&&nodeOk(e[1])).map(([a,b])=>`<line x1="${P(a).x}" y1="${P(a).y}" x2="${P(b).x}" y2="${P(b).y}"/>`).join('');
- const m=mainOf()||S.roster[0];
- document.getElementById('app').innerHTML=`<div class="wv"><div class="ttop"><button class="btn-small" data-act="back" data-esc="1">${ic('back',16)}<span class="lbl"> Obóz</span></button><button class="btn-small" data-act="world" title="Mapa świata">${ic('map',18)}<span class="lbl"> Świat</span></button><h2>${emb(18)} Velesia</h2><button class="btn-small" data-act="journal">${ic('contract',18)}<span class="lbl"> Dziennik</span>${qBadge()}</button><span class="pill gold">${ic('gold',18)} ${S.gold}</span></div>
- <div class="wbody"><div class="wfit" id="rfit"><div class="wmap reg" id="rmap"><img class="px" src="${VART.velesia}" alt="Mapa Velesii"><svg class="roads" viewBox="0 0 100 100" preserveAspectRatio="none">${roads}</svg>
- ${ks.map(k=>{const N=P(k);return `<button class="npin n-${N.ty} ${k===rSel?'on':''} ${k===here?'here':''} ${N.ty==='site'&&N.r!=null&&!S.reg.lv[N.r]?'lk':''}" data-act="nsel" data-k="${k}" style="left:${N.x}%;top:${N.y}%"><i>${nodeIc(k)}</i><b>${N.n}</b>${qMark(k)?'<em>!</em>':''}</button>`}).join('')}
- <div class="party" id="pmark" style="left:${P(here).x}%;top:${P(here).y}%">${m?`<img class="px pfig" src="${heroSprite(m)}" alt="">`:''}<span class="pflag">${emb(12)}</span></div></div></div>
- <aside class="wside" id="rside">${nodePanel(rSel)}</aside></div></div>`;
- fitBox('rfit',16/9);if(!S.intro){S.intro=1;save();setTimeout(()=>{if(screen==='region')modal(loreHtml('velesia',true))},60)}}
-function nodePanel(k){const N=NODES[k],here=hereNode(),path=pathTo(here,k),d=path?path.length-1:0;let b=(N.ty==='site'&&N.r!=null?`<div class="pano scene bg-${BIOMES[N.r].k}">${sceneLayers(BIOMES[N.r].k,false)}</div>`:`<div class="pano" style="background-image:url(${VART['p_'+k]||VART['p_mglista']})"></div>`)+`<h2>${N.ty==='site'?ic('fight',18):N.ty==='exit'?ic('lock',16):ic('nav_town',18)} ${N.n}</h2><div class="sub">${N.t}${d&&N.ty!=='exit'?` · ${d} ${d>1?'dni':'dzień'} drogi`:''}</div><p class="nd">${N.d}</p>`;
- if(N.ty==='exit')return b+`<div class="soon">${ic('lock',16)} Wkrótce</div>`;
- if(S.exp)return b+`<button class="btn-main" data-act="map">${ic('walk',20)} Wróć na wyprawę</button>`;
- if(N.ty==='town'){if(k===S.loc)return b+`<div class="here">${ic('flag',14)} Tu jest kompania</div><button class="btn-main" data-act="intown">${ic('nav_town',20)} Wejdź do miasta</button>`;
-  return b+`<button class="btn-main" data-act="travel" data-k="${k}" ${path?'':'disabled'}>${ic('walk',20)} Podróżuj</button><div class="sub">Po drodze może się coś wydarzyć.</div>`}
- /* miejsce wyprawy */
- if(k==='polana'){const st=S.q.osadnicy&&S.q.osadnicy.s==='pieczec';return b+(st?`<div class="sub">Zalecany poziom bohaterów: 5+</div><button class="btn-main" data-act="polgo">${ic('walk',20)} Wyrusz na polanę</button>`:`<div class="sub">Pieczęć milczy. Na razie nie ma tu czego szukać.</div>`)}
- const r=N.r,R=S.reg;if(!R.lv[r])return b+`<div class="soon">${ic('lock',16)} Zamknięte</div><div class="sub">Pokonaj bossa poprzedniej krainy, aby tu dotrzeć.</div>`;
- if(!mapSel||mapSel.r!==r||R.lv[r]<mapSel.L)mapSel={r,L:R.lv[r]};const L=mapSel.L,st=expStage(r,L),ph=partyHeroes(),hurt=ph.filter(h=>h.hp<mh(h)*.6).length;
- b+=`<div class="rlv">${[1,2,3,4].map(l=>{const op=R.lv[r]>=l,cl=l<4?R.lv[r]>l||R.done[r]:R.done[r];return `<button class="${L===l?'on':''} ${l===4?'bl':''}" data-act="rlv" data-r="${r}" data-l="${l}" ${op?'':'disabled'}>${op?(l===4?ic('boss',14):''):ic('lock',12)}${l<4?['','I','II','III'][l]:'Boss'}${cl?'<i class="ck">✓</i>':''}</button>`}).join('')}</div>`;
- b+=`<div class="sub">${5+Math.min(L,3)} komnat · ${L>=4?'boss: '+ENEMIES[BIOMES[r].boss].name:'na końcu elita'} · zalecany poziom: ${Math.max(1,Math.round(st*.75))}</div>${hurt?`<div class="warn">${ic('hp',12)} Rannych: ${hurt} – rany nie goją się na wyprawie!</div>`:''}`;
- b+=`<div class="mparty" data-act="formq">${[4,3,2,1,0].map(i=>{const h=S.slots[i]!=null?getHero(S.slots[i]):null;return `<span class="mp ${i<2?'f':''}">${h?bust(heroSprite(h),h.cls,30,1,-4):''}</span>`}).join('')}<small>Formacja ▸</small></div>`;
- return b+`<div class="rgorow"><button class="mbag" data-act="tomarket" title="Zapasy">${ic('bag',18)}<span>${bagN()}/${bagCap()}</span></button><button class="btn-main" data-act="rgo" data-k="${k}" ${ph.length&&path?'':'disabled'}>${ic('walk',20)} ${k===here?'Wyrusz':'Podróżuj i wyrusz'}</button></div>`}
 /* --- podróż: znacznik idzie po drogach, po drodze 30% szans na wydarzenie --- */
-function travel(to,then){if(_trav)return;const path=pathTo(hereNode(),to);if(!path)return;_trav=true;const mk=document.getElementById('pmark');let i=0;
- const step=()=>{i++;if(i>=path.length||!mk){arrive(to,then,path.length-1);return}const N=NODES[path[i]];mk.style.left=N.x+'%';mk.style.top=N.y+'%';typeof SND!=='undefined'&&SND.play('tap');setTimeout(step,T(560))};
+function travel(to,then){if(_trav)return;const path=pathTo(hereNode(),to);if(!path||path.length<2){if(then)then();return}_trav=true;window._lp=path;const g=document.getElementById('ngo');if(g)g.remove();const mk=document.getElementById('pmark');let i=0;
+ if(mk&&NODES[to]){mvCenterSoft(to)}
+ const step=()=>{i++;if(i>=path.length||!mk){passDays(path.length-1);arrive(to,then,path.length-1);return}const N=NODES[path[i]];reveal(path[i],1);mk.style.left=N.x+'%';mk.style.top=N.y+'%';typeof SND!=='undefined'&&SND.play('tap');setTimeout(step,T(520))};
  if(mk)mk.classList.add('mv');setTimeout(step,T(60))}
 let _then=null;
 function arrive(to,then,days){_trav=false;if(days>0&&Math.random()<roadChance()){S.pend={to};_then=then||null;save();roadEvent();return}finishTravel(to,then)}
 const roadChance=()=>window.ROAD_P!=null?window.ROAD_P:.3;
-function finishTravel(to,then){S.pend=null;const N=NODES[to];if(N.ty==='town')S.loc=to;save();if(then){then();return}rSel=to;screen='region';render();if(N.ty==='town'){toast(`Kompania dociera do: ${N.n}`);questGo(to)}}
-function startSiteExp(k,r,L,extra){const N=NODES[k];if(!partyHeroes().length){toast('Najpierw ustaw drużynę w formacji!');return}S.exp=Object.assign(genExp(r,L),{site:k},extra||{});S.loc=N.home||S.loc;expStartTown(S.exp);save();screen='exp';render()}
+function finishTravel(to,then){S.pend=null;const N=NODES[to];if(N.ty==='town'||N.ty==='poi')S.loc=to;else if(window._lp){const c=window._lp.filter(k=>NODES[k]&&(NODES[k].ty==='town'||NODES[k].ty==='poi'));if(c.length)S.loc=c[c.length-1]}window._lp=null;reveal(to);save();if(then){then();return}rSel=to;screen='region';render();
+ if(N.ty==='town'){toast(`Kompania dociera do: ${N.n} (${dayTxt()})`);questGo(to)}else if(N.ty==='poi'){if(!questGo(to)&&!S.poi[to])setTimeout(()=>poiEvent(to),250)}}
+function startSiteExp(k,r,L,extra){reveal(k,1);const l=S.loc,N=NODES[k];
+ if(!partyHeroes().length)toast('Najpierw ustaw drużynę w formacji!');
+ else{S.exp=Object.assign(genExp(r,L),{site:k},extra||{});S.loc=N.home||S.loc;expStartTown(S.exp);save();screen='exp';render()}
+ /* kompania zostaje tam, skąd wyruszyła (miasto, wieś lub ciekawe miejsce) */
+ if(NODES[l]&&(NODES[l].ty==='town'||NODES[l].ty==='poi')){S.loc=l;save()}}
 /* --- wydarzenia na drodze --- */
 const RCLS=c=>partyHeroes().find(h=>c.includes(h.cls));
 const clsTag=c=>`<i class="ctag">[${c.map(k=>CLASSES[k].name).join('/')}]</i>`;
@@ -89,14 +95,25 @@ const ROADEV={
  znalezisko:{n:'Znalezisko',ic:'chest',p:null,t:()=>'W rowie leży okuta skrzynka – chyba spadła z kupieckiego wozu. Zamek wygląda solidnie.',
   o:[{t:'Rozbijcie zamek',r:()=>{const g=20+S.stage*5;S.gold+=g;if(Math.random()<.4){const it=makeItem(S.stage,rollRar(.1));if(S.inv.length<INV_MAX)S.inv.push(it);return {txt:`+${g} zł i ${it.n}.`}}return {txt:`+${g} zł. Reszta zawartości się potłukła.`}}},{c:['lotr'],t:'Otwórz wytrychem',r:()=>{const g=30+S.stage*7;S.gold+=g;const it=makeItem(S.stage+1,rollRar(.2,1));if(S.inv.length<INV_MAX)S.inv.push(it);return {txt:`Delikatna robota. +${g} zł i ${it.n}!`}}},{t:'Odwieźcie ją do najbliższego grodu',r:()=>{rep('dwor',4);rep('lud',2);S.gold+=15;return {txt:'Starosta dziękuje i płaci znaleźne 15 zł. +Dwór'}}}]},
  zjawisko:{n:'Dziwne zjawisko',ic:'event',p:'duch',t:()=>'Nad mokradłem tańczą błękitne ogniki. Z mgły dobiega szept w dawno zapomnianej mowie.',
-  o:[{t:'Podejdźcie bliżej',r:()=>{if(Math.random()<.5){S.bless={name:'Szept ogników',fx:{crit:6}};return {txt:'Ogniki krążą wokół was i znikają. Czujecie się dziwnie pewni siebie. (Na następną wyprawę: +6% kryt.)'}}return {txt:`Ogniki wciągają was w bagno. ${hurtAll(.1)}.`}}},{c:['druid','kaplan','czarnoksieznik'],t:'Odpowiedz duchom w ich mowie',r:()=>{rep('duchy',6);S.bless={name:'Błogosławieństwo duchów',fx:{defP:.1,heal:.1}};return {txt:'Duchy przodków odpowiadają łagodnie. Na następną wyprawę: +10% obrony i +10% leczenia. +Duchy'}}},{t:'Odwróćcie wzrok i idźcie dalej',r:()=>({txt:'Szept cichnie za plecami.'})}]}
+  o:[{t:'Podejdźcie bliżej',r:()=>{if(Math.random()<.5){S.bless={name:'Szept ogników',fx:{crit:6}};return {txt:'Ogniki krążą wokół was i znikają. Czujecie się dziwnie pewni siebie. (Na następną wyprawę: +6% kryt.)'}}return {txt:`Ogniki wciągają was w bagno. ${hurtAll(.1)}.`}}},{c:['druid','kaplan','czarnoksieznik'],t:'Odpowiedz duchom w ich mowie',r:()=>{rep('duchy',6);S.bless={name:'Błogosławieństwo duchów',fx:{defP:.1,heal:.1}};return {txt:'Duchy przodków odpowiadają łagodnie. Na następną wyprawę: +10% obrony i +10% leczenia. +Duchy'}}},{t:'Odwróćcie wzrok i idźcie dalej',r:()=>({txt:'Szept cichnie za plecami.'})}]},
+ /* v18 */
+ brod:{n:'Bród na Velesce',ic:'event',p:'rusalka',t:()=>'Przy brodzie siedzą na kamieniach blade dziewczęta z mokrymi włosami. „Chodźcie się wykąpać, wędrowcy… woda taka ciepła…”',
+  o:[{t:'Do broni!',r:()=>({fight:['rusalka','utopiec'],bk:5,lbl:'Rusałki przy brodzie'})},{c:['bard'],t:'Zaśpiewaj im pieśń',r:()=>{rep('duchy',2);return {txt:'Rusałki słuchają zasłuchane i pozwalają wam przejść. Jedna rzuca wam srebrną łuskę. '+reward(25+S.stage*3)}}},{t:'Nadłóż drogi przez groblę (+1 dzień)',r:()=>{passDays(1);return {txt:'Dzień marszu w błocie, ale wszyscy cali.'}}}]},
+ poludnie:{n:'Południe w polu',ic:'event',p:'poludnica',t:()=>'Słońce w zenicie. Między łanami zboża stoi wysoka biała postać z sierpem. „Odpowiedz, wędrowcze: co jest cięższe – snop czy sierp?”',
+  o:[{t:'„Snop – bo sierp wraca do domu, a snop zostaje w polu.”',r:()=>{rep('duchy',2);return {txt:'Południca kiwa głową i rozpływa się w drżącym powietrzu.'}}},{t:'Zaatakuj ją!',r:()=>({fight:['poludnica'],bk:6,lbl:'Południca'})},{t:'Schowaj się w cieniu i przeczekaj',r:()=>{S.roster.forEach(h=>h.hp=Math.max(1,h.hp-Math.round(stats(h).maxHp*.1)));return {txt:'Upał daje się we znaki. (−10% zdrowia)'}}}]},
+ dzik:{n:'Rozjuszony dzik',ic:'fight',p:null,t:()=>'Z zarośli wypada ogromny odyniec z kłami jak noże. Za nim drugi.',
+  o:[{t:'Stawić czoła',r:()=>({fight:['dzik','dzik'],bk:0,lbl:'Dziki na drodze'})},{c:['lucznik','lotr'],t:'Zapoluj z ukrycia',r:()=>{S.sup.prowiant=(S.sup.prowiant||0)+1;return {txt:'Celny strzał. Dziczyzna na wieczór i skóra na sprzedaż. (+1 prowiant) '+reward(15)}}},{t:'Wejdź na drzewa i przeczekaj',r:()=>({txt:'Dziki ryją jeszcze godzinę, potem odchodzą.'})}]},
+ rozstaje:{n:'Rozstaje dróg',ic:'event',p:null,t:()=>'Na rozstajach, przy przydrożnym krzyżu, siedzi elegancki jegomość z kopytem zamiast stopy. „Mam dla was interes. Sakwa złota za… drobiazg. Nic, czego byście potrzebowali.”',
+  o:[{t:()=>`Przyjmij sakwę (+${60+S.stage*8} zł, Duchy −8)`,r:()=>{S.gold+=60+S.stage*8;rep('duchy',-8);return {txt:'Bies chichocze i znika. Złoto jest prawdziwe. Na razie.'}}},{c:['kaplan','paladyn'],t:'Przegoń go modlitwą',r:()=>{rep('duchy',4);rep('lud',2);return {txt:'Bies syczy i zapada się pod ziemię, zostawiając swąd siarki.'}}},{t:'Zaatakuj biesa',r:()=>({fight:['bies','bies'],bk:1,lbl:'Biesy z rozstajów'})}]}
 };
 function roadItem(){if(!S.fl.rit){const it=makeItem(S.stage,rollRar(.15));it.price=Math.round(it.price*.75);S.fl.rit=it}return S.fl.rit}
 function roadEvent(k){k=k||pick(Object.keys(ROADEV));S.pend.ev=k;save();const E=ROADEV[k];
  modal(`<div class="dlg">${E.p?`<div class="dpor"><img class="px" src="${VART['n_'+E.p]}" alt=""></div>`:`<div class="dpor ic">${ic(E.ic,40)}</div>`}<div class="dtx"><h2>${ic(E.ic,20)} ${E.n}</h2><p>${E.t()}</p></div></div><div class="actions dopts">${E.o.map((o,i)=>{const ok=!o.c||RCLS(o.c);return ok?`<button data-act="rev" data-i="${i}">${o.c?clsTag(o.c)+' ':''}${typeof o.t==='function'?o.t():o.t}</button>`:''}).join('')}</div>`)}
-function roadResolve(i){const k=S.pend&&S.pend.ev;if(!k)return;const o=ROADEV[k].o[i];if(!o||(o.c&&!RCLS(o.c)))return;const r=o.r();save();
+function roadResolve(i){const k=S.pend&&S.pend.ev;if(!k)return;const E=ROADEV[k],o=E.o[i];if(!o||(o.c&&!RCLS(o.c)))return;const r=o.r();save();
+ /* zdarzenia v18: walka z własną listą wrogów i tłem krainy */
+ if(['brod','poludnie','dzik','rozstaje'].includes(k)){if(r.fight){closeModal();roadFight(r.fight,r.lbl,{bk:r.bk});return}modal(`<h2>${E.n}</h2><p>${r.txt}</p><button class="btn-main" data-act="revok">${ic('walk',20)} Dalej</button>`);return}
  if(r.fight){closeModal();roadFight();return}
- modal(`<h2>${ic(ROADEV[k].ic,20)} ${ROADEV[k].n}</h2><p>${r.txt}</p><button class="btn-main" data-act="revok">${ic('walk',20)} W drogę</button>`)}
+ modal(`<h2>${ic(E.ic,20)} ${E.n}</h2><p>${r.txt}</p><button class="btn-main" data-act="revok">${ic('walk',20)} W drogę</button>`)}
 function roadFight(list,lbl,extra){if(!partyHeroes().length){const g=Math.min(S.gold,20+S.stage*3);S.gold-=g;S.pend=null;save();modal(`<h2>${ic('skull',20)} Ucieczka</h2><p>Nikt w drużynie nie jest zdolny do walki. Uciekacie, gubiąc ${g} zł.</p><button class="btn-main" data-act="close">Dalej</button>`);render();return}const E=Object.assign({r:Math.min(4,Math.max(0,Math.floor((S.stage-1)/5))),L:Math.min(3,1+((S.stage-1)%5>2?1:0)),st:Math.max(1,S.stage),rooms:[{k:'fight',done:0}],i:0,gold:0,loot:[],kills:0,road:1},extra||{});S.exp=E;save();
  const bio=BIOMES[(extra&&extra.bk!=null)?extra.bk:1];startBattle({st:E.st,est:E.st,bio,list:list||Array.from({length:3+(S.stage>8?1:0)},()=>pick(['bandyta','rzezimieszek','lucznikB'])),exp:true,lbl:lbl||'Zasadzka na trakcie',wl:'Zasadzka!'})}
 function roadDone(){const E=S.exp;S.gold+=E.gold;bankLoot(E);S.exp=null;save();const q=E.qd;

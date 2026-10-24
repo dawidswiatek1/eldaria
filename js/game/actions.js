@@ -29,13 +29,3 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
  case 'tocamp':if(S.qPend){const d=S.qPend;S.qPend=null;save();setTimeout(()=>showDlg(d),80)}break;
  }});
 let jFrom=null;
-/* ===== PODPIĘCIA DO ISTNIEJĄCEJ GRY ===== */
-const _expComplete=expComplete;expComplete=function(){const E=S&&S.exp;if(!E)return;if(E.road){roadDone();return}
- if(E.site==='polana'){const bonus=60+E.st*8;S.gold+=E.gold+bonus;bankLoot(E);partyHeroes().forEach(h=>h.exps=(h.exps||0)+1);const tw=expEndTown(E,false,true);questExp(E);S.exp=null;save();
-  modal(`<div class="banner"><div class="rays"></div><h1>${ic('flag',24)} Mglista Polana</h1></div><div class="res"><p>${ic('gold',18)} Łupy: ${E.gold} + premia ${bonus} zł</p><p>Mgła rzednie. W samym środku kręgu kamieni czeka pieczęć…</p>${tw.map(t=>`<p>${t}</p>`).join('')}</div><button class="btn-main" data-act="tocamp">${ic('walk',22)} Podejdź do pieczęci</button>`);return}
- const n=questExp(E);_expComplete();if(n&&!S.qPend)toast('Dziennik: cel zadania wykonany!')};
-const _expRetreat=expRetreat;expRetreat=function(){const E=S&&S.exp;if(E&&E.road){roadDone();return}_expRetreat()};
-const _conEv=conEv;conEv=function(t,d){_conEv(t,d);if(t==='kill')questKill(d)};
-const _expStart=expStartTown;expStartTown=function(E){_expStart(E);if(S.bless){expAddFx(E,S.bless.fx,S.bless.name);S.bless=null}partyHeroes().forEach(h=>{const U=h.uniq&&UNIQ[h.uniq];if(U)expAddFx(E,U.fx,U.fxn)})};
-const _finExp=finishExpBattle;finishExpBattle=function(){const road=S&&S.exp&&S.exp.road;_finExp();if(road&&S&&!S.exp){S.pend=null;save()}};
-const _genOffers=genOffers;genOffers=function(){_genOffers();const m=repMul('lud',1);if(m!==1)S.offers.forEach(o=>o.cost=Math.round(o.cost*m))};

@@ -1,6 +1,6 @@
 /* ===== WALKA ===== */
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
-const BEASTS=['wilk','ghul','harpia','nietoperz','pajak','troll','smok','szlam'];
+const BEASTS=['wilk','ghul','harpia','nietoperz','pajak','troll','smok','szlam','dzik','wilkolak','wilkolakA','bazyliszek','zmij'];
 function unitFromHero(h){const c=CLASSES[h.cls],s=stats(h),A=heroA(h);return {uid:'h'+h.id,side:'h',hero:h,key:h.cls,name:h.name.split(' ')[0],cls:h.cls,A,img:A.f0,hp:Math.min(h.hp,s.maxHp),maxHp:s.maxHp,atk:s.atk,def:s.def,spd:s.spd,crit:s.crit/100,critM:1.6+s.x.critM,tal:h.tal||{},x:s.x,fx:c.fx,dt:heroDt(h),res:s.res,miss:s.miss||0,cd:{},st:{},alive:true,skills:heroSkills(h)}}
 function makeEnemy(k,st,uid,suffix,hpMul){const e=ENEMIES[k],hm=1+.22*(st-1)+.08*Math.max(0,st-5),am=1+.14*(st-1)+.04*Math.max(0,st-5),hp=Math.round(e.hp*hm*(hpMul||1)),A=enemyAnim(k,true);
  return {uid,side:'e',key:k,name:e.name+(suffix||''),A,img:A.f0,hp,maxHp:hp,atk:Math.round(e.atk*am),def:Math.round(e.def+st*.5),spd:Math.round((e.spd+rnd(0,1))*10)/10,crit:.05,critM:1.6,tal:{},x:{},sp:e.sp,fx:e.fx||'melee',dt:e.dt||FX2DT[e.fx]||'ciete',res:e.res||{},nb:e.nb,boss:e.boss,fly:e.fly,eth:e.eth,claw:BEASTS.includes(k),cd:{},st:{},alive:true}}
@@ -80,7 +80,10 @@ function hit(u,t,mult,fx){if(!t||!t.alive)return 0;if(u.side==='h'&&u.row==='b'&
  if(u.x&&u.x.ls&&u.alive)healQ(u,Math.round(d*u.x.ls));
  if(t.x&&t.x.thorns&&t.alive&&u.alive&&u!==t){const r=Math.max(1,Math.round(d*t.x.thorns));log(`↩ ${t.name} odbija ${r} obrażeń.`,'');dmg(u,r,'dmg',t.name+' (odwet)',t)}
  return d}
-function cheatDeath(t){if(t.side!=='h')return false;
+function cheatDeath(t){
+ /* strzyga powstaje, jeśli nie dobito jej ogniem lub świętością */
+ if(t.side==='e'&&t.key==='strzyga'&&!t.rose){const dt=(B.curFx&&FX2DT[B.curFx])||B.curDt||'';if(dt!=='ogien'&&dt!=='swiete'&&!burning(t)){t.rose=1;t.hp=Math.round(t.maxHp*.4);log(`🧛 ${t.name} powstaje z martwych! (dobij ogniem lub świętością)`,'r');setTimeout(()=>{if(B&&t.alive){flt(t,'Powstaje!','info');ring(t,'#b46cff')}},T(300));return true}}
+ if(t.side!=='h')return false;
  if(!t.cheat&&RK(t,'woj_nieugiety')){t.cheat=1;t.hp=1;t.st.shield=2;flt(t,'Nieugięty!','info');log(`🛡 ${t.name} nie daje się powalić!`,'g');return true}
  if(!t.cheat&&RK(t,'cz_nies')){t.cheat=1;t.hp=Math.round(t.maxHp*.3);flt(t,'Nieśmiertelny!','info');log(`🩸 ${t.name} wraca z progu śmierci!`,'g');return true}
  if(!B.aniol){const a=B.units.find(x=>x.side==='h'&&x.alive&&x!==t&&RK(x,'kap_aniol'));if(a){B.aniol=1;t.hp=Math.round(t.maxHp*.25);pillar(t,'#fff2a0');flt(t,'Anioł stróż!','info');log(`🕊️ Anioł stróż (${a.name}) ratuje: ${t.name}!`,'g');return true}}

@@ -37,7 +37,11 @@ const VART={
  "n_leszy":"assets/portraits/leszy.png",
  "n_utopiec":"assets/portraits/utopiec.png",
  "n_strzyga":"assets/portraits/strzyga.png",
- "e_husarz":"assets/events/husarz.png"
+ "e_husarz":"assets/events/husarz.png",
+ /* panoramy wsi (te same obrazki) */
+ "p_brzezina":"assets/towns/panorama-dabrowa.webp",
+ "p_olszynow":"assets/towns/panorama-kurhanow.webp",
+ "p_mokradla":"assets/towns/panorama-mglista.webp"
 };
 /* grafika v18 (mapa Velesii, miasta, tła walk) – generowane przez src/art/v18/v18art.py */
 const VART18={
