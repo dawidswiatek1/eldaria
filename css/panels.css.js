@@ -4,6 +4,9 @@ css`
 .pnl,.card,.herohead,.panel,.howto,.perkrow,.attr,.item,.statgrid div,.log{border:10px solid transparent;border-image:var(--fr-panel) 10/10px stretch;background:var(--tx-wood) 0 0/320px 320px;background-clip:padding-box}
 .card{padding:0 2px;margin-bottom:6px;display:flex;gap:8px;align-items:center;position:relative}
 .card .av{width:64px;height:64px;flex-shrink:0;overflow:hidden;box-shadow:0 0 0 2px #140d12,inset 0 -10px 0 #0003}
+/* nagrobek poległego zamiast portretu (graveImg w js/ui/camp.js) */
+.card .av.gravav{display:flex;align-items:flex-end;justify-content:center;background:linear-gradient(#1a1a2a,#2a2a24 70%,#3a3424);padding-bottom:2px}
+.card .av.gravav img{image-rendering:pixelated;filter:drop-shadow(0 2px 0 #0008)}
 .bust{overflow:hidden;position:relative;flex-shrink:0}
 .bust img{position:absolute;left:50%;transform:translateX(-50%)}
 .card .info{flex:1;min-width:0}

@@ -71,7 +71,7 @@ const BOSS={
  troll:{
   regen:u=>burning(u)?0:.05,
   big:{n:'Wyrwane drzewo',d:'zamach w pierwszy rząd, może ogłuszyć',cd:3,ann:'wyrywa drzewo z korzeniami…',
-   run:async u=>{const f=alive('h').filter(h=>h.row==='f'),ts=f.length?f:alive('h').slice(0,2);if(!ts.length)return;ts.forEach(t=>bfx('lawina',t));await anim(u,ts,'melee');shake(true);ts.forEach(t=>{if(hit(u,t,1.4)>0&&t.alive&&Math.random()<.4)stun(t)})}},
+   run:async u=>{const f=alive('h').filter(h=>h.row==='f'),ts=f.length?f:alive('h').slice(0,2);if(!ts.length)return;ts.forEach(t=>bfx('drzewo',t));await anim(u,ts,'melee');shake(true);ts.forEach(t=>{if(hit(u,t,1.4)>0&&t.alive&&Math.random()<.4)stun(t)})}},
   tip:u=>burning(u)?'Troll płonie – nie regeneruje się.':'Troll regeneruje 5% PŻ co turę – podpal go (ogień to jego słabość).'},
  utopiecS:{
   big:{n:'Topiel',d:'wciąga oznaczonego bohatera pod wodę',cd:3,mark:1,ann:'wyciąga szpony po ofiarę…',run:async(u,c)=>{const t=taunted(markT(c));if(!t)return;await bigOne(u,t,'topiel');if(hit(u,t,1.7,'ice')>0&&t.alive){stun(t);bleed(u,t,2,u.atk*.3,'🧪')}}},

@@ -128,7 +128,7 @@ async function enemyAct(u){if(u.obj)return;
  if(ready){switch(u.sp){
   case 'heal':{const w=lowest(alive('e').filter(e=>e.hp/e.maxHp<.6));if(w){sp('leczy sojusznika!');await anim(u,[w],'heal');heal(w,Math.round(w.maxHp*.3));return}break}
   case 'smash':case 'golem':if(Math.random()<.6){sp('Miażdżący cios!');const t=target();await anim(u,[t],'melee');shake(true);hit(u,t,1.8);return}break;
-  case 'troll':if(Math.random()<.45){sp('Miażdżący cios!');const t=target();await anim(u,[t],'melee');shake(true);hit(u,t,1.6);return}break;
+  case 'troll':if(Math.random()<.45){sp('Miażdżący cios!');const t=target();await anim(u,[t],'melee');bfx('drzewo',t);shake(true);hit(u,t,1.6);return}break;
   case 'fire':{sp('Ognisty oddech!');await anim(u,hs,'fire');shake(true);hs.forEach(t=>{if(hit(u,t,.7,'fire')>0&&t.alive&&Math.random()<.4)bleed(u,t,2,u.atk*.25,'🔥')});return}
   case 'stun':if(Math.random()<.5){sp('Oplata siecią!');const t=target();await anim(u,[t],'web');if(hit(u,t,.8,'web')>0)stun(t);return}break;
   case 'stunhit':if(Math.random()<.45){sp('Cios pałką w głowę!');const t=target();await anim(u,[t],'melee');if(hit(u,t,1.1)>0&&Math.random()<.6)stun(t);return}break;
