@@ -55,7 +55,8 @@ function selNode(k){if(!nodeVis(k)&&!fogN(k))return;rSel=k;document.querySelecto
 function nodeIc(k){const N=NODES[k];if(N.ty==='site'&&N.r!=null&&!S.reg.lv[N.r])return ic('lock',14);if(N.ty==='site'&&N.r!=null&&S.reg.done[N.r])return ic('flag',14);if(N.ty==='poi'&&S.poi&&S.poi[k])return ic('xp',14);return ic(N.ic||(N.ty==='site'?'fight':'nav_town'),14)}
 function renderRegion(){regOk();wOk();const here=hereNode();if(!rSel||!(nodeVis(rSel)||fogN(rSel)))rSel=here;const ks=Object.keys(NODES).filter(nodeOk),fg=Object.keys(NODES).filter(fogN);
  const P=k=>NODES[k],vis=k=>nodeOk(k),/* drogi są narysowane na mapie; linie tylko dla ścieżek do sekretnych miejsc i do mgły */
- roads=EDGES.filter(e=>vis(e[0])&&vis(e[1])&&(SECRET.includes(e[0])||SECRET.includes(e[1]))).map(([a,b])=>`<line x1="${P(a).x}" y1="${P(a).y}" x2="${P(b).x}" y2="${P(b).y}"/>`).join('')+EDGES.filter(e=>(vis(e[0])&&fogN(e[1]))||(vis(e[1])&&fogN(e[0]))).map(([a,b])=>`<line class="fg" x1="${P(a).x}" y1="${P(a).y}" x2="${P(b).x}" y2="${P(b).y}"/>`).join('');
+ pl=(a,b,cl)=>`<polyline ${cl?`class="${cl}" `:''}points="${roadLine(a,b).map(p=>p.join(',')).join(' ')}"/>`,
+ roads=EDGES.filter(e=>vis(e[0])&&vis(e[1])&&(SECRET.includes(e[0])||SECRET.includes(e[1]))).map(([a,b])=>pl(a,b)).join('')+EDGES.filter(e=>(vis(e[0])&&fogN(e[1]))||(vis(e[1])&&fogN(e[0]))).map(([a,b])=>pl(a,b,'fg')).join('');
  const m=mainOf()||S.roster[0];
  document.getElementById('app').innerHTML=`<div class="wv rv2"><div class="ttop"><button class="btn-small" data-act="back" data-esc="1">${ic('back',16)}<span class="lbl"> Obóz</span></button><button class="btn-small" data-act="world" title="Mapa świata">${ic('map',18)}<span class="lbl"> Świat</span></button><h2>${emb(18)} Velesia <small class="tsub">${dayTxt()}</small></h2><button class="btn-small" data-act="journal">${ic('contract',18)}<span class="lbl"> Dziennik</span>${qBadge()}</button><span class="pill gold">${ic('gold',18)} ${S.gold}</span></div>
  <div class="wbody"><div class="rview" id="rview"><div class="rmap" id="rmap"><img class="px" src="${VART18.map}" alt="Mapa Velesii" draggable="false"><svg class="roads" viewBox="0 0 100 100" preserveAspectRatio="none">${roads}</svg>
@@ -86,6 +87,8 @@ function nodePanel(k){const N=NODES[k];
  b+=`<div class="mparty" data-act="formq">${[4,3,2,1,0].map(i=>{const h=S.slots[i]!=null?getHero(S.slots[i]):null;return `<span class="mp ${i<2?'f':''}">${h?bust(heroSprite(h),h.cls,30,1,-4):''}</span>`}).join('')}<small>Formacja ▸</small></div>`;
  return b+`<div class="rgorow"><button class="mbag" data-act="tomarket" title="Zapasy">${ic('bag',18)}<span>${bagN()}/${bagCap()}</span></button><button class="btn-main" data-act="rgo" data-k="${k}" ${ph.length&&path?'':'disabled'}>${ic('walk',20)} ${k===here?'Wyrusz':'Podróżuj i wyrusz'}</button></div>`}
 /* podróż po mapie: travel() i finishTravel() w js/world/world-map.js */
+/* kamera za kompanią w podróży (bez wygładzania – wołane co klatkę) */
+function mvFollow(x,y){const R=mvRect();if(!R)return;const B0=mvBase(R.v);MZ.x=B0.W/2-x/100*B0.w*MZ.z;MZ.y=B0.H/2-y/100*B0.h*MZ.z;mvApply()}
 function mvCenterSoft(k){const m=document.getElementById('rmap');if(m){m.style.transition='transform .6s ease';setTimeout(()=>{if(m)m.style.transition=''},700)}mvCenter(k)}
 document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el||!S)return;switch(el.dataset.act){
  case 'mz':mvZoom(+el.dataset.z);break;case 'mzc':mvCenterSoft(hereNode());break;

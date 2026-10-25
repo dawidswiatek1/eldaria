@@ -12,7 +12,7 @@ css`
 .npin.n-fog b{color:#b8a888;background:#140d1299}
 .npin.here b{color:#9ae070}
 .npin.on i{transform:scale(1.18);box-shadow:0 0 0 2px #140d12,0 0 0 4px #fff4d0,0 0 12px 4px #ffd870}
-.roads line.fg{stroke:#b8a888;opacity:.45;stroke-dasharray:2 6}
+.roads .fg{stroke:#b8a888;opacity:.45;stroke-dasharray:2 6}
 .ngo{position:absolute;left:8px;bottom:6px;z-index:8;max-width:calc(100% - 170px);overflow:hidden;text-overflow:ellipsis;min-height:32px;padding:0 8px;border-width:6px;border-image-width:6px;white-space:nowrap;font-size:.8rem;pointer-events:auto;color:#2a1408;border-image-source:var(--fr-btn-gold,var(--fr-btn));background:#e8a040;}
 .mzb{position:absolute;right:6px;bottom:6px;display:flex;gap:4px;align-items:center;z-index:7}
 .mzb .btn-small{min-height:34px;min-width:34px;padding:0 6px;border-width:6px;border-image-width:6px;font-size:1.1rem}

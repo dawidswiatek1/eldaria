@@ -10,7 +10,7 @@ miejsca wystarczy dopisać mu rysunek (LANDMARK niżej) i uruchomić ponownie:
 
 Wymaga: Python 3, numpy, scipy, Pillow. Gra sama z tego narzędzia nie korzysta.
 """
-import math, os, random, re, sys
+import math, os, random, re, sys, zlib
 import numpy as np
 from PIL import Image, ImageDraw
 from scipy import ndimage
@@ -160,9 +160,11 @@ FARMS = [('olszynow', 0, 14, 62, 30), ('olszynow', -40, -6, 26, 18), ('pola', 0,
 MAIN_ROADS = {('weleszow', 'sanow'), ('weleszow', 'dabrowa'), ('sanow', 'wschodnia'), ('kregoszew', 'kapliczka'), ('dabrowa', 'kapliczka'), ('sanow', 'pola'), ('pola', 'kurhanow')}
 
 
-def node_area(scale=1.0):
+def node_area(scale=1.0, skip=()):
     m = np.zeros((H, W), bool)
     for k, nd in NODES.items():
+        if k in skip:
+            continue
         x, y = P(nd['x'], nd['y'])
         m |= ((XX - x) / (24 * scale)) ** 2 + ((YY - y + 9) / (19 * scale)) ** 2 < 1
     return m
@@ -172,10 +174,19 @@ def build_masks():
     m = {}
     water = stroke(RIVER_MAIN, (5, 8), 1, 1) | stroke(RIVER_WEST, (8, 9), 1, 2) | stroke(RIVER_EAST, (7, 8), 1, 3) | stroke(RIVER_TRIB, (3, 6), .8, 4)
     water |= blob(LAKE, 7, 5)
+    if 'rozlewiska' in NODES:  # zalane łąki: sadzawki wokół miejsca
+        x, y = NP('rozlewiska')
+        for i, (dx, dy, rx, ry) in enumerate([(-26, -4, 9, 4), (-14, 9, 7, 3), (18, 10, 8, 3.5), (-30, 12, 6, 3), (10, -16, 7, 3)]):
+            water |= (((XX - x - dx) / rx) ** 2 + ((YY - y - dy) / ry) ** 2) < 1 + (fbm(60 + i, (6, 3), (.6, .4)) - .5) * .8
     m['water'] = water
     m['plains'] = blob(PLAINS, 26, 11)
     m['dead'] = blob(DEAD, 16, 12)
-    m['mount'] = blob(MOUNTAINS, 14, 13)
+    mount = blob(MOUNTAINS, 14, 13)
+    for k, nd in NODES.items():
+        if nd['ty'] in ('town', 'poi'):
+            x, y = P(nd['x'], nd['y'])
+            mount &= ((XX - x) / 34) ** 2 + ((YY - y + 8) / 26) ** 2 > 1
+    m['mount'] = mount
     forest = blob(FOREST_W, 22, 14) | blob(FOREST_NE, 16, 15)
     for i, g in enumerate(GROVES):
         forest |= blob(g, 9, 40 + i)
@@ -204,7 +215,7 @@ FLOOR = pal('#1f3a1e', '#264524', '#2e5229')
 PLAIN = pal('#94803e', '#a8924a', '#bba456', '#cab464', '#d8c476', '#e4d288')
 DEADC = pal('#33271f', '#41332a', '#4f4034', '#5e4d3e', '#6c5a48')
 SWMP = pal('#253427', '#2d3f2e', '#364a34', '#41563c', '#4c6244')
-ROCKG = pal('#3b3833', '#47433c', '#545046', '#625d51')
+ROCKG = pal('#4a4146', '#564c50', '#62575a', '#706466')
 MISTC = np.array(hexc('#e2e9ee'), float)
 
 
@@ -353,16 +364,16 @@ def paint_details(M, busy):
             if y + 1 < H:
                 img[y + 1, x] = dk
     dry = free & M['plains'] & ~M['dead']
-    for (x, y) in scatter(dry, 8, .95, 71):
+    for (x, y) in scatter(dry, 9, .95, 71):
         x, y = int(x), int(y)
         r = R.random()
         if r < .35:
             img[y, x] = hexc('#8e7a3c')
             if x + 1 < W:
                 img[y, x + 1] = hexc('#e8d898')
-        elif r < .52:
+        elif r < .44:
             add(y, lambda x=x, y=y: blit(BUSH_DRY, x, y))
-        elif r < .545:
+        elif r < .45:
             add(y, lambda x=x, y=y: blit(STONE_S, x, y))
     for (x, y) in scatter(free & M['dead'] & (sdf(M['dead']) < -3), 14, .95, 72):
         r = R.random()
@@ -486,7 +497,7 @@ SPR_CACHE = {}
 def tree_sprite(kind, size, var):
     key = (kind, size, var, R.randint(0, 4))
     if key not in SPR_CACHE:
-        s = (hash(key) & 0xffff) + SEED
+        s = (zlib.crc32(repr(key).encode()) & 0xffff) + SEED
         SPR_CACHE[key] = conifer(size, var, s) if kind == 'c' else leafy(size, var, s, kind == 'b')
     return SPR_CACHE[key]
 
@@ -729,8 +740,8 @@ REED = ascii_spr(['l l', 'lgl', ' g '], {'l': '#8a9a46', 'g': '#4e6028'})
 
 # ================================================================ DROGI
 ROAD_VIA = {('weleszow', 'sanow'): [(54.5, 26), (55.5, 36)], ('sanow', 'wschodnia'): [(64, 45), (70, 44)], ('kregoszew', 'kurhanow'): [(27, 66), (36, 70)],
-            ('weleszow', 'doliny'): [(45, 15)], ('olszynow', 'wschodnia'): [(71, 36)], ('wschodnia', 'jama'): [(83, 34), (86, 24)],
-            ('wschodnia', 'grzbiet'): [(82, 40)], ('wschodnia', 'straznica'): [(80, 54), (83, 61)], ('ruiny', 'poludnie'): [(66, 86)],
+            ('weleszow', 'doliny'): [(45, 15)], ('olszynow', 'wschodnia'): [(71, 36)], ('wschodnia', 'jama'): [(80.5, 39), (84, 36.5), (82.5, 31), (86.5, 27), (85, 21.5), (89, 18)],
+            ('wschodnia', 'grzbiet'): [(80.5, 41), (83.5, 40), (85, 36.5)], ('wschodnia', 'straznica'): [(80, 54), (83, 61)], ('ruiny', 'poludnie'): [(66, 86)],
             ('straznica', 'martwe'): [(91, 76)], ('kurhanow', 'ruiny'): [(52, 77)], ('sanow', 'pola'): [(51.5, 46.5), (47.5, 47.8), (45.2, 51.5), (46, 56)],
             ('brzezina', 'sanow'): [(46, 40)], ('mlyn', 'rozlewiska'): [(29.5, 57)]}
 
@@ -741,7 +752,7 @@ def road_pts(a, b):
     if key and key != (a, b):
         via = via[::-1]
     pts = [NP(a)] + [P(*v) for v in via] + [NP(b)]
-    r2 = random.Random(hash((a, b)) & 0xffff)
+    r2 = random.Random(zlib.crc32((a + '|' + b).encode()))
     # lekkie wygięcia
     out = [pts[0]]
     for p0, p1 in zip(pts, pts[1:]):
@@ -755,13 +766,19 @@ def road_pts(a, b):
     return catmull(out, 14)
 
 
+ROAD_CURVES = {}
+
+
 def paint_roads(M):
     road = Image.new('L', (W, H), 0)
     d = ImageDraw.Draw(road)
     for a, b in EDGES:
-        if a in SECRET or b in SECRET or a not in NODES or b not in NODES:
+        if a not in NODES or b not in NODES:
             continue
         cs = road_pts(a, b)
+        ROAD_CURVES[(a, b)] = cs
+        if a in SECRET or b in SECRET:  # sekretnych ścieżek nie rysujemy – gra pokaże je po odkryciu
+            continue
         wd = 3 if (a, b) in MAIN_ROADS or (b, a) in MAIN_ROADS else 2
         d.line([tuple(p) for p in cs], fill=255, width=wd, joint='curve')
     rm = np.array(road) > 0
@@ -781,6 +798,39 @@ def paint_roads(M):
     rail = ndimage.binary_dilation(br) & ~br & M['water']
     img[rail] = hexc('#3a2614')
     return rm
+
+
+def resample(cs, step):
+    out = [cs[0]]
+    acc = 0.0
+    for p0, p1 in zip(cs, cs[1:]):
+        seg = math.hypot(p1[0] - p0[0], p1[1] - p0[1])
+        while acc + seg >= step and seg > 0:
+            t = (step - acc) / seg
+            p0 = (p0[0] + (p1[0] - p0[0]) * t, p0[1] + (p1[1] - p0[1]) * t)
+            out.append(p0)
+            seg = math.hypot(p1[0] - p0[0], p1[1] - p0[1])
+            acc = 0.0
+        acc += seg
+    if math.hypot(out[-1][0] - cs[-1][0], out[-1][1] - cs[-1][1]) > step * .4:
+        out.append(cs[-1])
+    else:
+        out[-1] = cs[-1]
+    return out
+
+
+def write_roads():
+    """js/data/velesia-roads.js: kształt każdej drogi w procentach mapy – po nim idzie kompania"""
+    rows = []
+    for (a, b), cs in ROAD_CURVES.items():
+        pts = resample([tuple(p) for p in cs], 5)
+        rows.append(' "%s|%s":[%s]' % (a, b, ','.join('[%s,%s]' % (('%.1f' % (x * 100 / W)).rstrip('0').rstrip('.'), ('%.1f' % (y * 100 / H)).rstrip('0').rstrip('.')) for x, y in pts)))
+    src = ('/* ===== DROGI VELESII: kształt dróg z mapy, punkty w procentach mapy (x, y) =====\n'
+           '   Wygenerowane przez tools/velesia_map.py – nie edytuj ręcznie, tylko uruchom skrypt ponownie. */\n'
+           'const ROADS={\n' + ',\n'.join(rows) + '};\n')
+    out = os.path.join(ROOT, 'js/data/velesia-roads.js')
+    open(out, 'w', encoding='utf-8').write(src)
+    print('zapisano', out, len(src) // 1024, 'KB')
 
 
 # ================================================================ BUDYNKI
@@ -1392,15 +1442,25 @@ def main():
     paint_swamp(M, busy | keep)
     place_hills(M, keep | busy)
     paint_details(M, busy | keep)
-    nofor = keep | M['water'] | busy
+    rw = ndimage.binary_dilation(rm, structure=np.ones((1, 9), bool))
+    band = rw.copy()
+    for dy in range(-2, 19):
+        band |= np.roll(rw, dy, axis=0)
+    nofor = keep | M['water'] | busy | band
+    # tam, gdzie w lesie nie wyrosną drzewa (przy drogach i miejscach), zamiast gołej ściółki – trawiasta przesieka
+    fr = M['forest'] & (band | keep) & ~rm & ~M['water']
+    gr = GRASS[np.clip(tone(N2 * .6 + N3 * .4, 6, .7) - 2, 0, 3)]
+    img[fr] = gr[fr]
     plant_trees(M, nofor)
-    raise_mountains(M, keep | ndimage.binary_dilation(rm, iterations=8))
+    in_mnt = [k for k, nd in NODES.items() if nd['ty'] == 'site' and M['mount'][int(NP(k)[1]), int(NP(k)[0])]]
+    raise_mountains(M, node_area(skip=in_mnt) | ndimage.binary_dilation(rm, iterations=2))  # drogi górskie i tak rysujemy na wierzchu
     place_barrows(M, keep | busy)
     L = landmarks()
     for k, (spr, dy) in L.items():
         if k in NODES:
             x, y = NP(k)
-            add(y + dy + 1, lambda s=spr, x=x, y=y + dy: blit(s, x, y))
+            top = 1000 if M['mount'][int(y), int(x)] else 0  # w górach: nad szczytami
+            add(y + dy + 1 + top, lambda s=spr, x=x, y=y + dy: blit(s, x, y))
     if 'jary' in NODES:
         x, y = NP('jary')
         lm_gorge()(x, y - 4)
@@ -1410,12 +1470,19 @@ def main():
     print('obiekty', len(OBJS), round(time.time() - t0, 1), 's')
     for _, _, fn in sorted(OBJS, key=lambda o: (o[0], o[1])):
         fn()
+    # drogi przez góry: na wierzchu skał (ścieżka wije się po zboczach)
+    mz = rm & ndimage.binary_dilation(M['mount'], iterations=6) & ~M['water']
+    rc = pal('#7e6238', '#9c7c48', '#b49456', '#c8aa6a')[tone(N3, 4, .9)]
+    me = ndimage.binary_dilation(mz) & ~mz & ndimage.binary_dilation(M['mount'], iterations=6)
+    img[me] = (img[me] * .6).astype(np.uint8)
+    img[mz] = rc[mz]
     if 'bagno' in NODES:
         wisps(*NP('bagno'))
     paint_mist(M)
     out = os.path.join(ROOT, 'assets/maps/velesia-big.png')
     Image.fromarray(img).quantize(256, method=Image.Quantize.MAXCOVERAGE, dither=Image.Dither.NONE).save(out, optimize=True)
     print('zapisano', out, os.path.getsize(out) // 1024, 'KB', round(time.time() - t0, 1), 's')
+    write_roads()
     if debug:
         os.makedirs(os.path.join(ROOT, 'tools/out'), exist_ok=True)
         big = Image.fromarray(img).resize((W * 2, H * 2), Image.NEAREST)

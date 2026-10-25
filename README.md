@@ -76,6 +76,9 @@ scipy and Pillow – only needed to redraw the map, not to play). It reads place
 so towns, roads and pins always line up. The landscape (rivers, forests, mountains, fields) and the
 drawing of each place (`landmarks()`) are in the script.
 
+It also writes `js/data/velesia-roads.js` (`ROADS`): the shape of every road, which the company walks
+along when travelling and which the dashed lines to secret places follow.
+
 To add a place: add it to `NODES` (and roads to `EDGES`), give it a drawing in `landmarks()` if it needs
 one, then run `python3 tools/velesia_map.py` (add `--debug` for a labelled preview in `tools/out/`).
 The map is 1024×640; the game shows it scaled without smoothing, 2 screen pixels per map pixel by default.

@@ -30,7 +30,7 @@ const NODES={
  kapliczka:{n:'Leśna kapliczka',t:'Ciekawe miejsce',ty:'poi',x:13,y:46,ic:'temple',hidden:1,d:'Drewniana kapliczka na rozstaju leśnych dróg. Wędrowcy zostawiają tu dary.'},
  krag:{n:'Krąg Kamienny',t:'Ciekawe miejsce',ty:'poi',x:32,y:24,ic:'event',hidden:1,d:'Omszałe głazy ustawione w krąg. Szeptunki przychodzą tu w noc Kupały.'},
  straznica:{n:'Strażnica',t:'Ciekawe miejsce',ty:'poi',x:85,y:69,ic:'flag',hidden:1,d:'Opuszczona wieża sygnałowa u południowych stóp Wielkiego Grzbietu. Z jej szczytu widać Martwe Ziemie.'},
- ruiny:{n:'Ruiny Asterionu',t:'Ciekawe miejsce',ty:'poi',x:59,y:79,ic:'event',hidden:1,d:'Kolumny i łuki z czasów dawnych magów. Na kamieniach wciąż widać runy.'},
+ ruiny:{n:'Ruiny Asterionu',t:'Ciekawe miejsce',ty:'poi',x:63,y:79.5,ic:'event',hidden:1,d:'Kolumny i łuki z czasów dawnych magów. Na kamieniach wciąż widać runy.'},
  doliny:{n:'Mgliste Doliny',t:'Ciekawe miejsce',ty:'poi',x:38,y:12,ic:'event',hidden:1,d:'Doliny wiecznie spowite mgłą. Ludzie słyszą tu głosy zmarłych.'},
  rozlewiska:{n:'Rozlewiska Utopców',t:'Ciekawe miejsce',ty:'poi',x:29,y:64,ic:'event',hidden:1,d:'Zalane łąki nad Veleską. Rusałki i utopce wciągają tu nieostrożnych.'},
  polana:{n:'Mglista Polana',t:'Sekretna lokacja',ty:'site',hidden:1,x:22,y:11,ic:'event',d:'Krąg runicznych kamieni w mgle – miejsce pieczęci Asterionu.'},
@@ -78,11 +78,25 @@ function renderWorld(){const K=KINGDOMS.find(k=>k.k===wSel)||KINGDOMS[0];
  fitBox('wfit',16/9)}
 /* --- mapa Velesii (widok: js/world/velesia-map.js) --- */
 function qMark(k){return Object.keys(S.q).some(id=>{const q=S.q[id];if(q.done)return false;const st=QD[id]&&QD[id].st[q.s];return st&&st.obj&&(st.obj.go===k||st.obj.site===k||(st.obj.exp&&SITE_OF_R[st.obj.exp.r]===k))})||(NODES[k].ty==='town'&&talkNew(k))}
-/* --- podróż: znacznik idzie po drogach, po drodze 30% szans na wydarzenie --- */
-function travel(to,then){if(_trav)return;const path=pathTo(hereNode(),to);if(!path||path.length<2){if(then)then();return}_trav=true;window._lp=path;const g=document.getElementById('ngo');if(g)g.remove();const mk=document.getElementById('pmark');let i=0;
- if(mk&&NODES[to]){mvCenterSoft(to)}
- const step=()=>{i++;if(i>=path.length||!mk){passDays(path.length-1);arrive(to,then,path.length-1);return}const N=NODES[path[i]];reveal(path[i],1);mk.style.left=N.x+'%';mk.style.top=N.y+'%';typeof SND!=='undefined'&&SND.play('tap');setTimeout(step,T(520))};
- if(mk)mk.classList.add('mv');setTimeout(step,T(60))}
+/* --- podróż: kompania idzie po narysowanych drogach, po drodze 30% szans na wydarzenie --- */
+/* kształt drogi a→b z mapy (ROADS w js/data/velesia-roads.js, punkty w % mapy); bez danych – prosto */
+function roadLine(a,b){const r=ROADS[a+'|'+b];if(r)return r;const q=ROADS[b+'|'+a];if(q)return q.slice().reverse();return [[NODES[a].x,NODES[a].y],[NODES[b].x,NODES[b].y]]}
+const WALK_PX=.11;/* piksele mapy na milisekundę (przy prędkości gry ×1) */
+function travel(to,then){if(_trav)return;const path=pathTo(hereNode(),to);if(!path||path.length<2){if(then)then();return}_trav=true;window._lp=path;const g=document.getElementById('ngo');if(g)g.remove();const mk=document.getElementById('pmark');
+ const done=()=>{if(mk){mk.classList.remove('walk','fl');mk.style.transition=''}passDays(path.length-1);arrive(to,then,path.length-1)};
+ if(!mk){done();return}
+ /* jedna linia przez wszystkie odcinki; at[n] = indeks punktu, w którym kompania mija n-te miejsce */
+ const pts=[],at=[0];path.slice(1).forEach((k,i)=>{roadLine(path[i],k).forEach((p,j)=>{if(i&&!j)return;pts.push(p)});at.push(pts.length-1)});
+ const d=[0];for(let i=1;i<pts.length;i++)d.push(d[i-1]+Math.hypot((pts[i][0]-pts[i-1][0])*MAPW/100,(pts[i][1]-pts[i-1][1])*MAPH/100));
+ const tot=d[d.length-1]||1,dur=RM?300:Math.max(400,Math.min(8000,T(tot/WALK_PX)));let seg=1,ni=1,t0=null;
+ mk.style.transition='none';mk.classList.add('walk');
+ const frame=now=>{if(!document.body.contains(mk)){done();return}if(t0==null)t0=now;const s=Math.min(tot,(now-t0)/dur*tot);
+  while(seg<pts.length-1&&d[seg]<s)seg++;const a=pts[seg-1],b=pts[seg],f=d[seg]>d[seg-1]?(s-d[seg-1])/(d[seg]-d[seg-1]):1,x=a[0]+(b[0]-a[0])*f,y=a[1]+(b[1]-a[1])*f;
+  mk.style.left=x+'%';mk.style.top=y+'%';if(Math.abs(b[0]-a[0])>.05)mk.classList.toggle('fl',b[0]<a[0]);mvFollow(x,y);
+  /* mijane miejsca: odkryj sąsiadów, stuknij krokiem */
+  while(ni<path.length&&d[at[ni]]<=s+.01){reveal(path[ni],1);if(ni<path.length-1)typeof SND!=='undefined'&&SND.play('tap');ni++}
+  if(s>=tot){done();return}requestAnimationFrame(frame)};
+ requestAnimationFrame(frame)}
 let _then=null;
 function arrive(to,then,days){_trav=false;if(days>0&&Math.random()<roadChance()){S.pend={to};_then=then||null;save();roadEvent();return}finishTravel(to,then)}
 const roadChance=()=>window.ROAD_P!=null?window.ROAD_P:.3;
