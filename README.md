@@ -101,6 +101,16 @@ targets (`bfx`): PixelLab exports in `tools/art/fx/<key>/`, packed by `tools/fx_
 `assets/fx/` and the list `js/data/fx-boss.js` (`BFX`: anchor at the feet or the middle, scale, duration).
 The first win over each boss gives a named legendary trophy (`S.bk`).
 
+## Specializations
+
+`js/data/specs.js` (`SPEC`): from level 10 (`SPEC_LVL`) every hero picks one of two paths for their class in the
+Talenty tab (e.g. warrior → Mistrz miecza or Strażnik, mage → Piromanta or Mistrz runów); the choice is `h.spec` and is
+undone only by the temple talent reset. A path gives stat bonuses (`e`, counted with talents in `talFx`), its own skill
+(`sk`, an `SK` entry in `js/data/skills.js` with `spec:1` and an icon name in `ico`, drawn by `skIc`) and a passive
+trait. The traits run through small hooks in battle (`specStart`, `specGuard`, `specAm`, `specCrit`, `specAfter`,
+`specKill`, `specDown`, `specHeal`, `specEcho`) called from `js/battle/battle.js` and `battle-layout.js`.
+Styles: `css/specs.css.js`.
+
 ## Quests and events
 
 - `js/story/quests.js`: `QD` (quests and their steps), `DLG` (dialogs with choices), `TALK` (who you can talk to in each

@@ -145,7 +145,7 @@ function poiResolve(i){const k=curPoi,E=POI[k],o=E&&E.o[i];if(!o||(o.c&&!RCLS(o.
  if(r.dlg){showDlg(r.dlg);return}
  if(r.fight){closeModal();roadFight(r.fight,r.lbl);return}modal(`<h2>${E.n}</h2><p>${r.txt}</p><button class="btn-main" data-act="region">${ic('map',20)} Mapa</button>`)}
 /* obóz poza miastem */
-function renderField(){const k=S.loc,N=NODES[k],nb=S.roster.some(h=>h.free||tFree(h));
+function renderField(){const k=S.loc,N=NODES[k],nb=S.roster.some(devPend);
  document.getElementById('app').innerHTML=`<div class="townv stown"><div class="ttop"><button class="btn-small" data-act="tab" data-t="team">${ic('nav_team',18)}<span class="lbl">Drużyna</span>${nb?'<span class="badge">!</span>':''}</button><h2>${ic('camp',20)} Obóz: ${N.n} <small class="tsub">${dayTxt()}</small></h2><span class="pill gold">${ic('gold',18)} ${S.gold}</span><button class="btn-small" data-act="menu" aria-label="Menu">${ic('gear',18)}</button><button class="btn-main tgo" data-act="map">${ic('map',20)} Mapa</button></div>
  <div class="stbody"><div class="stpano" style="background-image:url(${VART.p_mglista})"><div class="stcap"><b>${N.n}</b><small>${N.t}</small></div></div><div class="stside"><p class="nd">${N.d}</p><p class="nd">Kompania rozbiła obóz. Usługi miejskie są dostępne tylko w miastach i wsiach – ruszaj dalej przez mapę.</p>${S.poi[k]?'':`<button class="btn-main" data-act="poigo" data-k="${k}">${ic('event',20)} Zbadaj to miejsce</button>`}</div></div></div>`;
  /* przyciski zadań, które prowadzą w to miejsce */

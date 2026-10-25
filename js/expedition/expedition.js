@@ -114,14 +114,14 @@ function finishExpBattle(){const E=S.exp,win=alive('e').length===0&&alive('h').l
   modal(`<div class="banner"><h1>Porażka…</h1></div><div class="res"><p ${dl()}>Drużyna została pokonana. Wyprawa przepadła razem z jej łupami.${m?` ${esc(m.name.split(' ')[0])} i ocaleni z trudem wracają do miasta.`:''}</p>${fh}${tw.map(t=>`<p ${dl()}>${t}</p>`).join('')}</div><button class="btn-main" data-act="tocamp">${ic('nav_town',22)} Do obozu</button>`);
   /* przegrana walka w drodze: podróż przepada */
   if(E.road){S.pend=null;save()}return}
- const st=B.st,gold=Math.round((14+st*7)*(B.elite?1.6:1)+(boss?60+st*6:0)),xp=Math.round((12+st*5)*(B.elite?1.4:1)*(boss?1.6:1));E.gold+=Math.round(gold*(1+((E.fx&&E.fx.gold)||0)))+stolen;S.wins++;E.kills+=B.units.filter(u=>u.side==='e'&&!u.obj).length;
- lines.push(`${ic('gold',18)} +${gold} złota do łupów wyprawy`+(stolen?` (+${stolen} odzyskane)`:''),`${ic('xp',18)} +${xp} PD dla ocalałych`);
+ const st=B.st,gold=Math.round((14+st*7)*(B.elite?1.6:1)+(boss?60+st*6:0)),xp=Math.round((12+st*5)*(B.elite?1.4:1)*(boss?1.6:1));E.gold+=Math.round(gold*(1+((E.fx&&E.fx.gold)||0)))+stolen+(B.rab||0);S.wins++;E.kills+=B.units.filter(u=>u.side==='e'&&!u.obj).length;
+ lines.push(`${ic('gold',18)} +${gold} złota do łupów wyprawy`+(stolen?` (+${stolen} odzyskane)`:'')+(B.rab?` (+${B.rab} skradzione)`:''),`${ic('xp',18)} +${xp} PD dla ocalałych`);
  B.units.filter(u=>u.side==='h'&&u.alive).forEach(u=>{const h=u.hero,l0=h.lvl;const msgs=gainXp(h,xp);if(h.lvl>l0)lv.push({h,msgs})});
  const luck=Math.min(.3,st*.02)+(boss?.15:B.elite?.08:0),n=boss?2:B.elite?1:Math.random()<.35?1:0;for(let k=0;k<n;k++){const it=makeItem(st+(boss?1:0),rollRar(luck,boss?1:0));E.loot.push(it);got.push(it)}if(boss){const tr=bossTrophy();if(tr){E.loot.push(tr);got.push(tr)}}
  const room=E.rooms[E.i];if(room)room.done=1;
  B.units.filter(u=>u.side==='e'&&!u.obj).forEach(u=>conEv('kill',u.key));if(B.elite)conEv('elite');if(boss)conEv('boss',E.r);const injs=rollInjuries(),drops=expDrops(boss);lines.push(...drops);
  let html=`<div class="banner"><div class="rays"></div><h1>${ic(boss?'boss':'xp',26)} ${boss?esc(B.units.find(u=>u.boss).name)+' '+gf(B.units.find(u=>u.boss),'pokonany','pokonana')+'!':'Zwycięstwo!'}</h1></div><div class="res">${lines.map(l=>`<p ${dl()}>${l}</p>`).join('')}`;
- lv.forEach(({h,msgs})=>{const nl=msgs.filter(m=>m.startsWith('⭐')).length;html+=`<div class="lvcard" ${dl()}>${bust(heroSprite(h),h.cls,44,1.5)}<div><b>${esc(h.name)}</b><br>${ic('lvl',14)} Poziom ${h.lvl}! <small>+${3*nl} pkt cech, +${nl} pkt talentu</small></div></div>`});
+ lv.forEach(({h,msgs})=>{const nl=msgs.filter(m=>m.startsWith('⭐')).length;html+=`<div class="lvcard" ${dl()}>${bust(heroSprite(h),h.cls,44,1.5)}<div><b>${esc(h.name)}</b><br>${ic('lvl',14)} Poziom ${h.lvl}! <small>+${3*nl} pkt cech, +${nl} pkt talentu</small>${msgs.filter(m=>!m.startsWith('⭐')).map(m=>`<br><small>${esc(m)}</small>`).join('')}</div></div>`});
  got.forEach(it=>{html+=`<div class="loot r${it.r}" style="--rc:${rcol(it)};animation-delay:${(0.35+(i++)*0.3).toFixed(2)}s"><div class="ii">${itIc(it,28)}</div><div><b style="color:${rcol(it)};text-shadow:1px 1px 0 #000">${esc(it.n)}</b><br><small>${it.uq?'Trofeum bossa (pierwsze zwycięstwo)':RAR[it.r].n} · ${statStr(it.st)} · do łupów</small></div></div>`});
  injs.forEach(({h,k})=>html+=`<p ${dl()} class="injp">${ic(INJ[k].m?'mind':'injury',16)} ${esc(h.name.split(' ')[0])}: <b>${INJ[k].n}</b> (${INJ[k].d}) – wylecz w Szpitalu.</p>`);
  html+=fateHtml(F,dl);

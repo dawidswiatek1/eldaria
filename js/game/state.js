@@ -25,6 +25,8 @@ function migrate(s){if(!s||!Array.isArray(s.roster))return null;
   loadMsg=(loadMsg?loadMsg+' ':'')+'Nowość: Zamek królewski w Weleszowie to teraz sala tronowa – król Przemysław przyjmuje kompanię na audiencjach, daje zadania „Na służbie Korony” i nadaje tytuły z przywilejami. Kontrakty wydaje kancelaria na dworze. Skarbiec przeniósł się do Kantoru „Złota Waga” (Weleszów i filia w Sanowie)'+(s.vault?` – wasze ${s.vault} zł czeka tam bezpiecznie`:'')+'. W kantorze jest też skrytka na przedmioty i pożyczki. Brzezina i Olszynów mają nowe widoki, a husarz Jaromir – nowy wygląd.'}
  if(s.v===13){S=s;s.bk=s.bk||{};s.v=14;
   loadMsg=(loadMsg?loadMsg+' ':'')+'Nowość: bossowie walczą inaczej! Zapowiadają wielkie ciosy turę wcześniej – przerwiesz je obrażeniami albo ogłuszeniem. Leszy, herszt, nekromanta i golem mają na polu bitwy rzeczy do zniszczenia (korzenie, sztandar, urnę, kryształy), a pasek bossa podpowiada, co robić. Za pierwsze zwycięstwo nad każdym bossem – legendarne trofeum.'}
+ if(s.v===14){S=s;s.v=15;const n=s.roster.filter(h=>h.lvl>=SPEC_LVL).length;
+  loadMsg=(loadMsg?loadMsg+' ':'')+'Nowość: specjalizacje! Od 10. poziomu każdy bohater wybiera jedną z dwóch ścieżek swojej klasy (zakładka Talenty) – wojownik zostaje mistrzem miecza albo strażnikiem, mag piromantą albo mistrzem runów… Specjalizacja daje nową umiejętność, cechę i premie.'+(n?` ${n>1?'Już '+n+' bohaterów może':'Jeden bohater już może'} wybrać swoją.`:'')}
  if(s.v===SAVE_VER)return s;
  return null}
 function load(){const raw=localStorage.getItem(SAVE_KEY);if(!raw)return null;try{const s=migrate(JSON.parse(raw));if(s){s.roster.forEach(upHero);return s}}catch(e){console.warn('zapis',e)}
@@ -57,7 +59,9 @@ const xpNeed=l=>50+l*30;
 const heroSkills=h=>['atak',...syncLoad(h)];
 const restCost=()=>Math.round((15+S.stage*8)*[1,1,.75,.5][tl('swiatynia')]);
 const talReset=h=>Math.round((20+h.lvl*12)*(tl('swiatynia')>=3?.5:1));
-function talFx(h){const o={hpP:0,atkP:0,def:0,spd:0,crit:0,critM:0,healP:0,ls:0,dodge:0,thorns:0,dtP:{},res:{}};for(const id in h.tal||{}){const n=TN[id],r=h.tal[id];if(!n||!n.e||!r)continue;for(const k in n.e){const v=n.e[k];if(typeof v==='object'){for(const q in v)o[k][q]=(o[k][q]||0)+v[q]*r}else o[k]+=v*r}}return o}
+/* efekty talentów i specjalizacji (SPEC[..].e, js/data/specs.js) */
+function talFx(h){const o={hpP:0,atkP:0,def:0,spd:0,crit:0,critM:0,healP:0,ls:0,dodge:0,thorns:0,dtP:{},res:{}};const add=(e,r)=>{for(const k in e){const v=e[k];if(typeof v==='object'){for(const q in v)o[k][q]=(o[k][q]||0)+v[q]*r}else o[k]+=v*r}};
+ for(const id in h.tal||{}){const n=TN[id],r=h.tal[id];if(n&&n.e&&r)add(n.e,r)}const sp=specOf(h);if(sp&&sp.e)add(sp.e,1);return o}
 function stats(h){const b=h.base,p=h.pts;let hp=b.hp+p.hp*10,atk=b.atk+p.atk*2,def=b.def+p.def*2,spd=b.spd+p.spd*.4,crit=CLASSES[h.cls].crit*100+p.spd;
  for(const s in h.eq){const it=h.eq[s];if(it){const t=it.st;hp+=t.hp||0;atk+=t.atk||0;def+=t.def||0;spd+=t.spd||0;crit+=t.crit||0}}
  const X=talFx(h),J=injFx(h);let hpP=X.hpP+J.hpP,atkP=X.atkP+J.atkP;def+=X.def;def*=1+J.defP;spd+=X.spd+J.spd;crit+=X.crit+J.crit;spd=Math.max(1,spd);
@@ -68,7 +72,7 @@ const heroDt=h=>CLASSES[h.cls].dt||WDT[h.eq.bron?h.eq.bron.b:DEF_W[h.cls]]||'cie
 function changeHero(h,fn){const o=stats(h).maxHp;fn();const n=stats(h).maxHp;h.hp=Math.max(1,Math.min(n,h.hp+Math.max(0,n-o)))}
 function gainXp(h,x){const out=[];h.xp+=x;while(h.xp>=xpNeed(h.lvl)){h.xp-=xpNeed(h.lvl);h.lvl++;const g=CLASSES[h.cls].grow;
  h.base.hp+=g.hp;h.base.atk+=g.atk;h.base.def+=g.def;h.base.spd=Math.round((h.base.spd+g.spd)*10)/10;h.free+=3;h.hp=stats(h).maxHp;
- out.push(`⭐ ${h.name} – poziom ${h.lvl}! +3 punkty cech, +1 punkt talentu`);const i=SKL.indexOf(h.lvl);if(i>0){const u=SK[POOL[h.cls][i]];out.push(`🔓 ${h.name} odblokowuje: ${u.icon} ${u.name}`)}}syncLoad(h);return out}
+ out.push(`⭐ ${h.name} – poziom ${h.lvl}! +3 punkty cech, +1 punkt talentu`);const i=SKL.indexOf(h.lvl);if(i>0){const u=SK[POOL[h.cls][i]];out.push(`🔓 ${h.name} odblokowuje: ${u.icon} ${u.name}`)}if(h.lvl===SPEC_LVL&&specPend(h))out.push(`🎖 ${h.name} może wybrać specjalizację: ${SPECS[h.cls].map(k=>specNm(h,k)).join(' albo ')} (zakładka Talenty)`)}syncLoad(h);return out}
 /* własny wygląd mają tylko unikalni towarzysze; dawne wyglądy rekrutów (łuczniczka, strażnik, rycerz – h.skin
    w starych zapisach) ustąpiły sprite'om klas z js/data/sprites-classes.js */
 const heroSkin=h=>h.uniq?h.skin:null;

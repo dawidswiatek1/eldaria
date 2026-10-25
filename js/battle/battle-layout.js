@@ -51,7 +51,7 @@ function refreshBattle(){if(!B)return;const a=B.active;const t=document.getEleme
  let panel='';
  if(B.awaiting&&a){const s=SK[B.sel],tt=tOf(a,B.sel);const need=B.sel==='zamiana'?'Wybierz sojusznika':tt==='enemy'?'Dotknij wroga':tt==='ally'?'Dotknij sojusznika':tt==='deadAlly'?'Dotknij poległego':'';
   const blocked=isOff(a,B.sel)&&reachOf(a,B.sel)==='m'&&frontAlive('e')&&alive('e').some(e=>e.row==='b');
-  panel=`<div class="hint"><b class="who">${esc(a.name)}${a.row==='f'?' (1. rząd)':' (2. rząd)'}:</b> <b>${s.name}</b> ${isOff(a,B.sel)?reachChip(reachOf(a,B.sel))+' ':''}${s.dt?dtChip(s.dt==='wep'?a.dt:s.dt)+' ':''}${blocked?`<b class="blkh">${ic('lock',12)} Najpierw pokonaj pierwszy rząd</b> `:''}<span class="ds">${s.desc}</span></div><div class="pbar"><div class="skills n${a.skills.length}">${a.skills.map(k=>{const sk=SK[k],cd=a.cd[k]||0,no=SK[k].t==='deadAlly'&&!deadAllies().length;return `<button data-act="skill" data-k="${k}" class="${B.sel===k?'sel':''}" ${cd>0||no?'disabled':''} aria-label="${sk.name}">${ic('sk_'+k,28,'si')}<span class="sn${sk.name.split(" ").some(w=>w.length>11)?" ln":""}">${sk.name}</span>${cd>0?`<span class="cd">${cd>=90?'1×':cd}</span>`:''}</button>`}).join('')}<button data-act="skill" data-k="zamiana" class="swp ${B.sel==='zamiana'?'sel':''}" aria-label="Zamień miejsce" ${alive('h').length<2?'disabled':''}>${ic('reroll',22,'si')}<span class="sn">Zamień</span></button>${B.exp?`<button data-act="bag" data-b="1" class="swp bagb" aria-label="Torba" ${bagB()&&B.itemT!==B.turnId?'':'disabled'}>${ic('bag',22,'si')}<span class="sn">Torba</span>${bagB()?`<span class="cd">${bagB()}</span>`:''}</button>`:''}</div>${need?`<div class="need">▶ ${need}</div>`:`<button class="btn-main use" data-act="use">✔ Użyj</button>`}</div>`}
+  panel=`<div class="hint"><b class="who">${esc(a.name)}${a.row==='f'?' (1. rząd)':' (2. rząd)'}:</b> <b>${s.name}</b> ${isOff(a,B.sel)?reachChip(reachOf(a,B.sel))+' ':''}${s.dt?dtChip(s.dt==='wep'?a.dt:s.dt)+' ':''}${blocked?`<b class="blkh">${ic('lock',12)} Najpierw pokonaj pierwszy rząd</b> `:''}<span class="ds">${s.desc}</span></div><div class="pbar"><div class="skills n${a.skills.length}">${a.skills.map(k=>{const sk=SK[k],cd=a.cd[k]||0,no=SK[k].t==='deadAlly'&&!deadAllies().length;return `<button data-act="skill" data-k="${k}" class="${B.sel===k?'sel':''}" ${cd>0||no?'disabled':''} aria-label="${sk.name}">${skIc(k,28,'si')}<span class="sn${sk.name.split(" ").some(w=>w.length>11)?" ln":""}">${sk.name}</span>${cd>0?`<span class="cd">${cd>=90?'1×':cd}</span>`:''}</button>`}).join('')}<button data-act="skill" data-k="zamiana" class="swp ${B.sel==='zamiana'?'sel':''}" aria-label="Zamień miejsce" ${alive('h').length<2?'disabled':''}>${ic('reroll',22,'si')}<span class="sn">Zamień</span></button>${B.exp?`<button data-act="bag" data-b="1" class="swp bagb" aria-label="Torba" ${bagB()&&B.itemT!==B.turnId?'':'disabled'}>${ic('bag',22,'si')}<span class="sn">Torba</span>${bagB()?`<span class="cd">${bagB()}</span>`:''}</button>`:''}</div>${need?`<div class="need">▶ ${need}</div>`:`<button class="btn-main use" data-act="use">✔ Użyj</button>`}</div>`}
  else panel=`<div class="hint wait">${a?`<b class="who">${esc(a.name)}</b> działa… `:''}${SET.auto?'Tryb automatyczny.':'Czekaj na swoją turę.'} <span class="ds">${lpTxt()}: odporności i słabości.</span></div>`;
  document.getElementById('panel').innerHTML=panel;fitPanel()}
 function wipe(lbl,sub){const w=document.createElement('div');w.id='wipe';w.innerHTML=`<div class="bars">${Array.from({length:8},(_,i)=>`<i style="top:${i*12.5}%;transform-origin:${i%2?'right':'left'}"></i>`).join('')}</div><div class="lbl"><b>${lbl}</b><span>${sub}</span></div>`;document.body.appendChild(w);setTimeout(()=>w.remove(),T(950))}
@@ -74,7 +74,9 @@ function startFx(){const hs=B.units.filter(u=>u.side==='h'),es=B.units.filter(u=
   if(RK(u,'dru_wieczny')){hs.forEach(a=>a.st.regen={t:3,v:Math.round(a.maxHp*.05)});L(`🌳 Wieczny las (${u.name}): drużyna się regeneruje.`)}
   if(RK(u,'bar_cisza')){es.forEach(e=>e.st.weak=Math.max(e.st.weak||0,3));L(`🎻 Pieśń rozpaczy (${u.name}) osłabia wrogów.`)}
   if(RK(u,'bar_inspir')){hs.forEach(a=>{a.st.haste=Math.max(a.st.haste||0,3);a.st.hasteV=Math.max(a.st.hasteV||0,2)});L(`🎺 Uwertura (${u.name}): drużyna +2 SZY.`)}
-  if(RK(u,'kap_aura')){hs.forEach(a=>a.resAll=(a.resAll||0)+10);L(`✨ Aura ochronna (${u.name}): +10% odporności.`)}})}
+  if(RK(u,'kap_aura')){hs.forEach(a=>a.resAll=(a.resAll||0)+10);L(`✨ Aura ochronna (${u.name}): +10% odporności.`)}});
+ /* cechy specjalizacji (js/data/specs.js) */
+ specStart()}
 function startTick(u){for(const k in u.cd)if(u.cd[k]>0)u.cd[k]--;const s=u.st;
  ['taunt','shield','evade','sunder','rally','weak','curse','haste','bear','expose'].forEach(k=>{if(s[k]>0){s[k]--;if(!s[k]){delete s[k];delete s[k+'V'];if(k==='curse')delete s.curseSrc}}});
  if(s.regen){const g=s.regen;healQ(u,g.v);g.t--;if(g.t<=0)delete s.regen}
@@ -103,7 +105,7 @@ async function doAction(u,k,target){const sk=SK[k];if(!B.awaiting||(u.cd[k]||0)>
  if(tt==='deadAlly'&&(!tg||tg.alive||tg.revived))return;if((tt==='enemy'||tt==='ally')&&(!tg||!tg.alive))return;
  B.awaiting=false;refreshBattle();if(k!=='atak')log(`${sk.icon} ${u.name}: ${sk.name}`,'y');
  const fx=k==='atak'?(u.st.bear>0?'melee':u.fx):sk.fx;await anim(u,Array.isArray(tg)?tg:[tg],fx);B.curFx=fx;B.curDt=!sk.dt||sk.dt==='wep'?u.dt:sk.dt;B.cur={u,k,p:PW(u,k),cb:sk.cb||0};
- try{sk.run(u,tg)}catch(e){console.warn(e)}B.cur=null;B.curFx=null;B.curDt=null;B.curReach=null;if(tt==='self'||fx==='buff'){ring(u,'#ffe36a');vfx('holy',center(u,.4),1.6)}
+ try{sk.run(u,tg);specEcho(u,k,tt,tg)}catch(e){console.warn(e)}B.cur=null;B.curFx=null;B.curDt=null;B.curReach=null;if(tt==='self'||fx==='buff'){ring(u,'#ffe36a');vfx('holy',center(u,.4),1.6)}
  if(sk.cd)u.cd[k]=u.cd[k]===-1?0:cdOf(u,k)+1;const r=B.resolve;B.resolve=null;r&&r()}
 function heroAI(u){const ready=k=>u.skills.includes(k)&&!(u.cd[k]>0);const al=alive('h'),fo=alive('e');if(!fo.length)return['atak',null];
  /* cel: boss w trakcie zapowiedzi (przerwij!), potem elementy bossa (korzenie, kryształy…), potem najsłabszy */
@@ -150,8 +152,8 @@ function finishBattle(){if(B.exp)return finishExpBattle();const win=alive('e').l
  const F=battleFates(win),fallen=F.fallen;S.roster.forEach(h=>{if(h.hq){h.hosp=Math.max(h.hosp||0,h.hq);h.hq=0}h.dd=0});
  const stolen=B.units.reduce((a,u)=>a+(u.stolen||0),0);
  let title,bossName='';
- if(win){const boss=S.stage%5===0;const bu=B.units.find(u=>u.boss);bossName=bu?ENEMIES[bu.key].name:'';const gold=30+S.stage*15+(boss?120:0),xp=25+S.stage*10;S.gold+=gold+stolen;S.wins++;title=boss?`${bossName} ${gf({name:bossName},'pokonany','pokonana')}!`:'Zwycięstwo!';
-  lines.push(`${ic('gold',18)} +${gold} złota`+(stolen?` (+${stolen} odzyskane)`:''),`${ic('xp',18)} +${xp} PD dla ocalałych`);
+ if(win){const boss=S.stage%5===0;const bu=B.units.find(u=>u.boss);bossName=bu?ENEMIES[bu.key].name:'';const gold=30+S.stage*15+(boss?120:0),xp=25+S.stage*10;S.gold+=gold+stolen+(B.rab||0);S.wins++;title=boss?`${bossName} ${gf({name:bossName},'pokonany','pokonana')}!`:'Zwycięstwo!';
+  lines.push(`${ic('gold',18)} +${gold} złota`+(stolen?` (+${stolen} odzyskane)`:'')+(B.rab?` (+${B.rab} skradzione)`:''),`${ic('xp',18)} +${xp} PD dla ocalałych`);
   B.units.filter(u=>u.side==='h'&&u.alive).forEach(u=>{const h=u.hero,l0=h.lvl;h.hp=Math.min(stats(h).maxHp,h.hp+Math.round(stats(h).maxHp*.2));const msgs=gainXp(h,xp);if(h.lvl>l0)lv.push({h,msgs})});
   const luck=Math.min(.3,S.stage*.02)+(boss?.15:0);
   if(boss){loot.push(makeItem(S.stage+1,rollRar(luck,1)),makeItem(S.stage+1,rollRar(luck,1)))}if(bu){const tr=bossTrophy();if(tr)loot.push(tr)}else{if(Math.random()<.6)loot.push(makeItem(S.stage,rollRar(luck)));if(S.stage>3&&Math.random()<.25)loot.push(makeItem(S.stage,rollRar(luck)))}
