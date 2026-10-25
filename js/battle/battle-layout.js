@@ -3,7 +3,7 @@ const DPR=()=>Math.max(1,Math.min(6,(window.devicePixelRatio||1)*UIZ));
 const qsc=v=>Math.max(1,Math.round(v*DPR()))/DPR();/* skala w całych pikselach urządzenia = ostre piksele */
 const panelRes=()=>LH()<360?78:LH()<460?86:96;
 const frontAlive=side=>B.units.some(x=>x.side===side&&x.alive&&x.row==='f');
-function canReach(u,t,k){if(!t||!u||t.side===u.side)return true;if(t.row!=='b')return true;return reachOf(u,k)!=='m'||!frontAlive(t.side)}
+function canReach(u,t,k){if(!t||!u||t.side===u.side)return true;if(t.row!=='b'||t.obj)return true;return reachOf(u,k)!=='m'||!frontAlive(t.side)}
 const reachable=(u,k,side)=>alive(side).filter(t=>canReach(u,t,k));
 function slotX(side,i){const L=B.lay,off=L.c0+L.w*(i+.5)+(i>=2?L.rg:0);return side==='h'?L.mid-off:L.mid+off}
 function slotPos(i,side,u){const L=B.lay,z=u.A,s=u._s||L.sc,iw=z.cw*s,ih=z.ch*s;let cx=slotX(side,i);if(u.boss)cx=(slotX(side,0)+slotX(side,1))/2;
@@ -12,7 +12,7 @@ function slotPos(i,side,u){const L=B.lay,z=u.A,s=u._s||L.sc,iw=z.cw*s,ih=z.ch*s;
 function placeUnit(u){const el=uel(u);if(!el||u.slot==null)return;const m=/left:([-\d]+)px;top:([-\d]+)px;width:(\d+)px;z-index:(\d+)/.exec(slotPos(u.slot,u.side,u));if(!m)return;el.style.left=m[1]+'px';el.style.top=m[2]+'px';el.style.width=m[3]+'px';el.style.zIndex=m[4]}
 let PANEL_H=0;
 function buildBattle(){const bio=B.bio||biomeOf(S.stage);
- document.getElementById('app').innerHTML=`<div class="bt"><div id="scene" class="scene bg-${bio.k}">${sceneLayers(bio.k)}<div class="rowmark h"></div><div class="rowmark e"></div></div><div class="btop"><span class="pill" id="bt-title"></span><div class="order" id="order"></div><button class="btn-small" data-act="logt" id="b-log" aria-label="Dziennik walki">${ic('map',16)}<span class="lbl">Dziennik</span></button><button class="btn-small" data-act="auto" id="b-auto"></button><button class="btn-small" data-act="speed" id="b-speed"></button></div><div class="log${SET.logOpen?' open':''}" id="log" data-act="logt">${B.log.map(l=>`<div class="${l.c||''}">${esc(l.t)}</div>`).join('')}</div><div id="panel"></div></div>`;
+ document.getElementById('app').innerHTML=`<div class="bt"><div id="scene" class="scene bg-${bio.k}">${sceneLayers(bio.k)}<div class="rowmark h"></div><div class="rowmark e"></div></div><div class="btop"><span class="pill" id="bt-title"></span><div class="order" id="order"></div><button class="btn-small" data-act="logt" id="b-log" aria-label="Dziennik walki">${ic('map',16)}<span class="lbl">Dziennik</span></button><button class="btn-small" data-act="auto" id="b-auto"></button><button class="btn-small" data-act="speed" id="b-speed"></button></div><div id="bossbar" class="bossbar" hidden></div><div class="log${SET.logOpen?' open':''}" id="log" data-act="logt">${B.log.map(l=>`<div class="${l.c||''}">${esc(l.t)}</div>`).join('')}</div><div id="panel"></div></div>`;
  const scene=document.getElementById('scene'),W=scene.clientWidth,H=scene.clientHeight,top=LH()<360?40:46;
  const SW=Math.min(W,Math.round(H*2.5)),ox=Math.round((W-SW)/2),half=SW/2,c0=Math.max(12,Math.round(half*.05)),w=(half-c0-6)/5.3,rg=Math.round(w*.3);
  const sc=qsc(Math.min(3,H*.28/HM.ch,w*1.1/HM.cw)),ih=HM.ch*sc,yF=H-panelRes()-26,yB=yF-Math.max(8,Math.round(ih*.1));
@@ -32,6 +32,7 @@ function unitInfo(u){if(!B)return;B.paused=true;const e=u.side==='e'?ENEMIES[u.k
  <div class="resrow"><span class="sub">Pozycja:</span><span class="rs">${u.row==='f'?'1. rząd':'2. rząd'}</span><span class="sub">Atak:</span>${reachChip(reachOf(u,'atak'))}</div><div class="resrow"><span class="sub">Zadaje:</span>${dtChip(u.dt)}${u.nb?'<span class="sub">· nie krwawi</span>':''}</div>
  <div class="resrow"><span class="sub">Słabości:</span>${wk.length?wk.map(k=>resChip(k,r[k])).join(''):'<span class="sub">brak</span>'}</div>
  <div class="resrow"><span class="sub">Odporności:</span>${rs.length?rs.map(k=>resChip(k,r[k])).join(''):'<span class="sub">brak</span>'}</div>
+ ${u.boss&&BOSS[u.key]?`<div class="note bossn">${ic('boss',14)} ${BOSS[u.key].tip?BOSS[u.key].tip(u):''}${BOSS[u.key].big?`<br><b>${BOSS[u.key].big.n}</b>: ${BOSS[u.key].big.d}. Zapowiada go turę wcześniej – przerwiesz go obrażeniami (${Math.round(CHG_NEED*100)}% PŻ) albo ogłuszeniem.`:''}</div>`:''}
  ${st?`<div class="resrow"><span class="sub">Efekty:</span><span class="sts inl">${st}</span></div>`:''}
  <div class="sub" style="margin-top:6px">Słabość: obrażenia większe o podany %. Odporność: mniejsze.</div><button style="width:100%;margin-top:8px" data-act="close">Wróć do walki</button>`)}
 function fitScale(u){const L=B.lay,cw=u.A.cw;return cw*L.sc>L.w*1.45?Math.max(qsc(L.sc*.6),qsc(L.w*1.45/cw)):L.sc}
@@ -46,7 +47,7 @@ function swapUnits(u,t){const a=u.slot;u.slot=t.slot;t.slot=a;[u,t].forEach(x=>{
 function refreshBattle(){if(!B)return;const a=B.active;const t=document.getElementById('bt-title');if(!t)return;
  t.innerHTML=`${ic(B.units.some(x=>x.boss)?'boss':'map',18)} ${esc(B.lbl||'')} · R${B.round}`;document.getElementById('b-auto').innerHTML=SET.auto?`${ic('pause',16)} Auto`:`${ic('auto',16)} Auto`;document.getElementById('b-speed').innerHTML=`${ic('speed',16)} ×${SET.speed}`;
  document.getElementById('order').innerHTML=(B.order||[]).filter(u=>u.alive).map(u=>`<img class="px ${u.side}${u===a?' act':''}" src="${u.img}" alt="">`).join('');
- B.units.forEach(u=>{const el=uel(u);if(!el)return;el.classList.toggle('active',u===a);el.classList.toggle('target',isTarget(u));el.classList.toggle('noreach',!!noReach(u));updUnit(u)});
+ bossBar();B.units.forEach(u=>{const el=uel(u);if(!el)return;el.classList.toggle('active',u===a);el.classList.toggle('target',isTarget(u));el.classList.toggle('noreach',!!noReach(u));updUnit(u)});
  let panel='';
  if(B.awaiting&&a){const s=SK[B.sel],tt=tOf(a,B.sel);const need=B.sel==='zamiana'?'Wybierz sojusznika':tt==='enemy'?'Dotknij wroga':tt==='ally'?'Dotknij sojusznika':tt==='deadAlly'?'Dotknij poległego':'';
   const blocked=isOff(a,B.sel)&&reachOf(a,B.sel)==='m'&&frontAlive('e')&&alive('e').some(e=>e.row==='b');
@@ -60,7 +61,7 @@ function placeEnemies(es){const boss=es.find(e=>e.boss);let rest=es.filter(e=>e!
 function startBattle(cfg){cfg=cfg||{};syncForm();const party=S.slots.map((id,i)=>({h:id!=null?getHero(id):null,i})).filter(x=>x.h&&x.h.hp>0);if(!party.length){toast('Brak zdolnych do walki bohaterów!');return}
  const st=cfg.st||S.stage,bio=cfg.bio||biomeOf(st);
  B={round:0,units:[],log:[],sel:'atak',active:null,awaiting:false,resolve:null,over:false,order:[],st,bio,lbl:cfg.lbl||('Etap '+st),exp:!!cfg.exp,elite:!!cfg.elite};
- party.forEach(({h,i})=>{const u=unitFromHero(h);u.slot=i;u.row=i<2?'f':'b';B.units.push(u)});if(cfg.exp&&S.exp&&S.exp.fx)B.units.forEach(u=>buffUnit(u,S.exp.fx));placeEnemies(cfg.list?cfg.list.map((k,i,l)=>makeEnemy(k,cfg.est||st,'e'+i,l.filter(x=>x===k).length>1?' '+'ABCDE'[l.slice(0,i+1).filter(x=>x===k).length-1]:'')):genEnemies(st)).forEach(e=>B.units.push(e));
+ party.forEach(({h,i})=>{const u=unitFromHero(h);u.slot=i;u.row=i<2?'f':'b';B.units.push(u)});if(cfg.exp&&S.exp&&S.exp.fx)B.units.forEach(u=>buffUnit(u,S.exp.fx));placeEnemies(cfg.list?cfg.list.map((k,i,l)=>makeEnemy(k,cfg.est||st,'e'+i,l.filter(x=>x===k).length>1?' '+'ABCDE'[l.slice(0,i+1).filter(x=>x===k).length-1]:'')):genEnemies(st)).forEach(e=>B.units.push(e));bossSetup();
  const boss=B.units.find(u=>u.side==='e'&&u.boss);
  B.log.push({t:`⚔️ ${B.lbl} (${bio.n}): ${alive('e').map(e=>e.name).join(', ')}`,c:'y'});
  startFx();wipe(boss?'BOSS: '+esc(boss.name):cfg.wl||B.lbl,esc(bio.n));
@@ -75,15 +76,16 @@ function startFx(){const hs=B.units.filter(u=>u.side==='h'),es=B.units.filter(u=
   if(RK(u,'bar_inspir')){hs.forEach(a=>{a.st.haste=Math.max(a.st.haste||0,3);a.st.hasteV=Math.max(a.st.hasteV||0,2)});L(`🎺 Uwertura (${u.name}): drużyna +2 SZY.`)}
   if(RK(u,'kap_aura')){hs.forEach(a=>a.resAll=(a.resAll||0)+10);L(`✨ Aura ochronna (${u.name}): +10% odporności.`)}})}
 function startTick(u){for(const k in u.cd)if(u.cd[k]>0)u.cd[k]--;const s=u.st;
- ['taunt','shield','evade','sunder','rally','weak','curse','haste','bear'].forEach(k=>{if(s[k]>0){s[k]--;if(!s[k]){delete s[k];delete s[k+'V'];if(k==='curse')delete s.curseSrc}}});
+ ['taunt','shield','evade','sunder','rally','weak','curse','haste','bear','expose'].forEach(k=>{if(s[k]>0){s[k]--;if(!s[k]){delete s[k];delete s[k+'V'];if(k==='curse')delete s.curseSrc}}});
  if(s.regen){const g=s.regen;healQ(u,g.v);g.t--;if(g.t<=0)delete s.regen}
  if(s.bleed){const b=s.bleed;log(`${b.ic} ${u.name} traci ${b.dmg} PŻ.`,u.side==='h'?'r':'');const p=center(u,.5);particles(p,6,b.ic==='🔥'?FXC.fire:b.ic==='🧪'?FXC.poison:b.ic==='🌑'?FXC.dark:['#ff4a3a','#a01a1a'],{up:b.ic==='🩸'?0:24,r0:4,r1:18,d:.6});dmg(u,b.dmg,'dmg',(b.ic==='🩸'?'krwawienie':b.ic==='🔥'?'ogień':b.ic==='🌑'?'gnicie':'trucizna')+' ('+b.by+')');b.t--;if(b.t<=0)delete s.bleed}
- if(u.alive&&(u.sp==='troll'||u.sp==='golem')&&u.hp<u.maxHp)heal(u,Math.round(u.maxHp*(u.sp==='troll'?.05:.05)));updUnit(u);
- /* regeneracja: leszy i borowy (nie gdy płoną) */
+ /* regeneracja bossów (troll, golem, leszy…): bossTick w js/battle/bosses.js */
+ if(u.alive&&u.boss)bossTick(u);updUnit(u);
+ /* regeneracja borowego (nie gdy płonie) */
  if(!u.alive)return;
- if((u.sp==='leszy'||u.sp==='roots')&&u.hp<u.maxHp){if(burning(u)){if(!u._bm){u._bm=1;log(`🔥 ${u.name} płonie – nie może się odradzać!`,'g')}}else{heal(u,Math.round(u.maxHp*(u.sp==='leszy'?.06:.04)))}updUnit(u)}}
+ if(u.sp==='roots'&&u.hp<u.maxHp){if(burning(u)){if(!u._bm){u._bm=1;log(`🔥 ${u.name} płonie – nie może się odradzać!`,'g')}}else{heal(u,Math.round(u.maxHp*.04))}updUnit(u)}}
 async function battleLoop(){
- while(!B.over){B.round++;if(B.round===26)log('😫 Wyczerpanie! Od teraz wszyscy zadają coraz większe obrażenia.','r');B.order=B.units.filter(u=>u.alive).sort((a,b)=>spdOf(b)-spdOf(a)||Math.random()-.5);
+ while(!B.over){B.round++;if(B.round===26)log('😫 Wyczerpanie! Od teraz wszyscy zadają coraz większe obrażenia.','r');B.order=B.units.filter(u=>u.alive&&!u.obj).sort((a,b)=>spdOf(b)-spdOf(a)||Math.random()-.5);
   for(const u of B.order){while(B&&B.paused&&!B.over)await new Promise(r=>setTimeout(r,120));if(!B||B.over)return;if(!u.alive)continue;if(checkEnd())return;
    B.active=u;B.awaiting=false;refreshBattle();startTick(u);
    if(!u.alive){await sleep(600);if(checkEnd())return;continue}
@@ -104,20 +106,23 @@ async function doAction(u,k,target){const sk=SK[k];if(!B.awaiting||(u.cd[k]||0)>
  try{sk.run(u,tg)}catch(e){console.warn(e)}B.cur=null;B.curFx=null;B.curDt=null;B.curReach=null;if(tt==='self'||fx==='buff'){ring(u,'#ffe36a');vfx('holy',center(u,.4),1.6)}
  if(sk.cd)u.cd[k]=u.cd[k]===-1?0:cdOf(u,k)+1;const r=B.resolve;B.resolve=null;r&&r()}
 function heroAI(u){const ready=k=>u.skills.includes(k)&&!(u.cd[k]>0);const al=alive('h'),fo=alive('e');if(!fo.length)return['atak',null];
- const C=k=>{const f=reachable(u,k,'e');return {al,fo:f.length?f:fo,low:lowest(al),weak:(f.length?f:fo).slice().sort((a,b)=>a.hp-b.hp)[0],dead:deadAllies(),boss:fo.some(e=>e.boss)}};
+ /* cel: boss w trakcie zapowiedzi (przerwij!), potem elementy bossa (korzenie, kryształy…), potem najsłabszy */
+ const C=k=>{const f=reachable(u,k,'e'),F=f.length?f:fo,bc=F.find(e=>e.boss&&e.chg),ob=F.filter(e=>e.obj).sort((a,b)=>a.hp-b.hp);return {al,fo:F,low:lowest(al),weak:bc||ob[0]||F.slice().sort((a,b)=>a.hp-b.hp)[0],dead:deadAllies(),boss:fo.some(e=>e.boss)}};
  const c0=C('atak');let best=['atak',c0.weak],bs=12;
  for(const k of u.skills){if(k==='atak'||!ready(k))continue;const sk=SK[k],tt=tOf(u,k),c=C(k);if(tt==='deadAlly'&&!c.dead.length)continue;let r=null;
   try{r=sk.ai?sk.ai(u,c):tt==='enemy'?[38+(sk.pw||1)*9,c.weak]:tt==='allEnemies'?aiAoe(u,c,44):null}catch(e){r=null}
   if(r&&r[0]>bs){bs=r[0];best=[k,r[1]]}}
  const tt=tOf(u,best[0]),cb=C(best[0]);if(tt==='enemy'&&(!best[1]||!best[1].alive||!canReach(u,best[1],best[0])))best[1]=cb.weak;if(tt==='ally'&&(!best[1]||!best[1].alive))best[1]=cb.low;return best}
-async function enemyAct(u){
+async function enemyAct(u){if(u.obj)return;
+ /* bossowie: zapowiadane ciosy i fazy (js/battle/bosses.js) */
+ if(u.boss&&BOSS[u.key]&&alive('h').length){try{if(await bossAct(u))return}catch(e){console.warn(e)}}
  /* bestie Velesii: własne zachowania (MAI w js/world/beasts.js) */
- {const ai=MAI[u.sp];if(ai&&!(u.cd.sp>0)&&alive('h').length){try{if(await tryExecute(u))return;const c=aiCtx(u);if(await ai(u,c))return}catch(e){console.warn(e)}}}if(u.cd.br>0&&u.sp==='zmij')u.cd.br--;
+ {const ai=MAI[u.sp];if(ai&&!(u.cd.sp>0)&&alive('h').length){try{if(await tryExecute(u))return;const c=aiCtx(u);if(await ai(u,c))return}catch(e){console.warn(e)}}}
  const hs=alive('h');if(!hs.length)return;if(await tryExecute(u))return;const ready=!(u.cd.sp>0);const rh=hs.filter(h=>canReach(u,h,'atak'));
  const target=()=>{const tz=rh.filter(h=>h.st.taunt>0);if(tz.length)return pick(tz);if(Math.random()<.5)return lowest(rh);return pick(rh)};
  const two=()=>{const tz=rh.filter(h=>h.st.taunt>0);if(tz.length)return [tz[0]];return rh.slice().sort(()=>Math.random()-.5).slice(0,2)};
  const sp=(m,cd)=>{log(`${u.name}: ${m}`,'r');u.cd.sp=cd||4;flt(u,m.replace(/!$/,''),'info')};
- const allies=alive('e').filter(e=>e!==u);
+ const allies=alive('e').filter(e=>e!==u&&!e.obj);
  if(ready){switch(u.sp){
   case 'heal':{const w=lowest(alive('e').filter(e=>e.hp/e.maxHp<.6));if(w){sp('leczy sojusznika!');await anim(u,[w],'heal');heal(w,Math.round(w.maxHp*.3));return}break}
   case 'smash':case 'golem':if(Math.random()<.6){sp('Miażdżący cios!');const t=target();await anim(u,[t],'melee');shake(true);hit(u,t,1.8);return}break;
@@ -133,7 +138,7 @@ async function enemyAct(u){
   case 'rally':if(allies.length&&!allies.some(a=>a.st.rally>0)){sp('Mroczne błogosławieństwo!',4);await anim(u,allies,'buff');allies.concat([u]).forEach(a=>{a.st.rally=2;ring(a,'#ff6a5a');updUnit(a)});return}break;
   case 'multi':{sp('Pikowanie!',3);const ts=two();setF(u,'wind');await sleep(160);setF(u,'strike',400);await moveMv(u,-30,10,150,260);ts.forEach((t,i)=>setTimeout(()=>{if(B&&!B.over)hit(u,t,.85)},T(i*120)));await sleep(260);return}
   case 'guard':if(!(u.st.shield>0)){u.st.shield=2;log(`${u.name} unosi gardę!`,'r');ring(u,'#b46cff');flt(u,'Garda','info');updUnit(u);u.cd.sp=4}break;
-  case 'herszt':{const minions=allies.length;if(minions<3&&summon(u,pick(['bandyta','rzezimieszek','lucznikB']))){u.cd.sp=3;setF(u,'cast',600);flt(u,'Do mnie, chłopcy!','info');await sleep(500);return}
+  case 'herszt':{const minions=allies.length;if(minions<3&&!u.noSum&&summon(u,pick(['bandyta','rzezimieszek','lucznikB']))){u.cd.sp=3;setF(u,'cast',600);flt(u,'Do mnie, chłopcy!','info');await sleep(500);return}
    if(!u.st.rally&&minions){sp('Okrzyk bojowy!',3);await anim(u,allies,'buff');alive('e').forEach(a=>{a.st.rally=2;ring(a,'#ff6a5a');updUnit(a)});return}
    sp('Potężne cięcie!',2);const t=target();await anim(u,[t],'melee');shake(true);hit(u,t,1.4);return}
   case 'necro':{const sk=allies.filter(a=>a.key==='szkielet').length;if(sk<2&&summon(u,'szkielet')){u.cd.sp=3;setF(u,'cast',600);await sleep(500);return}
@@ -149,7 +154,7 @@ function finishBattle(){if(B.exp)return finishExpBattle();const win=alive('e').l
   lines.push(`${ic('gold',18)} +${gold} złota`+(stolen?` (+${stolen} odzyskane)`:''),`${ic('xp',18)} +${xp} PD dla ocalałych`);
   B.units.filter(u=>u.side==='h'&&u.alive).forEach(u=>{const h=u.hero,l0=h.lvl;h.hp=Math.min(stats(h).maxHp,h.hp+Math.round(stats(h).maxHp*.2));const msgs=gainXp(h,xp);if(h.lvl>l0)lv.push({h,msgs})});
   const luck=Math.min(.3,S.stage*.02)+(boss?.15:0);
-  if(boss){loot.push(makeItem(S.stage+1,rollRar(luck,1)),makeItem(S.stage+1,rollRar(luck,1)))}else{if(Math.random()<.6)loot.push(makeItem(S.stage,rollRar(luck)));if(S.stage>3&&Math.random()<.25)loot.push(makeItem(S.stage,rollRar(luck)))}
+  if(boss){loot.push(makeItem(S.stage+1,rollRar(luck,1)),makeItem(S.stage+1,rollRar(luck,1)))}if(bu){const tr=bossTrophy();if(tr)loot.push(tr)}else{if(Math.random()<.6)loot.push(makeItem(S.stage,rollRar(luck)));if(S.stage>3&&Math.random()<.25)loot.push(makeItem(S.stage,rollRar(luck)))}
   S.stage++;genOffers();genShop()}
  else{title='Porażka…';if(stolen)lines.push(`${ic('gold',18)} Złodzieje uciekli z ${stolen} złota.`)}
  const over=S.roster.length===0;const reached=over?S.stage:S.stage-1;
@@ -159,7 +164,7 @@ function finishBattle(){if(B.exp)return finishExpBattle();const win=alive('e').l
  let i=0;const dl=()=>`style="animation-delay:${(0.35+(i++)*0.22).toFixed(2)}s"`;
  let html=`<div class="banner">${win?'<div class="rays"></div>':''}<h1>${win?ic(S.stage-1>0&&(S.stage-1)%5===0?'boss':'xp',26)+' ':''}${esc(title)}</h1></div><div class="res">${lines.map(l=>`<p ${dl()}>${l}</p>`).join('')}`;
  lv.forEach(({h,msgs})=>{const nl=msgs.filter(m=>m.startsWith('⭐')).length;html+=`<div class="lvcard" ${dl()}>${bust(heroSprite(h),h.cls,44,1.5)}<div><b>${esc(h.name)}</b><br>${ic('lvl',14)} Poziom ${h.lvl}! <small>+${3*nl} pkt cech, +${nl} pkt talentu</small>${msgs.filter(m=>!m.startsWith('⭐')).map(m=>`<br><small>${esc(m)}</small>`).join('')}</div></div>`});
- loot.forEach(it=>{if(S.inv.length<INV_MAX){S.inv.push(it);html+=`<div class="loot r${it.r}" style="--rc:${rcol(it)};animation-delay:${(0.35+(i++)*0.3).toFixed(2)}s"><div class="ii">${itIc(it,28)}</div><div><b style="color:${rcol(it)};text-shadow:1px 1px 0 #000">${esc(it.n)}</b><br><small>${RAR[it.r].n} · ${statStr(it.st)}</small></div></div>`}else{S.gold+=sellPrice(it);html+=`<p ${dl()}>${ic('bag',16)} Plecak pełny – ${esc(it.n)} sprzedany za ${sellPrice(it)} zł</p>`}});
+ loot.forEach(it=>{if(S.inv.length<INV_MAX||it.uq){S.inv.push(it);html+=`<div class="loot r${it.r}" style="--rc:${rcol(it)};animation-delay:${(0.35+(i++)*0.3).toFixed(2)}s"><div class="ii">${itIc(it,28)}</div><div><b style="color:${rcol(it)};text-shadow:1px 1px 0 #000">${esc(it.n)}</b><br><small>${RAR[it.r].n} · ${statStr(it.st)}</small></div></div>`}else{S.gold+=sellPrice(it);html+=`<p ${dl()}>${ic('bag',16)} Plecak pełny – ${esc(it.n)} sprzedany za ${sellPrice(it)} zł</p>`}});
  if(win)html+=`<p ${dl()}>${ic('sk_leczenie',16)} Ocaleni odzyskują 20% PŻ.</p><p ${dl()}>${ic('tavern',16)}${ic('smith',16)} Nowi ochotnicy w karczmie i nowy towar u kowala.</p>`;
  if(!win)html+=`<p ${dl()}>Ocaleni wycofują się do obozu. Etap pozostaje ten sam.</p>`;
  html+=fateHtml(F,dl);

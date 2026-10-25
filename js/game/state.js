@@ -23,6 +23,8 @@ function migrate(s){if(!s||!Array.isArray(s.roster))return null;
  if(s.v===11){S=s;s.v=12;loadMsg=(loadMsg?loadMsg+' ':'')+'Nowość: sześć zadań pobocznych – kowal i stary strażnik we Wschodniej, koniuszy w Weleszowie, sołtys Brzeziny, Mira w Kurhanowie i Kamienny most na drodze do Sanowa. W podróży czekają też nowe wydarzenia.'}
  if(s.v===12){S=s;s.stash=s.stash||[];if(s.loan===undefined)s.loan=null;s.tyt=s.tyt||0;s.v=13;
   loadMsg=(loadMsg?loadMsg+' ':'')+'Nowość: Zamek królewski w Weleszowie to teraz sala tronowa – król Przemysław przyjmuje kompanię na audiencjach, daje zadania „Na służbie Korony” i nadaje tytuły z przywilejami. Kontrakty wydaje kancelaria na dworze. Skarbiec przeniósł się do Kantoru „Złota Waga” (Weleszów i filia w Sanowie)'+(s.vault?` – wasze ${s.vault} zł czeka tam bezpiecznie`:'')+'. W kantorze jest też skrytka na przedmioty i pożyczki. Brzezina i Olszynów mają nowe widoki, a husarz Jaromir – nowy wygląd.'}
+ if(s.v===13){S=s;s.bk=s.bk||{};s.v=14;
+  loadMsg=(loadMsg?loadMsg+' ':'')+'Nowość: bossowie walczą inaczej! Zapowiadają wielkie ciosy turę wcześniej – przerwiesz je obrażeniami albo ogłuszeniem. Leszy, herszt, nekromanta i golem mają na polu bitwy rzeczy do zniszczenia (korzenie, sztandar, urnę, kryształy), a pasek bossa podpowiada, co robić. Za pierwsze zwycięstwo nad każdym bossem – legendarne trofeum.'}
  if(s.v===SAVE_VER)return s;
  return null}
 function load(){const raw=localStorage.getItem(SAVE_KEY);if(!raw)return null;try{const s=migrate(JSON.parse(raw));if(s){s.roster.forEach(upHero);return s}}catch(e){console.warn('zapis',e)}

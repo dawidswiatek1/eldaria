@@ -1,6 +1,6 @@
 /* ===== ELDARIA – service worker: gra działa bez internetu po pierwszym uruchomieniu =====
    Wygenerowane przez tools/pwa_files.py (lista plików i wersja) – nie edytuj ręcznie. */
-const VER='79966054d6',CACHE='eldaria-'+VER;
+const VER='db689eca1c',CACHE='eldaria-'+VER;
 const FILES=[
   "./",
   "index.html",
@@ -31,6 +31,7 @@ const FILES=[
   "css/velesia-map.css.js",
   "css/velesia-towns.css.js",
   "css/court.css.js",
+  "css/bosses.css.js",
   "js/core/viewport.js",
   "js/data/gfx-heroes.js",
   "js/data/gfx-enemies.js",
@@ -38,6 +39,7 @@ const FILES=[
   "js/gfx/sprites.js",
   "js/data/sprites-v19.js",
   "js/data/sprites-classes.js",
+  "js/data/sprites-boss.js",
   "js/data/art.js",
   "js/data/velesia-roads.js",
   "js/core/util.js",
@@ -53,6 +55,7 @@ const FILES=[
   "js/ui/armory.js",
   "js/battle/battle.js",
   "js/battle/battle-layout.js",
+  "js/battle/bosses.js",
   "js/ui/input.js",
   "js/expedition/expedition.js",
   "js/town/town.js",

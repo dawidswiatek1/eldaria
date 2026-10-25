@@ -7,7 +7,7 @@ function regFix(s){if(!s.reg)return;while(s.reg.lv.length<BIOMES.length){s.reg.l
 /* --- zachowania --- */
 const MAI={};
 function aiCtx(u){const hs=alive('h'),rh=hs.filter(h=>canReach(u,h,'atak')),R=rh.length?rh:hs;
- return {hs,rh:R,allies:alive('e').filter(e=>e!==u),tgt:()=>{const tz=R.filter(h=>h.st.taunt>0);if(tz.length)return pick(tz);return Math.random()<.5?lowest(R):pick(R)},
+ return {hs,rh:R,allies:alive('e').filter(e=>e!==u&&!e.obj),tgt:()=>{const tz=R.filter(h=>h.st.taunt>0);if(tz.length)return pick(tz);return Math.random()<.5?lowest(R):pick(R)},
   sp:(m,cd)=>{log(`${u.name}: ${m}`,'r');u.cd.sp=cd||4;flt(u,m.replace(/!$/,''),'info')}}}
 const burning=u=>u.st.bleed&&u.st.bleed.ic==='🔥';
 function weaken(t,n){t.st.weak=Math.max(t.st.weak||0,n||2);flt(t,'Osłabienie','info');updUnit(t)}
@@ -35,7 +35,7 @@ MAI.gaze=async(u,c)=>{if(Math.random()<.45){c.sp('Spojrzenie bazyliszka!',4);con
 MAI.zmij=async(u,c)=>{const ph=u.hp>u.maxHp*.6?1:u.hp>u.maxHp*.3?2:3;
  if(ph>=2&&!u.flown){u.flown=1;log(`🐉 ${u.name} wzbija się w powietrze!`,'r');flt(u,'Lot!','info');u.st.evade=1;updUnit(u)}
  if(ph===3&&!u.rage){u.rage=1;u.atk=Math.round(u.atk*1.3);log(`🐉 ${u.name} wpada we wściekłość!`,'r');ring(u,'#ff6a2a')}
- if(ph>=2&&!(u.cd.br>0)){u.cd.br=2;c.sp('Ognisty oddech!',1);await anim(u,c.hs,'fire');shake(true);c.hs.forEach(t=>{if(hit(u,t,.75,'fire')>0&&t.alive&&Math.random()<.45)bleed(u,t,2,u.atk*.25,'🔥')});return 1}
+ /* ognisty oddech: zapowiadany wielki cios (BOSS.zmij w js/battle/bosses.js) */
  if(Math.random()<.5){c.sp('Cios ogonem!',2);const ts=c.rh.slice().sort(()=>Math.random()-.5).slice(0,2);await anim(u,ts,'melee');shake(true);ts.forEach(t=>hit(u,t,.85));return 1}};
 MAI.jaga=async(u,c)=>{
  if(!u.fly2&&u.hp<u.maxHp*.5){u.fly2=1;log('🧹 Baba Jaga wzlatuje w moździerzu!','r');flt(u,'Moździerz!','info');ring(u,'#b46cff');u.x.dodge=.3;updUnit(u)}
