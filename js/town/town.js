@@ -56,7 +56,7 @@ function conGen(){regOk();const R=S.reg,open=R.lv.map((l,i)=>l?i:-1).filter(i=>i
  const L=Math.max(1,Math.min(3,R.lv[r]));opts.push({t:'clean',r,L,n:1,g:G(60+st*14),it:1,txt:`Oczyść ${bio.n} (poz. ${['','I','II','III'][L]}+) bez strat`,s:'Nikt z drużyny nie może zginąć'});
  opts.push({t:'chest',n:2+Math.floor(Math.random()*3),g:0,txt:'',s:'Dowolna kraina'});const ch=opts[opts.length-1];ch.g=G(25+ch.n*15+st*4);ch.txt=`Otwórz ${ch.n} skrzynie`;
  const gg=Math.round((60+st*22)/10)*10;opts.push({t:'gold',n:gg,g:G(30+st*8),txt:`Przynieś ${gg} zł łupów z jednej wyprawy`,s:'Liczy się złoto zebrane na wyprawie'});
- const el=1+Math.floor(Math.random()*2);opts.push({t:'elite',n:el,g:G(40+st*10+el*20),txt:`Rozbij ${el} ${el>1?'oddziały':'oddział'} elity`,s:'Ostatnie komnaty wypraw'});
+ const el=1+Math.floor(Math.random()*2);opts.push({t:'elite',n:el,g:G(40+st*10+el*20),txt:`Rozbij ${el} ${el>1?'oddziały':'oddział'} elity`,s:'Elity na mapach wypraw'});
  if(tl('gildia')){const tn=3+Math.floor(Math.random()*3);opts.push({t:'tro',n:tn,g:G(30+tn*12+st*5),txt:`Zbierz ${tn} trofeów`,s:'Trofea wypadają z pokonanych potworów'})}
  opts.push({t:'exp',n:2,g:G(40+st*8),txt:'Ukończ 2 wyprawy',s:'Dowolne krainy i poziomy'});
  const c=pick(opts);c.id=++S.con.n;c.p=0;return c}
@@ -111,7 +111,7 @@ function rollInjuries(){const out=[];if(!B)return out;const red=.8;
   const mind=Math.random()<.3,ks=Object.keys(INJ).filter(k=>!INJ[k].p&&!h.inj.includes(k)&&(mind?INJ[k].m:!INJ[k].m));if(!ks.length)return;const k=pick(ks);h.inj.push(k);out.push({h,k})});return out}
 /* --- TARG i ZAPASY --- */
 const SUP={
- pochodnia:{n:'Pochodnia',ic:'torch',p:12,lv:1,d:'Oświetla 2 kolejne komnaty: widzisz je na mapie, a pułapki i zasadzki w nich zostaną wykryte.',w:'exp'},
+ pochodnia:{n:'Pochodnia',ic:'torch',p:12,lv:1,d:'Oświetla 2 kolejne kroki wyprawy na wszystkich ścieżkach: widzisz te komnaty na mapie, a pułapki i zasadzki w nich zostaną wykryte.',w:'exp'},
  bandaz:{n:'Bandaż',ic:'bandaz',p:10,lv:1,d:'Leczy 20% PŻ jednego bohatera i tamuje krwawienie lub truciznę.',w:'one',h:.2},
  prowiant:{n:'Prowiant',ic:'prowiant',p:8,lv:1,d:'Drużyna odzyskuje 10% PŻ. Przy ognisku: odpoczynek leczy 60% zamiast 35%.',w:'exp'},
  mikstura:{n:'Mikstura lecznicza',ic:'mikstura',p:28,lv:2,d:'Leczy 45% PŻ jednego bohatera.',w:'one',h:.45},
@@ -130,7 +130,7 @@ const bagN=()=>Object.values(S.sup||{}).reduce((a,b)=>a+b,0);
 const bagB=()=>Object.keys(SUP).filter(k=>SUP[k].w!=='exp').reduce((a,k)=>a+((S.sup||{})[k]||0),0);
 const supPrice=k=>SUP[k].p;
 function marketHtml(){const L=tl('targ');
- let b=`<div class="note">${ic('bag',14)} Torba na zapasy: <b>${bagN()}/${bagCap()}</b>. Zapasy zabierasz na każdą wyprawę; użyjesz ich w korytarzu (przycisk ${ic('bag',12)} Torba) i w walce (nie zużywa tury).</div><div class="cols">`;
+ let b=`<div class="note">${ic('bag',14)} Torba na zapasy: <b>${bagN()}/${bagCap()}</b>. Zapasy zabierasz na każdą wyprawę; użyjesz ich na wyprawie (przycisk ${ic('bag',12)} Torba) i w walce (nie zużywa tury).</div><div class="cols">`;
  for(const k in SUP){if(SUP[k].src)continue;const s=SUP[k],ok=L>=s.lv;b+=`<div class="item sup ${ok?'':'lk'}"><div class="ii">${ic(s.ic,32)}</div><div class="inf"><div class="inm">${s.n} <span class="cnt">×${S.sup[k]||0}</span></div><div class="sub">${s.d}</div></div>${ok?`<button class="btn-small btn-gold" data-act="supbuy" data-k="${k}" ${S.gold<supPrice(k)||bagN()>=bagCap()?'disabled':''}>${supPrice(k)} ${ic('gold',14)}</button>`:`<button class="btn-small" disabled>${ic('lock',14)} poz. ${s.lv}</button>`}</div>`}
  return b+'</div>'}
 function bagModal(inBattle){const ks=Object.keys(SUP).filter(k=>S.sup[k]>0&&(!inBattle||SUP[k].w!=='exp'));
@@ -143,12 +143,13 @@ function supApply(k,id,inBattle){if(!(S.sup[k]>0))return;const E=S.exp;
   S.sup[k]--;B.itemT=B.turnId;closeModal();tgts.forEach(u=>{heal(u,u.maxHp*(SUP[k].h||.25));if(k==='bandaz'&&u.st.bleed){delete u.st.bleed;flt(u,'Opatrzony','info')}updUnit(u)});log(`🎒 Użyto: ${SUP[k].n}.`,'g');refreshBattle();save();return}
  if(SUP[k].w==='buff'){if(!E)return;S.sup[k]--;expAddFx(E,SUP[k].fx,SUP[k].n);if(inBattle){B.itemT=B.turnId;closeModal();B.units.filter(u=>u.side==='h'&&u.alive).forEach(u=>{buffUnit(u,SUP[k].fx);ring(u,'#ffe36a');updUnit(u)});log(`🎒 ${SUP[k].n}: ${SUP[k].d}`,'g');refreshBattle();save();return}save();closeModal();render();toast(`${SUP[k].n}: działa do końca wyprawy.`);return}
  if(!E)return;let t='';
- if(k==='pochodnia'){E.torch=Math.max(E.torch||0,E.i+2);t='Pochodnia rozświetla drogę: widzisz 2 kolejne komnaty.'}
+ if(k==='pochodnia'){E.torch=Math.max(E.torch||0,expCol(E,E.i)+2);t='Pochodnia rozświetla drogę: widzisz 2 kolejne kroki na wszystkich ścieżkach.'}
  else if(k==='prowiant'){t=`Posiłek: drużyna odzyskuje ${healAll(.1)} PŻ.`}
  else if(k==='ziola'){t=`Zioła: drużyna odzyskuje ${healAll(.25)} PŻ.`}
  else{const h=getHero(id);if(!h)return;const v=Math.min(mh(h)-h.hp,Math.round(mh(h)*(SUP[k].h||.25)));h.hp+=v;t=`${h.name.split(' ')[0]} odzyskuje ${v} PŻ.`}
  S.sup[k]--;save();closeModal();render();toast(t)}
-const litRoom=i=>S.exp&&S.exp.torch!=null&&i<=S.exp.torch;
+/* pochodnia oświetla kroki mapy wyprawy (wszystkie ścieżki) do E.torch włącznie */
+const litRoom=i=>S.exp&&S.exp.torch!=null&&expCol(S.exp,i)<=S.exp.torch;
 /* --- wspólne zdarzenia końca wyprawy --- */
 function expEndTown(E,lost,done){const o=[];if(done)conEv('exp',{r:E.r,L:E.L,lost:!!E.lost,gold:E.gold});
  hospApply().forEach(t=>o.push(t));const v=vaultTick();if(v)o.push(`${ic('vault',14)} Skarbiec: +${v} zł odsetek`);trainPayout().forEach(t=>o.push(`${ic('train',14)} ${t}`));

@@ -18,7 +18,7 @@ function expDrops(boss){const E=S.exp,tro={},o=[];let odl=(Math.random()<.6?1:0)
  const F=E&&E.fx;if(F&&F.heal){let v=0;B.units.filter(u=>u.side==='h'&&u.alive).forEach(u=>{const h=u.hero,m=stats(h).maxHp,d=Math.min(m-h.hp,Math.round(m*F.heal));h.hp+=d;v+=d});if(v)o.push(`${ic('b_cmentarz',16)} Duch opiekuńczy leczy drużynę: +${v} PŻ`)}
  return o}
 /* --- ALCHEMIK --- */
-function alchHtml(){const L=tl('alchemik');let b=`<div class="note">${ic('bag',14)} Mikstury i eliksiry trafiają do torby (${bagN()}/${bagCap()}). Eliksir wypity w korytarzu lub w walce działa na całą drużynę <b>do końca wyprawy</b>. Esencja: <b>${S.mat.esc}</b>.</div><div class="cols">`;
+function alchHtml(){const L=tl('alchemik');let b=`<div class="note">${ic('bag',14)} Mikstury i eliksiry trafiają do torby (${bagN()}/${bagCap()}). Eliksir wypity na wyprawie lub w walce działa na całą drużynę <b>do końca wyprawy</b>. Esencja: <b>${S.mat.esc}</b>.</div><div class="cols">`;
  for(const k in SUP){const s=SUP[k];if(s.src!=='alch')continue;const ok=L>=s.lv;b+=`<div class="item sup ${ok?'':'lk'}"><div class="ii">${ic(s.ic,32)}</div><div class="inf"><div class="inm">${s.n} <span class="cnt">×${S.sup[k]||0}</span></div><div class="sub">${s.d}</div></div>${ok?`<button class="btn-small btn-gold" data-act="alchbuy" data-k="${k}" ${S.gold<alchPrice(k)||bagN()>=bagCap()||(s.esc&&S.mat.esc<s.esc)?'disabled':''}>${alchPrice(k)} ${ic('gold',14)}${s.esc?` +${s.esc} es.`:''}</button>`:`<button class="btn-small" disabled>${ic('lock',14)} poz. ${s.lv}</button>`}</div>`}
  return b+'</div>'}
 /* --- ZAKLINACZ --- */

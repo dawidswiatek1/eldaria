@@ -107,7 +107,7 @@ const POI={
   {t:'Odejdź',r:()=>({txt:'Ruiny czekały tysiąc lat. Poczekają jeszcze.'})}]},
  doliny:{ic:'event',n:'Mgliste Doliny',t:'Mgła gęstnieje. Z niej dochodzi kobiecy płacz i twoje imię, wypowiadane głosem kogoś, kto dawno nie żyje.',o:[
   {t:'Idź za głosem',r:()=>({fight:['strzyga','nietoperz'],lbl:'Strzyga we mgle'})},
-  {t:'Zapal pochodnię i trzymaj się ścieżki',req:()=>(S.sup.torch||0)>0,r:()=>{S.sup.torch--;S.found.grzbiet=1;return {txt:'Ogień rozrywa mgłę. Na końcu ścieżki – przełęcz ku Wielkiemu Grzbietowi. (−1 pochodnia)'}}},
+  {t:'Zapal pochodnię i trzymaj się ścieżki',req:()=>(S.sup.pochodnia||0)>0,r:()=>{S.sup.pochodnia--;S.found.grzbiet=1;return {txt:'Ogień rozrywa mgłę. Na końcu ścieżki – przełęcz ku Wielkiemu Grzbietowi. (−1 pochodnia)'}}},
   {t:'Zawróć',r:()=>({txt:'Głosy cichną dopiero przy Olszynowie.'})}]},
  rozlewiska:{p:'dziewczyna',n:'Rozlewiska Utopców',t:'Na kamieniu nad wodą siedzi dziewczyna o zielonych włosach i czesze je grzebieniem z rybich ości. „Chodź, wędrowcze… woda jest ciepła.”',o:[
   {t:'Do broni! To rusałka!',r:()=>({fight:['rusalka','utopiec','utopiec'],lbl:'Rusałki nad Veleską'})},
