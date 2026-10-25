@@ -52,7 +52,20 @@ const QD={
  jaga:{n:'Chata na kurzej stopce',loc:'mokradla',p:'dziewczyna',st:{
   wila:{j:'Baba Jaga porwała małego Jasia z Mokradeł. Tylko Wila z Dąbrowy wie, gdzie stoi chata na kurzej stopce. Porozmawiaj z nią.',obj:{go:'dabrowa',dlg:'jaga_wila'}},
   chata:{j:'Wyrusz do Chaty na kurzej stopce (na zachodnich bagnach) i pokonaj Babę Jagę.',obj:{exp:{r:7,L:1}},next:'jwroc'},
-  jwroc:{j:'Wróć z Jasiem do Mokradeł.',obj:{go:'mokradla',dlg:'jaga_end'}}}}
+  jwroc:{j:'Wróć z Jasiem do Mokradeł.',obj:{go:'mokradla',dlg:'jaga_end'}}}},
+ /* unikalni towarzysze: krótkie zadania osobiste */
+ giermek:{n:'Giermek z Kręgoszewa',loc:'kregoszew',p:'ignacy',st:{
+  proba:{j:'Ignacy chce iść z kompanią, ale kasztelan Borzywoj puści go tylko z kimś, kto wraca z wypraw cały. Ukończ dowolną wyprawę na poziomie II.',obj:{exp:{r:-1,L:2}},next:'iwroc'},
+  iwroc:{j:'Wróć do Kręgoszewa – Ignacy czeka przy koszarach ze spakowanym tobołkiem.',obj:{go:'kregoszew',dlg:'ign_end'}}}},
+ uczen:{n:'Uczeń zaklinacza',loc:'weleszow',p:'tymek',st:{
+  piwnica:{j:'Tymek przez przypadek wypuścił dwa biesy z księgi swojego mistrza. Pomóż mu przegonić je z piwnicy zaklinacza (porozmawiaj z Tymkiem w Weleszowie).'},
+  czeka:{j:'Tymek czeka w Weleszowie, aż zabierzecie go ze sobą.'}}},
+ tropicielka:{n:'Tropicielka z Brzeziny',loc:'brzezina',p:'nela',st:{
+  wilki:{j:'Wataha wilków podchodzi pod owczarnie Brzeziny. Pomóż Neli: zabijcie 4 wilki (na wyprawach lub w drodze).',obj:{kill:{k:'wilk',n:4}},next:'nwroc'},
+  nwroc:{j:'Wróć do Brzeziny i powiedz Neli, że wataha odeszła.',obj:{go:'brzezina',dlg:'nela_end'}}}},
+ kaplanka:{n:'Kapłanka z Sanowa',loc:'sanow',p:'karolina',st:{
+  swieca:{j:'Karolina prosi, by zanieść poświęconą świecę do Leśnej kapliczki (na zachód od Dąbrowy) i zapalić ją za wędrowców, którzy nie wrócili.',obj:{go:'kapliczka',dlg:'kar_kapl'}},
+  kwroc:{j:'Wróć do Sanowa i opowiedz Karolinie, co zobaczyliście w kapliczce.',obj:{go:'sanow',dlg:'kar_end'}}}}
 };
 const qS=id=>S.q[id]&&!S.q[id].done?S.q[id].s:(S.q[id]&&S.q[id].done?'done':null);
 /* kampania: zadania Aktu I po kolei; finał otwiera się po ukończeniu 3 z 4 */
@@ -136,7 +149,7 @@ const DLG={
   o:[{t:'Przysięgamy bronić Velesii.',fx:()=>{const r=addUniq('husarz');if(!S.roster.some(h=>h.uniq==='husarz'))return {txt:r};rep('dwor',10);qEnd('skrzydlaci','Złożyliście przysięgę przed rotmistrzem Zawiszą. Jaromir Skrzydlaty jedzie z kompanią.');return {txt:r+' (Unikalny towarzysz: husarz – paladyn z szablą; w drużynie dodaje +6% ataku i +4% kryt. na wyprawach.)'}}},{t:'Jeszcze nie jesteśmy gotowi.'}]},
  /* --- postacie poboczne --- */
  kasztelan:{p:'kasztelan',who:'Kasztelan Borzywoj',t:()=>'Kręgoszew to brama Velesii od zachodu. Z puszczy i bagien co rusz coś próbuje się przez nią przecisnąć: zbóje z traktu, upiory, ostatnio nawet orkowie zapędzeni aż z Grzbietu.\nKontrakty na zagrożenia graniczne wisią w komendanturze. Płacę rzetelnie.'+(S.rep.dwor>=20?' Dwór dobrze o was mówi – mam dla was premię.':''),o:[{t:'Zajrzymy do komendantury.',fx:()=>{tab='town';townView='castle'}},{t:'Bywaj, kasztelanie.'}]},
- kupiec:{p:'kupiec',who:'Mikuła, kupiec rzeczny',t:()=>{const r=[];if(!S.q.osadnicy)r.push('W Dąbrowie giną ludzie, włodarz szuka zbrojnych.');if(!S.q.bestia)r.push('W Kręgoszewie łowczyni Bogna szuka kogoś na bestię.');if(!S.q.artefakt)r.push('W stolicy dwa rody kłócą się o jakiś róg.');if(!S.q.skrzydlaci)r.push('Rotmistrz Skrzydlatych w Kręgoszewie podobno szuka śmiałków.');if(!S.q.niepamiec)r.push('W Ustroniu, w lasach za Olszynowem, ludzie zapominają imiona swoich zmarłych.');if(!S.q.kurhan)r.push('Oracz z Olszynowa wykopał pługiem jakiś kurhan.');if(!S.q.dlug)r.push('Kasztelan Borzywoj chce spalić chatę szeptunki, która uleczyła mu syna.');return 'Na rzece słychać wszystko! '+(r.length?'Mówią, że… '+r.join(' '):'Ale ostatnio to o was się mówi najwięcej.')},o:[{t:'Dzięki za wieści.'}]},
+ kupiec:{p:'kupiec',who:'Mikuła, kupiec rzeczny',t:()=>{const r=[];if(!S.q.osadnicy)r.push('W Dąbrowie giną ludzie, włodarz szuka zbrojnych.');if(!S.q.bestia)r.push('W Kręgoszewie łowczyni Bogna szuka kogoś na bestię.');if(!S.q.artefakt)r.push('W stolicy dwa rody kłócą się o jakiś róg.');if(!S.q.skrzydlaci)r.push('Rotmistrz Skrzydlatych w Kręgoszewie podobno szuka śmiałków.');if(!S.q.niepamiec)r.push('W Ustroniu, w lasach za Olszynowem, ludzie zapominają imiona swoich zmarłych.');if(!S.q.kurhan)r.push('Oracz z Olszynowa wykopał pługiem jakiś kurhan.');if(!S.q.dlug)r.push('Kasztelan Borzywoj chce spalić chatę szeptunki, która uleczyła mu syna.');if(!S.q.tropicielka)r.push('W Brzezinie córka leśnika szuka pomocy przeciw wilkom.');if(!S.q.uczen)r.push('Z piwnicy zaklinacza w Weleszowie dochodzi dziwny chichot.');return 'Na rzece słychać wszystko! '+(r.length?'Mówią, że… '+r.join(' '):'Ale ostatnio to o was się mówi najwięcej.')},o:[{t:'Dzięki za wieści.'}]},
  kaplan_l:{p:'kaplan',who:'Ojciec Światosław, kanclerz',t:'Świątynia i dwór patrzą na szeptunów nieufnie. Ale ja czytałem kroniki: kręgi kamienne stały tu przed pierwszym kościołem i przed pierwszym królem. Może warto ich słuchać.',o:[{t:'Bywaj, ojcze.'}]},
  /* v18 */
  rus_start:{p:'kupiec',who:'Mirosz, rybak z Sanowa',t:'Moja Dobrawa… Poszła prać na Rozlewiska trzy dni temu. Sąsiedzi słyszeli śpiew nad wodą, a rano tylko wianek pływał przy brzegu.\nLudzie mówią: rusałki. Ja nie mam już siły w to nie wierzyć. Pomożecie?',
@@ -237,7 +250,41 @@ const DLG={
   o:[{t:'Zabierzcie go do Dąbrowy na przesłuchanie',fx:()=>{S.fl.bor='jeniec';unlockLore('gwiazda');qSet('czarnybor','bwroc');rep('dwor',4);return {txt:'Związujecie kultystę. Przez całą drogę milczy i uśmiecha się do gwiazd. (Kronika: Zakon Pustej Gwiazdy)'}}},
    {t:'Odbierzcie mu obrożę i puśćcie wolno – niech zaniesie wieść',fx:()=>{S.fl.bor='wolny';unlockLore('gwiazda');qSet('czarnybor','bwroc');rep('duchy',3);return {txt:'Kultysta znika między drzewami. Obroża w waszych rękach jest ciepła jak żywe serce. (Kronika: Zakon Pustej Gwiazdy)'}}}]},
  bor_end:{p:'wlodar',who:'Pan Dobiesław, włodarz Dąbrowy',t:()=>'Troll z Czarnego Boru nie żyje! Drwale wracają do lasu, a dzieci znów chodzą na jagody.\nZakon Pustej Gwiazdy… czarne kamienie w kaplicy, w kurhanie, na pieczęci. To nie są przypadki, prawda? W Weleszowie muszą się o tym dowiedzieć. A wy – wy już jesteście w samym środku tej historii.',
-  o:[{t:'Przyjmij nagrodę',fx:()=>{const t=reward(260+S.stage*10,2,dworMul());rep('lud',12);rep('dwor',6);S.fl.akt=2;qEnd('czarnybor','Pokonaliście Pana Czarnego Boru i odkryliście Zakon Pustej Gwiazdy. Koniec Aktu I. '+t);return {txt:'Nagroda: '+t+'.<br><br><b>Koniec Aktu I: Szepty Velesii.</b> Ciąg dalszy kroniki – Zakon Pustej Gwiazdy – w kolejnych rozdziałach.'}}}]}
+  o:[{t:'Przyjmij nagrodę',fx:()=>{const t=reward(260+S.stage*10,2,dworMul());rep('lud',12);rep('dwor',6);S.fl.akt=2;qEnd('czarnybor','Pokonaliście Pana Czarnego Boru i odkryliście Zakon Pustej Gwiazdy. Koniec Aktu I. '+t);return {txt:'Nagroda: '+t+'.<br><br><b>Koniec Aktu I: Szepty Velesii.</b> Ciąg dalszy kroniki – Zakon Pustej Gwiazdy – w kolejnych rozdziałach.'}}}]},
+ /* ===== unikalni towarzysze ===== */
+ /* --- Ignacy, giermek z Kręgoszewa --- */
+ ign_start:{p:'ignacy',who:'Ignacy, giermek z Kręgoszewa',t:'Ej, wy! To wy jesteście tą kompanią, o której gadają w koszarach? Weźcie mnie ze sobą! Umiem czyścić zbroje, ostrzyć miecze i… i walczyć też umiem, naprawdę. Rotmistrz Zawisza mówi, że mam serce rycerza, tylko ręce jeszcze za krótkie.\nKasztelan się nie zgadza. Mówi, że puści mnie tylko z kimś, kto wraca z wypraw cały i przyprowadza wszystkich z powrotem.',
+  o:[{t:'Pokażemy kasztelanowi, że dbamy o swoich.',fx:()=>{qSet('giermek','proba');rep('dwor',2);return {txt:'Ignacy podskakuje z radości, aż brzęczy mu zbroja. „Będę czekał! I będę ćwiczył codziennie!” (Ukończ wyprawę na poziomie II.)'}}},{t:'Jesteś jeszcze za młody, chłopcze.'}]},
+ ign_idle:{p:'ignacy',who:'Ignacy, giermek z Kręgoszewa',t:'Ćwiczę codziennie! Trafiam już w słomianego chochoła dziewięć razy na dziesięć. No… osiem.',o:[{t:'Tak trzymaj.'}]},
+ ign_end:{p:'ignacy',who:'Ignacy, giermek z Kręgoszewa',t:'Kasztelan widział, jak wracacie – wszyscy cali! Powiedział, że mogę iść. Powiedział też, żebym słuchał starszych i nie pchał się pierwszy do bitki. Postaram się. Naprawdę.\nMam własny miecz! No, prawie własny. Pożyczony ze zbrojowni.',
+  o:[{t:'Witaj w kompanii, Ignacy!',fx:()=>joinUniq('ignacy','giermek','Ignacy, giermek z Kręgoszewa, dołączył do kompanii. Kasztelan kazał mu słuchać starszych.')},{t:'Jeszcze chwilę poczekaj.'}]},
+ /* --- Tymek, uczeń zaklinacza --- */
+ tym_start:{p:'tymek',who:'Tymek, uczeń zaklinacza',t:'Psst! Tak, wy! Proszę, nie mówcie mistrzowi… Chciałem tylko przeczytać jedno zaklęcie z jego wielkiej księgi. Jedno! Na rozpalanie ognia w kominku. A z księgi wyskoczyły dwa biesy i teraz siedzą w piwnicy, tłuką słoje z konfiturami i śmieją się okropnie.\nMistrz wraca jutro. Pomożecie mi je przegonić? Ja też umiem rzucać czary. Trochę.',
+  o:[{t:'Prowadź do piwnicy!',fx:()=>{qSet('uczen','piwnica');closeModal();roadFight(['bies','bies'],'Piwnica zaklinacza',{bk:2,qd:'tym_win',st:Math.max(3,S.stage)});return {fight:1}}},{t:'Może później.'}]},
+ tym_piwnica:{p:'tymek',who:'Tymek, uczeń zaklinacza',t:'Biesy dalej siedzą w piwnicy. Słyszycie? Właśnie zjadły wszystkie powidła mistrza.',
+  o:[{t:'Tym razem je przegonimy!',fx:()=>{closeModal();roadFight(['bies','bies'],'Piwnica zaklinacza',{bk:2,qd:'tym_win',st:Math.max(3,S.stage)});return {fight:1}}},{t:'Jeszcze nie.'}]},
+ tym_win:{p:'tymek',who:'Tymek, uczeń zaklinacza',t:'Ostatni bies z piskiem wskakuje z powrotem do księgi, a Tymek zatrzaskuje okładkę i siada na niej, na wszelki wypadek.\n„Uratowaliście mnie! I powidła… no, połowę powideł. Wiecie co? Mistrz zawsze mówi, że najlepiej uczyć się w drodze. Weźcie mnie ze sobą! Będę grzeczny. I będę czytał zaklęcia do końca, zanim je rzucę.”',
+  o:[{t:'Chodź z nami, Tymku!',fx:()=>{if(qS('uczen')==='piwnica')qSet('uczen','czeka');return joinUniq('tymek','uczen','Przegoniliście biesy z piwnicy zaklinacza, a Tymek ruszył z kompanią – uczyć się w drodze.')}},
+   {t:'Zostań i ucz się – wrócimy po ciebie.',fx:()=>{qSet('uczen','czeka');return {txt:'„Dobrze… Ale wróćcie szybko!” Tymek macha wam z okna wieży.'}}}]},
+ tym_join:{p:'tymek',who:'Tymek, uczeń zaklinacza',t:'Wróciliście! Spakowałem już księgę. Małą. Bez biesów.',
+  o:[{t:'Chodź z nami.',fx:()=>joinUniq('tymek','uczen','Przegoniliście biesy z piwnicy zaklinacza, a Tymek ruszył z kompanią – uczyć się w drodze.')},{t:'Jeszcze nie.'}]},
+ /* --- Nela z Brzeziny --- */
+ nela_start:{p:'nela',who:'Nela z Brzeziny',t:'Cicho… Widzicie te ślady? Wilki. Cała wataha, pięć, może sześć. Co noc podchodzą pod owczarnie, a ojciec ma chorą nogę i nie da rady ich odpędzić.\nSama trafię wilka z pięćdziesięciu kroków. Ale wataha to wataha. Pomożecie? Jak przetrzebimy stado, reszta odejdzie w głąb puszczy.',
+  o:[{t:'Zapolujemy na nie.',fx:()=>{qSet('tropicielka','wilki');rep('lud',2);return {txt:'Nela uśmiecha się po raz pierwszy. „Wilki chodzą po Mrocznej Puszczy i po traktach. Zabijcie cztery, a reszta zrozumie.”'}}},{t:'Nie teraz.'}]},
+ nela_idle:{p:'nela',who:'Nela z Brzeziny',t:()=>`Ile już wilków? ${(S.q.tropicielka&&S.q.tropicielka.n)||0} z 4. Tropy mówią, że reszta jest blisko.`,o:[{t:'Wkrótce wrócimy.'}]},
+ nela_end:{p:'nela',who:'Nela z Brzeziny',t:'Owce całe, ojciec śpi spokojnie, a wataha odeszła za Wilcze Jary – widziałam tropy, szły w pośpiechu.\nWiecie… Brzezina jest mała. Ja chcę zobaczyć Wielki Grzbiet, Bagno Czarne, Smoczą Jamę! Ojciec mówi, że jak już mam iść, to z porządnymi ludźmi. A wy jesteście porządni.',
+  o:[{t:'Chodź z nami, Nelu!',fx:()=>joinUniq('nela','tropicielka','Przegoniliście watahę spod Brzeziny, a Nela, córka leśnika, ruszyła z kompanią w świat.')},{t:'Zostań jeszcze przy ojcu.'}]},
+ /* --- Karolina z Sanowa --- */
+ kar_start:{p:'karolina',who:'Karolina, kapłanka z Sanowa',t:'Pokój z wami, wędrowcy. Jestem Karolina, opiekuję się kościołem nad jeziorem – i każdym, kto przyjdzie tu z raną.\nRybacy mówią, że przy Leśnej kapliczce na zachodzie znikają wędrowcy, a dary w miseczce leżą nietknięte od miesięcy. Ktoś musi zapalić tam światło za tych, którzy nie wrócili. Zaniesiecie świecę? Sama nie mogę zostawić rannych.',
+  o:[{t:'Zaniesiemy ją.',fx:()=>{S.found.kapliczka=1;routeFix();qSet('kaplanka','swieca');rep('duchy',2);return {txt:'Karolina owija świecę w lniane płótno i błogosławi waszą drogę. Leśna kapliczka jest na mapie, na zachód od Dąbrowy.'}}},{t:'Nie teraz.'}]},
+ kar_idle:{p:'karolina',who:'Karolina, kapłanka z Sanowa',t:'Świeca? Zanieście ją do Leśnej kapliczki, na zachód od Dąbrowy. Niech światło was prowadzi.',o:[{t:'Bywaj, Karolino.'}]},
+ kar_kapl:{p:'duch',who:'Leśna kapliczka',t:'Zapalacie świecę od Karoliny. Płomień staje prosto, choć wieje wiatr, a w jego blasku na ścianie kapliczki widać wyryte imiona – wędrowców, którzy kiedyś tędy szli. Gdy rozbłyska ostatnie, z lasu dochodzi cichy szept pełen ulgi.\nW miseczce na dary leży coś nowego: srebrny dzwoneczek.',
+  o:[{t:'Zabierz dzwoneczek dla Karoliny',fx:()=>{qSet('kaplanka','kwroc');rep('duchy',4);return {txt:'Dzwoneczek dźwięczy cicho, choć nikt nim nie porusza. Czas wracać do Sanowa.'}}}]},
+ kar_end:{p:'karolina',who:'Karolina, kapłanka z Sanowa',t:'Dzwoneczek z kapliczki… Słyszę w nim spokój. Dziękuję – za mnie i za tych, którzy nie wrócili.\nDużo myślałam, gdy was nie było. Ranni przychodzą do mnie z traktów, z gór, z bagien. Może czas, bym to ja poszła tam, gdzie jestem potrzebna, zamiast czekać, aż do mnie przyjdą. Jeśli zechcecie, pójdę z wami.',
+  o:[{t:'Będziemy zaszczyceni, Karolino.',fx:()=>joinUniq('karolina','kaplanka','Zanieśliście światło do Leśnej kapliczki, a Karolina, kapłanka z Sanowa, ruszyła z kompanią opatrywać rannych w drodze.')},
+   {t:'Twoje miejsce jest tu, przy rannych.',fx:()=>{const t=reward(60+S.stage*5,1);rep('lud',6);S.fl.karolina=1;qEnd('kaplanka','Zanieśliście światło do Leśnej kapliczki. Karolina została w Sanowie, przy rannych. '+t);return {txt:'Karolina kiwa głową z uśmiechem i błogosławi was na drogę. '+t+' (Możesz ją jeszcze zaprosić do kompanii w Sanowie.)'}}}]},
+ kar_join:{p:'karolina',who:'Karolina, kapłanka z Sanowa',t:'Wróciliście! Ranni w porcie mają się lepiej. Jeśli wciąż mnie potrzebujecie – pójdę.',
+  o:[{t:'Chodź z nami.',fx:()=>{const r=addUniq('karolina');if(S.roster.some(h=>h.uniq==='karolina'))S.fl.karolina=0;return {txt:r}}},{t:'Jeszcze nie.'}]}
 };
 const TALK={
  dabrowa:[{p:'wlodar',who:'Pan Dobiesław',s:'włodarz Dąbrowy',nw:()=>!S.q.osadnicy||qS('osadnicy')==='band_wroc'||qS('osadnicy')==='rozmowa'||(campFinOk()&&!S.q.czarnybor)||qS('czarnybor')==='bwroc',
@@ -245,16 +292,19 @@ const TALK={
   {p:'szeptucha',who:'Wila',s:'szeptucha spod starego dębu',nw:()=>['rozmowa','piecz_wroc'].includes(qS('osadnicy'))||S.fl.wila===1,dlg:()=>qS('osadnicy')==='rozmowa'?'osa_wila':qS('osadnicy')==='piecz_wroc'?'osa_seal_end':S.fl.wila===1?'wila_join':'osa_wila_idle',when:()=>!S.roster.some(h=>h.uniq==='szeptunka')&&!['slady','pieczec'].includes(qS('osadnicy'))}],
  kregoszew:[{p:'lowczyni',who:'Bogna',s:'łowczyni',nw:()=>!S.q.bestia||qS('bestia')==='jaga',dlg:()=>!S.q.bestia?'bes_start':qS('bestia')==='jaga'?'bes_plan':'bes_idle'},
   {p:'husarz',who:'Rotmistrz Zawisza',s:'dowódca Skrzydlatych',nw:()=>!S.q.skrzydlaci||qS('skrzydlaci')==='przysiega',dlg:()=>!S.q.skrzydlaci?'skr_start':qS('skrzydlaci')==='przysiega'?'skr_oath':'skr_idle'},
-  {p:'kasztelan',who:'Kasztelan Borzywoj',s:'komendant grodu',nw:()=>!S.q.dlug||qS('dlug')==='dwroc',dlg:()=>!S.q.dlug?'dlug_start':qS('dlug')==='dwroc'?'dlug_end':qS('dlug')==='done'?'kasztelan':'dlug_idle'}],
+  {p:'kasztelan',who:'Kasztelan Borzywoj',s:'komendant grodu',nw:()=>!S.q.dlug||qS('dlug')==='dwroc',dlg:()=>!S.q.dlug?'dlug_start':qS('dlug')==='dwroc'?'dlug_end':qS('dlug')==='done'?'kasztelan':'dlug_idle'},
+  {p:'ignacy',who:'Ignacy',s:'giermek',when:()=>qS('giermek')!=='done',nw:()=>!S.q.giermek||qS('giermek')==='iwroc',dlg:()=>!S.q.giermek?'ign_start':qS('giermek')==='iwroc'?'ign_end':'ign_idle'}],
  weleszow:[{p:'szlachcianka',who:'Pani Jadwiga',s:'ród Jastrzębców',nw:()=>!S.q.artefakt||qS('artefakt')==='odd_j',dlg:()=>!S.q.artefakt||qS('artefakt')==='wybor'?'art_j':qS('artefakt')==='odd_j'?'art_odd_j':'art_idle_j'},
   {p:'magnat',who:'Pan Bogusz',s:'ród Gryfitów',nw:()=>qS('artefakt')==='odd_b',dlg:()=>!S.q.artefakt||qS('artefakt')==='wybor'?'art_b':qS('artefakt')==='odd_b'?'art_odd_b':'art_idle_b'},
   {p:'szpieg',who:'Mściwój',s:'„uczony” z archiwum',when:()=>qS('artefakt')==='demask',nw:()=>true,dlg:'art_spy'},
-  {p:'kaplan',who:'Ojciec Światosław',s:'kanclerz i kapłan',nw:()=>qS('skrzydlaci')==='patent',dlg:()=>qS('skrzydlaci')==='patent'?'skr_patent':'kaplan_l'}],
+  {p:'kaplan',who:'Ojciec Światosław',s:'kanclerz i kapłan',nw:()=>qS('skrzydlaci')==='patent',dlg:()=>qS('skrzydlaci')==='patent'?'skr_patent':'kaplan_l'},
+  {p:'tymek',who:'Tymek',s:'uczeń zaklinacza',when:()=>qS('uczen')!=='done',nw:()=>!S.q.uczen||qS('uczen')==='czeka',dlg:()=>!S.q.uczen?'tym_start':qS('uczen')==='piwnica'?'tym_piwnica':'tym_join'}],
  sanow:[{p:'kupiec',who:'Mikuła',s:'kupiec rzeczny – plotki',dlg:'kupiec'},
-  {p:'kupiec',who:'Mirosz',s:'rybak z Sanowa',nw:()=>!S.q.rusalki||qS('rusalki')==='wroc',dlg:()=>!S.q.rusalki?'rus_start':qS('rusalki')==='wroc'?'rus_end':'rus_idle'}],
+  {p:'kupiec',who:'Mirosz',s:'rybak z Sanowa',nw:()=>!S.q.rusalki||qS('rusalki')==='wroc',dlg:()=>!S.q.rusalki?'rus_start':qS('rusalki')==='wroc'?'rus_end':'rus_idle'},
+  {p:'karolina',who:'Karolina',s:'kapłanka z kościoła nad jeziorem',when:()=>!S.roster.some(h=>h.uniq==='karolina')&&(qS('kaplanka')!=='done'||S.fl.karolina===1),nw:()=>!S.q.kaplanka||qS('kaplanka')==='kwroc'||S.fl.karolina===1,dlg:()=>!S.q.kaplanka?'kar_start':qS('kaplanka')==='kwroc'?'kar_end':S.fl.karolina===1?'kar_join':'kar_idle'}],
  kurhanow:[{p:'starszy',who:'Radogost',s:'starszy osady',nw:()=>qS('artefakt')==='sledztwo'||(qS('kurhan')==='kurhan'&&!S.fl.kurImie),dlg:()=>qS('artefakt')==='sledztwo'?'art_starszy':qS('kurhan')==='kurhan'&&!S.fl.kurImie?'kur_rado':null}],
  /* wsie */
- brzezina:[],
+ brzezina:[{p:'nela',who:'Nela',s:'córka leśnika',when:()=>qS('tropicielka')!=='done',nw:()=>!S.q.tropicielka||qS('tropicielka')==='nwroc',dlg:()=>!S.q.tropicielka?'nela_start':qS('tropicielka')==='nwroc'?'nela_end':'nela_idle'}],
  olszynow:[{p:'starszy',who:'Bogumił',s:'sołtys Olszynowa',nw:()=>!S.q.poludnica||qS('poludnica')==='pwroc',dlg:()=>!S.q.poludnica?'pol_start':qS('poludnica')==='pwroc'?'pol_end':'pol_idle'},
   {p:'kupiec',who:'Wojsław',s:'oracz',nw:()=>!S.q.kurhan||qS('kurhan')==='kwroc',dlg:()=>!S.q.kurhan?'kur_start':qS('kurhan')==='kwroc'?'kur_end':'kur_idle'}],
  mokradla:[{p:'dziewczyna',who:'Marysia',s:'siostra porwanego',nw:()=>!S.q.jaga||qS('jaga')==='jwroc',dlg:()=>!S.q.jaga?'jaga_start':qS('jaga')==='jwroc'?'jaga_end':'jaga_idle'}],

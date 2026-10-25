@@ -33,7 +33,9 @@ function heroAnim(cls,eq,skin,g){eq=eq||{};const sk=skin&&typeof SKIN!=='undefin
     klucz „klasa” (mężczyzna) albo „klasa_k” (kobieta); ekwipunek nie zmienia ich wyglądu */
  const ck2=g==='k'?cls+'_k':cls;
  if(!sk&&typeof CSPR!=='undefined'&&CSPR[ck2]&&CSPR[ck2]._d){const o=CSPR[ck2],id=composeData([[o,null]],o.w,o.h,0);return _sprCache[ck]={url:dataURL(id,0,0,o.w,o.h),f0:dataURL(id,HM.pl,0,HM.cw,HM.ch+HM.pt),fw:HM.fw,fh:HM.fh,n:7,pl:HM.pl,pt:HM.pt,cw:HM.cw,ch:HM.ch}}
- if(sk&&sk.spr&&typeof HSPR!=='undefined'&&HSPR[sk.spr]&&HSPR[sk.spr]._d){const o=HSPR[sk.spr],id=composeData([[o,null]],o.w,o.h,faceOf('H_'+sk.spr)==='L'?HM.fw:0);shadeData(id.data,o.w,o.h);return _sprCache[ck]={url:dataURL(id,0,0,o.w,o.h),f0:dataURL(id,HM.pl,0,HM.cw,HM.ch+HM.pt),fw:HM.fw,fh:HM.fh,n:7,pl:HM.pl,pt:HM.pt,cw:HM.cw,ch:HM.ch}}
+ /* unikalni towarzysze: pasek z CSPR (nowi) albo HSPR (js/data/sprites-v19.js) */
+ const so=sk&&sk.spr?((typeof CSPR!=='undefined'&&CSPR[sk.spr])||(typeof HSPR!=='undefined'&&HSPR[sk.spr])):null;
+ if(so&&so._d){const o=so,id=composeData([[o,null]],o.w,o.h,faceOf('H_'+sk.spr)==='L'?HM.fw:0);shadeData(id.data,o.w,o.h);return _sprCache[ck]={url:dataURL(id,0,0,o.w,o.h),f0:dataURL(id,HM.pl,0,HM.cw,HM.ch+HM.pt),fw:HM.fw,fh:HM.fh,n:7,pl:HM.pl,pt:HM.pt,cw:HM.cw,ch:HM.ch}}
  const L=GFX.L,st0=GFX.STYLE[cls],st=g==='k'&&L['body_'+cls+'|'+st0+'_k']?st0+'_k':st0,list=[],add=(n,t)=>{const o=L[n+'|'+st];if(o)list.push([o,t||null])},tf=(it,al)=>it&&(al||it.r>0)?RCOL[it.r]:null;
  const gl=it=>it&&it.r>0?RCOL[it.r]:null,addG=(n,it)=>{const o=L[n+'|'+st];if(o)list.push([o,null,gl(it)])};
  add('back_'+cls);if(sk&&sk.back){const bl=skinLayer(sk.back,cls);if(bl)list.push([bl,null])}const n0=list.length;add('body_'+cls);const a=eq.zbroja;add(a?'arm_'+a.b:(sk&&sk.arm?'arm_'+sk.arm:'defarm_'+cls),tf(a));if(sk&&sk.rc)for(let i=n0;i<list.length;i++)list[i][0]=skinRC(list[i][0],skin);if(!(sk&&sk.noBeard))add('beard_'+cls);

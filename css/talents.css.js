@@ -37,6 +37,6 @@ css`
 .skills.n5{grid-template-columns:1fr 1fr 1fr}
 .skills.n5 button{font-size:.76rem;padding:2px 2px;gap:3px;line-height:1.05}
 .skills.n5 button .si{width:22px;height:22px}
-.unit.bear .fxw{filter:sepia(.7) saturate(1.6) hue-rotate(-15deg) drop-shadow(0 0 3px #c07a3a);transform:scale(1.1);transform-origin:50% 100%}
+.unit.bear .fxw{filter:drop-shadow(0 0 3px #7ab04a88)}
 @media (max-width:360px){.tn{width:48px;height:48px}.tn.cap{width:52px;height:52px}.tn .ic{width:26px;height:26px}.tnm{font-size:.64rem}.lslot{font-size:.62rem}}
 `;

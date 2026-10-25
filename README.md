@@ -53,6 +53,10 @@ uses it for every hero without a unique look (`heroSkin` in `js/game/state.js`: 
 keep their own sprite); a class without a folder would fall back to the old layered sprites. To add or replace a class: put its export in
 `tools/art/classes/<class>/` and run `python3 tools/class_sprites.py` (`--debug` for a preview in `tools/out/`).
 
+Unique companions recruited through personal quests (Ignacy, Tymek, Nela, Karolina) live in
+`tools/art/companions/` – the tool also writes their dialog portraits to `assets/portraits/` – and the druid's
+bear form in `tools/art/forms/niedzwiedz/` (112 px frames; shown in battle while the `bear` status lasts).
+
 ## Rules for editing
 
 1. **Script order matters.** All `js/` files share one global scope, just like the old single file.

@@ -1,6 +1,8 @@
 /* ===== WYGLĄD UNIKALNYCH TOWARZYSZY (warstwy na papierowej lalce) ===== */
 const cl=v=>Math.max(0,Math.min(255,Math.round(v)));
-const SKIN={husarz:{spr:'husarz',g:'m'},szeptunka:{spr:'szeptunka',g:'k'},luczniczka:{spr:'luczniczka',g:'k'},rycerz:{spr:'rycerz',g:'m'},straznik:{spr:'straznik',g:'m'}};
+const SKIN={husarz:{spr:'husarz',g:'m'},szeptunka:{spr:'szeptunka',g:'k'},luczniczka:{spr:'luczniczka',g:'k'},rycerz:{spr:'rycerz',g:'m'},straznik:{spr:'straznik',g:'m'},
+ /* nowi unikalni towarzysze – paski w js/data/sprites-classes.js (CSPR) */
+ ignacy:{spr:'ignacy',g:'m'},tymek:{spr:'tymek',g:'m'},nela:{spr:'nela',g:'k'},karolina:{spr:'karolina',g:'k'}};
 const _skinRC={};
 function skinRC(o,skin,fk){fk=fk||'rc';if(!o||!o._d)return o;const key=skin+fk+'|'+(o.u||o.src||'')+o.w+'x'+o.h+(o._id||(o._id=Math.random().toString(36).slice(2)));if(_skinRC[key])return _skinRC[key];const f=SKIN[skin][fk],D=new Uint8ClampedArray(o._d);
  for(let i=0;i<D.length;i+=4){if(D[i+3]<20)continue;const c=f(D[i],D[i+1],D[i+2]);if(c){D[i]=c[0];D[i+1]=c[1];D[i+2]=c[2]}}
