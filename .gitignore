@@ -1,2 +1,8 @@
 tools/out/
 __pycache__/
+# budowa aplikacji na Androida
+android/.gradle/
+android/build/
+android/app/build/
+android/app/src/main/assets/
+android/local.properties

@@ -1,0 +1,42 @@
+plugins { id 'com.android.application' }
+
+// numer wersji = numer budowy w GitHub Actions, żeby każda nowa wersja instalowała się na starą
+def run = (System.getenv('GITHUB_RUN_NUMBER') ?: '1') as int
+
+android {
+    namespace 'pl.eldaria.gra'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'pl.eldaria.gra'
+        minSdk 24
+        targetSdk 34
+        versionCode run
+        versionName "1.${run}"
+    }
+
+    // Stały klucz podpisu (android/eldaria.keystore): kolejne wersje instalują się bez odinstalowania,
+    // więc zapis gry zostaje. To klucz do instalacji „z pliku”; do Google Play trzeba własnego, tajnego.
+    signingConfigs {
+        release {
+            storeFile file('../eldaria.keystore')
+            storePassword 'eldaria'
+            keyAlias 'eldaria'
+            keyPassword 'eldaria'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+    // pliki gry: także te zaczynające się od „_” (css/_css.js)
+    androidResources {
+        ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
