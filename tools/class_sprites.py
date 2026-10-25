@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""Sprite'y klas bohaterów z eksportów PixelLab: folder <klasa> = mężczyzna, <klasa>_k = kobieta.
+"""Sprite'y postaci z eksportów PixelLab: klasy bohaterów (tools/art/classes/: <klasa> = mężczyzna,
+<klasa>_k = kobieta), unikalni towarzysze (tools/art/companions/, + portret w assets/portraits/)
+i formy (tools/art/forms/, np. niedźwiedź druida – klatka 112 px).
 
 Źródła: tools/art/classes/<klasa>/Idle/rotations/east.png (postać patrząca w prawo)
 i Idle/animations/Walking/east/frame_00N.png (chód w prawo).
@@ -72,64 +74,109 @@ def kneel(a):
     return o
 
 
-def place(strip, f, a, dx=0, fx=None):
+def place(strip, f, a, dx=0, fx=None, fw=FW):
     h, w = a.shape[:2]
-    x0 = f * FW + int(round((fx if fx is not None else FOOT_X) - feet_x(a))) + dx
+    # bohater: stopy w punkcie fx; forma (szersza klatka): środek obrazka w środku klatki
+    anchor = feet_x(a) if fw == FW else w / 2
+    x0 = f * fw + int(round((fx if fx is not None else FOOT_X) - anchor)) + dx
     y0 = FOOT_Y + 1 - h
     for y in range(h):
         for x in range(w):
             if a[y, x, 3] == 0:
                 continue
             X, Y = x0 + x, y0 + y
-            if f * FW <= X < (f + 1) * FW and 0 <= Y < FH:
+            if f * fw <= X < (f + 1) * fw and 0 <= Y < FH:
                 strip[Y, X] = a[y, x]
 
 
-def build(cls):
-    d = os.path.join(SRC, cls, 'Idle')
+def build(d, fw=FW):
+    """d = folder eksportu; fw = szerokość klatki (80 bohater, 112 forma niedźwiedzia)"""
+    d = os.path.join(d, 'Idle')
     east = crop(load(os.path.join(d, 'rotations/east.png')))
     walk = [crop(load(p)) for p in sorted(glob.glob(os.path.join(d, 'animations/Walking/east/frame_*.png')))]
     sp = sorted(range(len(walk)), key=lambda i: -spread(walk[i]))
     wide = sorted(sp[:2])                       # dwie klatki w rozkroku
     mid = sp[-1]                                 # klatka „w przejściu”
-    # stopy na FOOT_X, chyba że postać (kostur, peleryna) wystaje poza rdzeń 8..53 – wtedy całość przesuwamy
-    l = FOOT_X - feet_x(east)
-    lo, hi = l, l + east.shape[1] - 1
-    fx = FOOT_X + (53 - hi if hi > 53 else 8 - lo if lo < 8 else 0)
-    strip = np.zeros((FH, FW * N, 4), np.uint8)
-    place(strip, 0, east, fx=fx)
-    place(strip, 1, breathe(east), fx=fx)
-    place(strip, 2, walk[wide[0]], -3, fx)      # zamach: odchylony do tyłu
-    place(strip, 3, walk[wide[1]], 5, fx)       # cios: wypad do przodu
-    place(strip, 4, walk[mid], 1, fx)           # czar
-    place(strip, 5, east, -4, fx)               # trafiony: odrzut
-    place(strip, 6, kneel(east), fx=fx)         # powalony
+    if fw == FW:
+        # stopy na FOOT_X, chyba że postać (kostur, peleryna) wystaje poza rdzeń 8..53 – wtedy całość przesuwamy
+        l = FOOT_X - feet_x(east)
+        lo, hi = l, l + east.shape[1] - 1
+        fx = FOOT_X + (53 - hi if hi > 53 else 8 - lo if lo < 8 else 0)
+    else:
+        fx = fw // 2
+    strip = np.zeros((FH, fw * N, 4), np.uint8)
+    place(strip, 0, east, fx=fx, fw=fw)
+    place(strip, 1, breathe(east), fx=fx, fw=fw)
+    place(strip, 2, walk[wide[0]], -3, fx, fw)  # zamach: odchylony do tyłu
+    place(strip, 3, walk[wide[1]], 5, fx, fw)   # cios: wypad do przodu
+    place(strip, 4, walk[mid], 1, fx, fw)       # czar
+    place(strip, 5, east, -4, fx, fw)           # trafiony: odrzut
+    place(strip, 6, kneel(east), fx=fx, fw=fw)  # powalony
     return strip
 
 
+def portrait(d):
+    """portret do rozmów 66×74: głowa i ramiona z widoku z ukosa, powiększone ×2, na ciemnym tle"""
+    a = crop(load(os.path.join(d, 'Idle/rotations/south-east.png')))
+    h, w = a.shape[:2]
+    top = a[:37]
+    ys, xs = np.where(top[..., 3] > 0)
+    cx = int((xs.min() + xs.max()) / 2) if len(xs) else w // 2
+    out = np.zeros((37, 33, 4), np.uint8)
+    for y in range(37):
+        for x in range(33):
+            X = cx - 16 + x
+            if 0 <= X < w and y < h:
+                out[y, x] = top[y, X]
+    bg = np.zeros((74, 66, 3), np.uint8)
+    yy = np.arange(74)[:, None]
+    bg[...] = (np.array([18, 16, 17]) + (np.array([46, 34, 24]) * (yy / 73.0)[..., None])).astype(np.uint8)
+    big = np.array(Image.fromarray(out).resize((66, 74), Image.NEAREST))
+    al = big[..., 3:] / 255.0
+    bg = (big[..., :3] * al + bg * (1 - al)).astype(np.uint8)
+    return Image.fromarray(bg)
+
+
+def strip_row(key, s, fw):
+    b = io.BytesIO()
+    Image.fromarray(s).save(b, 'PNG', optimize=True)
+    return ' "%s":{"w":%d,"h":%d,"fw":%d,"u":"data:image/png;base64,%s"}' % (key, fw * N, FH, fw, base64.b64encode(b.getvalue()).decode())
+
+
 def main():
-    classes = sorted(c for c in os.listdir(SRC) if os.path.isdir(os.path.join(SRC, c)))
-    rows, prev = [], []
-    for c in classes:
-        s = build(c)
-        b = io.BytesIO()
-        Image.fromarray(s).save(b, 'PNG', optimize=True)
-        rows.append(' "%s":{"w":%d,"h":%d,"u":"data:image/png;base64,%s"}' % (c, FW * N, FH, base64.b64encode(b.getvalue()).decode()))
-        prev.append(s)
-    src = ('/* ===== SPRITE\'Y KLAS („klasa” = mężczyzna, „klasa_k” = kobieta): paski 7 klatek 80×100 – stoi, oddech, zamach, cios, czar, trafiony, powalony =====\n'
-           '   Wygenerowane przez tools/class_sprites.py z tools/art/classes/ – nie edytuj ręcznie. Base64, bo gra czyta piksele. */\n'
+    rows, prev, keys = [], [], []
+    # klasy (80 px), unikalni towarzysze (80 px, + portret), formy (np. niedźwiedź druida, 112 px)
+    for sub, fw in (('classes', FW), ('companions', FW), ('forms', 112)):
+        base = os.path.join(ROOT, 'tools/art', sub)
+        if not os.path.isdir(base):
+            continue
+        for c in sorted(os.listdir(base)):
+            d = os.path.join(base, c)
+            if not os.path.isdir(d):
+                continue
+            s = build(d, fw)
+            rows.append(strip_row(c, s, fw))
+            prev.append(s)
+            keys.append(c)
+            if sub == 'companions':
+                portrait(d).save(os.path.join(ROOT, 'assets/portraits', c + '.png'), optimize=True)
+    src = ('/* ===== SPRITE\'Y POSTACI: paski 7 klatek (fw×100) – stoi, oddech, zamach, cios, czar, trafiony, powalony =====\n'
+           '   klasy: „klasa” = mężczyzna, „klasa_k” = kobieta; unikalni towarzysze (np. „karolina”); formy (np. „niedzwiedz”).\n'
+           '   Wygenerowane przez tools/class_sprites.py z tools/art/ – nie edytuj ręcznie. Base64, bo gra czyta piksele. */\n'
            'const CSPR={\n' + ',\n'.join(rows) + '};\n')
     out = os.path.join(ROOT, 'js/data/sprites-classes.js')
     open(out, 'w', encoding='utf-8').write(src)
-    print('zapisano', out, len(src) // 1024, 'KB:', ', '.join(classes))
+    print('zapisano', out, len(src) // 1024, 'KB:', ', '.join(keys))
     if '--debug' in sys.argv:
         os.makedirs(os.path.join(ROOT, 'tools/out'), exist_ok=True)
-        sheet = np.zeros((FH * len(prev), FW * N, 4), np.uint8)
+        W = max(s.shape[1] for s in prev)
+        sheet = np.zeros((FH * len(prev), W, 4), np.uint8)
         sheet[...] = (58, 80, 58, 255)
         for i, s in enumerate(prev):
             a = s[..., 3:] / 255.0
-            sheet[i * FH:(i + 1) * FH, :, :3] = (s[..., :3] * a + sheet[i * FH:(i + 1) * FH, :, :3] * (1 - a)).astype(np.uint8)
-        Image.fromarray(sheet).resize((FW * N * 3, FH * len(prev) * 3), Image.NEAREST).save(os.path.join(ROOT, 'tools/out/classes.png'))
+            sl = sheet[i * FH:(i + 1) * FH, :s.shape[1], :3]
+            sheet[i * FH:(i + 1) * FH, :s.shape[1], :3] = (s[..., :3] * a + sl * (1 - a)).astype(np.uint8)
+        Image.fromarray(sheet).resize((W * 2, FH * len(prev) * 2), Image.NEAREST).save(os.path.join(ROOT, 'tools/out/classes.png'))
 
 
 if __name__ == '__main__':
