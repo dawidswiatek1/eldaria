@@ -68,6 +68,14 @@ Unique companions recruited through personal quests (Ignacy, Tymek, Nela, Karoli
 `tools/art/companions/` – the tool also writes their dialog portraits to `assets/portraits/` – and the druid's
 bear form in `tools/art/forms/niedzwiedz/` (112 px frames; shown in battle while the `bear` status lasts).
 
+## Quests and events
+
+- `js/story/quests.js`: `QD` (quests and their steps), `DLG` (dialogs with choices), `TALK` (who you can talk to in each
+  town). The Act I campaign, companion quests and side quests 5–10 from the design doc (Żelazo pamięta, Ostatnie
+  polowanie, Zboże dla głodnych, Most z kości, Noc ognia, Ostatni sygnał) all live there.
+- `js/world/world-map.js`: `ROADEV` – random events while travelling (an event can limit where it happens with `ok`).
+- `js/world/velesia-map.js`: `POI` – one-time events at interesting places (an option can open a dialog: `{dlg:…}`).
+
 ## Rules for editing
 
 1. **Script order matters.** All `js/` files share one global scope, just like the old single file.
