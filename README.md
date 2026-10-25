@@ -22,7 +22,7 @@ js/
   game/               game state & saving, hero fate (injuries, death), button actions
   ui/                 camp, formation, hero screen, armory, touch/click handling
   battle/             battle logic and battle screen layout
-  expedition/         expeditions (corridor, rooms, events)
+  expedition/         expeditions (branching map with fog, rooms, events)
   town/               town, buildings and services (phase 1 and 2)
   world/              world map, Velesia map, towns, travel, new beasts
   story/              reputation, quests, dialogs, journal, unique companions

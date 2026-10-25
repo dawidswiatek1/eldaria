@@ -29,7 +29,6 @@ css`
 #modal .supt small{color:#e8d8b8}
 .mbag{flex:0 0 auto;min-height:44px;gap:3px;padding:0 6px;font-size:.8rem}
 .xbag{position:relative}
-.mr.lit{background:#5a4a1a;box-shadow:0 0 0 2px #140d12,0 0 6px #ffc040}
 .injp{color:#8a2a1a}
 .pbar .skills .bagb{position:relative}
 `;

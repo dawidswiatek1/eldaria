@@ -18,6 +18,7 @@ function migrate(s){if(!s||!Array.isArray(s.roster))return null;
  if(s.v===7){S=s;regFix(s);s.found=s.found||{};SITE_OF_R.forEach((k,r)=>{if(s.reg.lv[r])s.found[k]=1});s.day=s.day||1;s.poi=s.poi||{};s.v=8;loadMsg=(loadMsg?loadMsg+' ':'')+'Velesia urosła! Większa mapa (przeciągaj i przybliżaj), wioski, ciekawe miejsca i mgła wojny – podróże trwają dni i odkrywają nowe miejsca. W lasach i na bagnach czają się nowe bestie: leszy, utopce, rusałki, południce, strzygi… a gdzieś stoi chata na kurzej stopce.'}
  if(s.v===8){S=s;s.roster.forEach(h=>{if(h.g!=='m'&&h.g!=='k')h.g=heroG(h)});(s.offers||[]).forEach(o=>{if(o.hero&&o.hero.g!=='m'&&o.hero.g!=='k')o.hero.g=heroG(o.hero)});(s.fallen||[]).forEach(f=>{if(!f.g)f.g=genderOf(f.name)});s.v=9;
   loadMsg=(loadMsg?loadMsg+' ':'')+'Bohaterowie i bohaterki! Każda postać ma teraz płeć (przypisaną według imienia) – kobiety mają własny wygląd, a dziennik walki odmienia słowa (zadała, padła…).'}
+ if(s.v===9){S=s;s.v=10;loadMsg=(loadMsg?loadMsg+' ':'')+'Nowość: rozgałęzione wyprawy! Mapa wyprawy ma kilka ścieżek – na rozstajach sam wybierasz drogę. Widzisz tylko najbliższe komnaty, a pochodnia oświetla 2 kolejne kroki na wszystkich ścieżkach. Elity po drodze są opcjonalne: ryzyko za lepsze łupy.'+(s.exp&&!s.exp.road?' Wyprawę, która trwa, dokończysz jeszcze po staremu.':'')}
  if(s.v===SAVE_VER)return s;
  return null}
 function load(){const raw=localStorage.getItem(SAVE_KEY);if(!raw)return null;try{const s=migrate(JSON.parse(raw));if(s){s.roster.forEach(upHero);return s}}catch(e){console.warn('zapis',e)}
