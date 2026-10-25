@@ -1,0 +1,44 @@
+# Aplikacja na Androida: po każdej zmianie w main buduje Eldaria.apk i dodaje ją do „Releases”.
+name: Aplikacja na Androida
+on:
+  push:
+    branches: [main]
+  pull_request:          # próbna budowa (bez wydania), żeby sprawdzić zmiany przed scaleniem
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Pliki gry do aplikacji
+        run: |
+          mkdir -p android/app/src/main/assets/game
+          cp -r index.html css js assets android/app/src/main/assets/game/
+      - name: Budowa APK
+        working-directory: android
+        run: gradle assembleRelease --no-daemon --stacktrace
+      - name: APK z próbnej budowy
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Eldaria-apk
+          path: android/app/build/outputs/apk/release/app-release.apk
+      - name: Wydanie do pobrania
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/release/app-release.apk Eldaria.apk
+          gh release create "apk-${{ github.run_number }}" Eldaria.apk \
+            --title "Eldaria na Androida – wersja 1.${{ github.run_number }}" \
+            --notes "Pobierz Eldaria.apk na telefonie i otwórz plik, aby zainstalować (za pierwszym razem telefon zapyta o zgodę na instalację z tego źródła). Nowa wersja instaluje się na starą – zapis gry zostaje." \
+            --latest

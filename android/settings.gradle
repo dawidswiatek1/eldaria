@@ -1,0 +1,8 @@
+// Eldaria na Androida: WebView z plikami gry (kopiowane przy budowie przez .github/workflows/android.yml)
+pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories { google(); mavenCentral() }
+}
+rootProject.name = "Eldaria"
+include ':app'

@@ -6,6 +6,17 @@ It plays exactly the same as before.
 ## How to run
 
 - **On a computer:** double-click `index.html`. It works straight from disk, no server needed.
+- **Android app:** every merge into `main` builds `Eldaria.apk` (`.github/workflows/android.yml`) and attaches it
+  to a new GitHub Release. Download it on the phone and open it to install; a new version installs over the old
+  one and keeps the save. The app (`android/`) is a full-screen WebView that loads the game files from inside the
+  APK – the same way as opening `index.html` from disk. The back button acts like Esc.
+  `android/eldaria.keystore` (password `eldaria`) signs these sideloaded builds so updates keep working; a Google
+  Play release would need a new, secret key.
+- **Web app (PWA):** every merge into `main` also publishes the game to GitHub Pages (`.github/workflows/pages.yml`,
+  needs Settings → Pages → Source: GitHub Actions). There it can be installed from the browser ("Install app" /
+  "Add to Home Screen") and plays offline: `js/core/pwa.js` adds `manifest.webmanifest` and the service worker
+  `sw.js` (file list and version written by `tools/pwa_files.py` at publish time). Opened from disk it does nothing.
+  App icons: `tools/make_icons.py`.
 - **On a phone or to share it:** upload the whole folder to any static web host
   (GitHub Pages, Netlify, itch.io as an HTML5 zip, …) and open the link.
   Keep the folder structure as it is.

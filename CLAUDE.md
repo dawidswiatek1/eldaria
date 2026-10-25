@@ -26,6 +26,9 @@ no dependencies. Code comments and all in-game text are in Polish; keep it that 
   `js/game/state.js`. When the save shape changes, bump `SAVE_VER` and add a migration; never break old saves.
 - **The Velesia map image is generated** by `tools/velesia_map.py` from `NODES`/`EDGES` (see README).
   After moving or adding a place, rerun it so the drawing matches the pins.
+- **Phone app:** `android/` (WebView, built by GitHub Actions) and the PWA (`js/core/pwa.js`, `sw.js`,
+  `manifest.webmanifest`). A new file in `assets/` or a new `<script>` needs nothing extra – `tools/pwa_files.py`
+  picks them up at publish time.
 - Avoid `alert`/`confirm`/`prompt`: the game is also played inside a sandboxed frame where they don't work.
 
 ## Checking changes
