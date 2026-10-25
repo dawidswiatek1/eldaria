@@ -6,7 +6,7 @@
 (function(){
  const urls=new Set();
  const walk=o=>{if(typeof o==='string'){if(o.startsWith('assets/'))urls.add(o)}else if(o&&typeof o==='object')for(const k in o)walk(o[k])};
- walk(VART);walk(VART18);walk(GFX.TM);walk(GFX.P);
+ walk(VART);walk(VART18);walk(GFX.BLD);walk(GFX.P);
  const st=document.getElementById('eldaria-css');
  if(st)(st.textContent.match(/url\((assets\/[^)]+)\)/g)||[]).forEach(u=>urls.add(u.slice(4,-1)));
  const keep=window.ELD_PRELOAD=[];

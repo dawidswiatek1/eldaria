@@ -1,43 +1,9 @@
 /* ===== VELESIA v18: duża mapa (przesuwanie, zoom), mgła wojny, wioski, ciekawe miejsca, dni podróży ===== */
-for(const k in NODES)delete NODES[k];
-Object.assign(NODES,{
- weleszow:{n:'Weleszów',t:'Stolica Velesii',ty:'town',x:53,y:17,ic:'b_zamek',d:'Zamek na skalistym wzgórzu nad Veleską, rynek z fontanną, kościół z czerwonej cegły i port rzeczny. Serce królestwa.'},
- dabrowa:{n:'Dąbrowa',t:'Osada w świętym gaju',ty:'town',x:35.5,y:30.5,ic:'ziola',d:'Osada przy prastarym dębie, słynna z szeptunów i handlu ziołami. Wokół stoją kamienne kręgi.'},
- kregoszew:{n:'Kręgoszew',t:'Gród graniczny',ty:'town',x:75,y:53,ic:'b_koszary',d:'Drewniana warownia na skale, ostatnia straż przed Martwymi Ziemiami. Kowale, koszary i kontrakty graniczne.'},
- sanow:{n:'Sanów',t:'Miasto kupców',ty:'town',x:46,y:62.5,ic:'tavern',d:'Ruchliwe miasto targowe na skrzyżowaniu traktów. Spichlerze, przystań i najwięcej najemników w Velesii.'},
- kurhanow:{n:'Kurhanów',t:'Osada przy kurhanach',ty:'town',x:60.5,y:63,ic:'b_cmentarz',d:'Mała osada u stóp starych mogił. Mieszkańcy strzegą pamięci przodków.'},
- brzezina:{n:'Brzezina',t:'Wieś',ty:'town',vil:1,x:41,y:42,ic:'nav_town',d:'Spokojna wieś wśród brzóz. Karczma, plotki i kilku chętnych do wojaczki.'},
- olszynow:{n:'Olszynów',t:'Wieś rolnicza',ty:'town',vil:1,x:62,y:36,ic:'nav_town',hidden:1,d:'Bogata wieś wśród złotych pól. Chłopi szepczą o białej pani, która chodzi w południe po zbożu.'},
- mokradla:{n:'Mokradła',t:'Wieś na grobli',ty:'town',vil:1,x:22,y:68,ic:'nav_town',hidden:1,d:'Chaty na palach na skraju Bagna Czarnego. Zielarze i rybacy, którzy nie chodzą nad wodę po zmroku.'},
- mlyn:{n:'Młyn nad Veleską',t:'Ciekawe miejsce',ty:'poi',x:29.5,y:49.5,ic:'event',hidden:1,d:'Stary młyn wodny. Młynarz podobno ma układ z wodnikiem.'},
- kapliczka:{n:'Leśna kapliczka',t:'Ciekawe miejsce',ty:'poi',x:18,y:41,ic:'temple',hidden:1,d:'Drewniana kapliczka na rozstaju leśnych dróg. Wędrowcy zostawiają tu dary.'},
- krag:{n:'Krąg Kamienny',t:'Ciekawe miejsce',ty:'poi',x:26,y:22,ic:'event',hidden:1,d:'Omszałe głazy ustawione w krąg. Szeptunki przychodzą tu w noc Kupały.'},
- straznica:{n:'Strażnica',t:'Ciekawe miejsce',ty:'poi',x:84,y:40,ic:'flag',hidden:1,d:'Opuszczona wieża sygnałowa u stóp gór. Z jej szczytu widać Martwe Ziemie.'},
- ruiny:{n:'Ruiny Asterionu',t:'Ciekawe miejsce',ty:'poi',x:61.5,y:73,ic:'event',hidden:1,d:'Kolumny i łuki z czasów dawnych magów. Na kamieniach wciąż widać runy.'},
- doliny:{n:'Mgliste Doliny',t:'Ciekawe miejsce',ty:'poi',x:77,y:27,ic:'event',hidden:1,d:'Doliny wiecznie spowite mgłą. Ludzie słyszą tu głosy zmarłych.'},
- rozlewiska:{n:'Rozlewiska Utopców',t:'Ciekawe miejsce',ty:'poi',x:28,y:59,ic:'event',hidden:1,d:'Zalane łąki nad Veleską. Rusałki i utopce wciągają tu nieostrożnych.'},
- polana:{n:'Mglista Polana',t:'Sekretna lokacja',ty:'site',hidden:1,x:13,y:11,ic:'event',d:'Krąg runicznych kamieni w mgle – miejsce pieczęci Asterionu.'},
- puszcza:{n:'Mroczna Puszcza',t:'Wyprawa · kraina I',ty:'site',r:0,x:11,y:30,home:'dabrowa',d:'Prastara puszcza na zachodzie. Gobliny, wilki, dziki – i Leszy, pan lasu.'},
- trakt:{n:'Trakt Bandytów',t:'Wyprawa · kraina II',ty:'site',r:1,x:13,y:50,home:'dabrowa',hidden:1,d:'Leśny trakt kupiecki, od lat nękany przez zbójców. Biesy podobno im pomagają.'},
- kurhany:{n:'Kurhany Przodków',t:'Wyprawa · kraina III',ty:'site',r:2,x:50,y:85,home:'kurhanow',hidden:1,d:'Kurhany i krypty pod nimi. Strzygi i szeptuni nie dają spać przodkom.'},
- grzbiet:{n:'Wielki Grzbiet',t:'Wyprawa · kraina IV',ty:'site',r:3,x:68,y:8,home:'weleszow',hidden:1,d:'Ośnieżone turnie granicznego pasma. Orkowie, harpie, wilkołaki i bazyliszki.'},
- jama:{n:'Smocza Jama',t:'Wyprawa · kraina V',ty:'site',r:4,x:87.5,y:20,home:'kregoszew',hidden:1,d:'Rozżarzona pieczara w zboczu gór. Leże Żmija.'},
- bagno:{n:'Bagno Czarne',t:'Wyprawa · bagna',ty:'site',r:5,x:11,y:79,home:'mokradla',hidden:1,d:'Czarna woda, martwe drzewa i błędne ogniki. Królestwo Utopca Starszego.'},
- pola:{n:'Pola Południcy',t:'Wyprawa · pola',ty:'site',r:6,x:37,y:71,home:'sanow',hidden:1,d:'Złote łany, gdzie w samo południe nikt nie odważy się pracować.'},
- chata:{n:'Chata na kurzej stopce',t:'Sekretna wyprawa',ty:'site',r:7,x:5,y:60,home:'mokradla',hidden:1,d:'Płot z czaszek, a za nim chata, która obraca się na kurzej nodze. Dom Baby Jagi.'},
- jary:{n:'Wilcze Jary',t:'Łowisko',ty:'site',r:8,x:31,y:10,home:'dabrowa',hidden:1,d:'Głębokie jary w północnej puszczy. Wataha wilkołaka Alfy poluje tu każdej pełni.'},
- poludnie:{n:'Równiny Południowe',t:'ku Avarii',ty:'exit',x:82,y:88,ic:'lock',hidden:1,d:'Szeroki trakt na południe, ku stepom Avarii. Granica zamknięta – wkrótce.'},
- martwe:{n:'Martwe Ziemie',t:'granica',ty:'exit',x:93,y:56,ic:'skull',hidden:1,d:'Spękana, wymarła ziemia za wschodnią granicą. Stąd przychodzi zło – wkrótce.'}});
-EDGES.length=0;EDGES.push(...[['weleszow','dabrowa'],['weleszow','brzezina'],['weleszow','olszynow'],['weleszow','grzbiet'],['dabrowa','puszcza'],['dabrowa','jary'],['dabrowa','krag'],['dabrowa','kapliczka'],['dabrowa','brzezina'],['dabrowa','polana'],['krag','polana'],['kapliczka','trakt'],['kapliczka','mlyn'],['trakt','chata'],['brzezina','mlyn'],['brzezina','sanow'],['mlyn','rozlewiska'],['rozlewiska','mokradla'],['rozlewiska','pola'],['mokradla','bagno'],['mokradla','chata'],['sanow','pola'],['sanow','kurhanow'],['sanow','kurhany'],['kurhanow','ruiny'],['kurhanow','kregoszew'],['ruiny','poludnie'],['kurhanow','poludnie'],['olszynow','kregoszew'],['olszynow','doliny'],['kregoszew','straznica'],['kregoszew','martwe'],['straznica','jama'],['straznica','doliny'],['doliny','grzbiet']]);
-SITE_OF_R.push('bagno','pola','chata','jary');
-Object.assign(TOWNS,{brzezina:{svc:['karczma'],off:2,gosp:'Karczma „Pod Brzozą”'},olszynow:{svc:['karczma','targ'],off:2,gosp:'Karczma „Złoty Kłos”',targ:'Jarmark wiejski'},mokradla:{svc:['karczma','alchemik'],off:1,gosp:'Karczma na palach',alch:'Zielarz z grobli'}});
-Object.assign(TALK,{brzezina:[],olszynow:[],mokradla:[]});
 const nodeVis=k=>nodeOk(k)||(S.found&&S.found[k]);
 /* mgła: odkryj sąsiadów miejsca (oprócz sekretnych) */
 const SECRET=['polana','chata'];
 function reveal(k,quiet){const nw=[];EDGES.forEach(([a,b])=>{const o=a===k?b:b===k?a:null;if(o&&!SECRET.includes(o)&&NODES[o].hidden&&!S.found[o]){S.found[o]=1;nw.push(NODES[o].n)}});if(nw.length&&!quiet)toast('Odkryto na mapie: '+nw.join(', '));return nw}
 const fogN=k=>NODES[k].hidden&&!S.found[k]&&!SECRET.includes(k)&&EDGES.some(([a,b])=>(a===k&&nodeOk(b))||(b===k&&nodeOk(a)));
-const _wOk0=wOk;wOk=function(){if(!S)return;if(!S.found)S.found={};const ok=S.loc&&NODES[S.loc]&&NODES[S.loc].ty!=='exit'&&NODES[S.loc].ty!=='site';if(!ok)S.loc='weleszow';const _l=S.loc;_wOk0();S.loc=_l;if(!NODES[S.loc]||NODES[S.loc].ty!=='town'&&NODES[S.loc].ty!=='poi')S.loc='weleszow';if(!S.day)S.day=1;if(!S.poi)S.poi={};regFix(S);if(!S._rv){S._rv=1;reveal(S.loc,1)}SITE_OF_R.forEach((k,r)=>{if(k&&S.reg.lv[r]&&!S.found[k]){S.found[k]=1;}});routeFix()};
 /* znane miejsce bez znanej drogi: odsłoń najkrótszy szlak */
 function rawPath(a,b){const prev={[a]:null},q=[a];while(q.length){const c=q.shift();if(c===b){const p=[];let x=c;while(x!=null){p.unshift(x);x=prev[x]}return p}EDGES.forEach(([u,v])=>{const o=u===c?v:v===c?u:null;if(o&&!(o in prev)&&NODES[o].ty!=='exit'&&(!SECRET.includes(o)||o===b||S.found[o])){prev[o]=c;q.push(o)}})}return null}
 function routeFix(){if(!S||!NODES[S.loc])return;Object.keys(NODES).filter(k=>nodeOk(k)&&NODES[k].ty!=='exit').forEach(k=>{if(k===S.loc||pathTo(S.loc,k))return;const p=rawPath(S.loc,k);if(p)p.forEach(n=>{if(NODES[n].hidden)S.found[n]=1})})}
@@ -79,8 +45,8 @@ function selNode(k){if(!nodeVis(k)&&!fogN(k))return;rSel=k;document.querySelecto
  const sd=document.getElementById('rside');if(sd)sd.innerHTML=nodePanel(k);const N=NODES[k],here=hereNode();
  if(fogN(k)||k===here||N.ty==='exit'||S.exp)return;const path=pathTo(here,k);if(!path)return;
  const m=document.getElementById('rview');if(m)m.insertAdjacentHTML('beforeend',`<button class="ngo" id="ngo" data-act="${N.ty==='site'&&N.r!=null&&S.reg.lv[N.r]?'rgo':k==='polana'?'polgo':'travel'}" data-k="${k}">${ic('walk',14)} ${N.ty==='site'&&N.r!=null&&S.reg.lv[N.r]?'Wyrusz':'Podróżuj'}: ${N.n} · ${path.length-1} d.</button>`);ngoPlace();typeof SND!=='undefined'&&SND.play('tap')}
-nodeIc=function(k){const N=NODES[k];if(N.ty==='site'&&N.r!=null&&!S.reg.lv[N.r])return ic('lock',14);if(N.ty==='site'&&N.r!=null&&S.reg.done[N.r])return ic('flag',14);if(N.ty==='poi'&&S.poi&&S.poi[k])return ic('xp',14);return ic(N.ic||(N.ty==='site'?'fight':'nav_town'),14)};
-renderRegion=function(){regOk();wOk();const here=hereNode();if(!rSel||!(nodeVis(rSel)||fogN(rSel)))rSel=here;const ks=Object.keys(NODES).filter(nodeOk),fg=Object.keys(NODES).filter(fogN);
+function nodeIc(k){const N=NODES[k];if(N.ty==='site'&&N.r!=null&&!S.reg.lv[N.r])return ic('lock',14);if(N.ty==='site'&&N.r!=null&&S.reg.done[N.r])return ic('flag',14);if(N.ty==='poi'&&S.poi&&S.poi[k])return ic('xp',14);return ic(N.ic||(N.ty==='site'?'fight':'nav_town'),14)}
+function renderRegion(){regOk();wOk();const here=hereNode();if(!rSel||!(nodeVis(rSel)||fogN(rSel)))rSel=here;const ks=Object.keys(NODES).filter(nodeOk),fg=Object.keys(NODES).filter(fogN);
  const P=k=>NODES[k],vis=k=>nodeOk(k),roads=EDGES.filter(e=>vis(e[0])&&vis(e[1])).map(([a,b])=>`<line x1="${P(a).x}" y1="${P(a).y}" x2="${P(b).x}" y2="${P(b).y}"/>`).join('')+EDGES.filter(e=>(vis(e[0])&&fogN(e[1]))||(vis(e[1])&&fogN(e[0]))).map(([a,b])=>`<line class="fg" x1="${P(a).x}" y1="${P(a).y}" x2="${P(b).x}" y2="${P(b).y}"/>`).join('');
  const m=mainOf()||S.roster[0];
  document.getElementById('app').innerHTML=`<div class="wv rv2"><div class="ttop"><button class="btn-small" data-act="back" data-esc="1">${ic('back',16)}<span class="lbl"> Obóz</span></button><button class="btn-small" data-act="world" title="Mapa świata">${ic('map',18)}<span class="lbl"> Świat</span></button><h2>${emb(18)} Velesia <small class="tsub">${dayTxt()}</small></h2><button class="btn-small" data-act="journal">${ic('contract',18)}<span class="lbl"> Dziennik</span>${qBadge()}</button><span class="pill gold">${ic('gold',18)} ${S.gold}</span></div>
@@ -91,23 +57,28 @@ renderRegion=function(){regOk();wOk();const here=hereNode();if(!rSel||!(nodeVis(
  <div class="mzb"><button class="btn-small" data-act="mz" data-z="1.25" aria-label="Przybliż">+</button><button class="btn-small" data-act="mz" data-z="0.8" aria-label="Oddal">−</button><button class="btn-small" data-act="mzc" aria-label="Wyśrodkuj na kompanii">${ic('flag',14)}</button><span id="rzl"></span></div></div>
  <aside class="wside" id="rside">${nodePanel(rSel)}</aside></div></div>`;
  mvApply();mvBind();if(rSel!==here)selNode(rSel);
- if(!S.intro){S.intro=1;save();setTimeout(()=>{if(screen==='region')modal(loreHtml('velesia',true))},60)}};
-const _nodePanel0=nodePanel;nodePanel=function(k){const N=NODES[k];
+ if(!S.intro){S.intro=1;save();setTimeout(()=>{if(screen==='region')modal(loreHtml('velesia',true))},60)}}
+function nodePanel(k){const N=NODES[k];
  if(fogN(k))return `<div class="pano fogp"></div><h2>${ic('event',18)} Nieodkryte</h2><p class="nd">Mgła i dzikie ostępy. Dotrzyj do sąsiedniego miejsca, by zobaczyć, co tu jest.</p>`;
  if(N.ty==='poi'){const here=hereNode(),path=pathTo(here,k),d=path?path.length-1:0;let b=`<div class="pano" style="background-image:url(${VART['p_'+({mlyn:'dabrowa',kapliczka:'dabrowa',krag:'mglista',straznica:'kregoszew',ruiny:'kurhanow',doliny:'mglista',rozlewiska:'mglista'}[k])]})"></div><h2>${ic(N.ic,18)} ${N.n}</h2><div class="sub">${N.t}${d?` · ${d} ${d>1?'dni':'dzień'} drogi`:''}${S.poi[k]?' · zbadane':''}</div><p class="nd">${N.d}</p>`;
   if(S.exp)return b;if(k===here)return b+`<div class="here">${ic('flag',14)} Tu obozuje kompania</div>${S.poi[k]?'':`<button class="btn-main" data-act="poigo" data-k="${k}">${ic('event',20)} Zbadaj</button>`}`;
   return b+`<button class="btn-main" data-act="travel" data-k="${k}" ${path?'':'disabled'}>${ic('walk',20)} Podróżuj (${d} d.)</button>`}
- let h=_nodePanel0(k);if(N.ty==='town'&&N.vil)h=h.replace('<div class="pano"','<div class="pano" style="background-image:url('+VART.p_dabrowa+')"');
- const d=(pathTo(hereNode(),k)||[1]).length-1;return h.replace('> Podróżuj</button>',`> Podróżuj (${d} d.)</button>`)};
-/* podróż: dni + odkrywanie */
-travel=function(to,then){if(_trav)return;const path=pathTo(hereNode(),to);if(!path||path.length<2){if(then)then();return}_trav=true;window._lp=path;const g=document.getElementById('ngo');if(g)g.remove();const mk=document.getElementById('pmark');let i=0;
- if(mk&&NODES[to]){mvCenterSoft(to)}
- const step=()=>{i++;if(i>=path.length||!mk){passDays(path.length-1);arrive(to,then,path.length-1);return}const N=NODES[path[i]];reveal(path[i],1);mk.style.left=N.x+'%';mk.style.top=N.y+'%';typeof SND!=='undefined'&&SND.play('tap');setTimeout(step,T(520))};
- if(mk)mk.classList.add('mv');setTimeout(step,T(60))};
+ /* miasto, wieś, wyjście z mapy, miejsce wyprawy */
+ const here=hereNode(),path=pathTo(here,k),d=path?path.length-1:0;let b=(N.ty==='site'&&N.r!=null?`<div class="pano scene bg-${BIOMES[N.r].k}">${sceneLayers(BIOMES[N.r].k,false)}</div>`:`<div class="pano" style="background-image:url(${N.ty==='town'&&N.vil?VART.p_dabrowa:VART['p_'+k]||VART['p_mglista']})"></div>`)+`<h2>${N.ty==='site'?ic('fight',18):N.ty==='exit'?ic('lock',16):ic('nav_town',18)} ${N.n}</h2><div class="sub">${N.t}${d&&N.ty!=='exit'?` · ${d} ${d>1?'dni':'dzień'} drogi`:''}</div><p class="nd">${N.d}</p>`;
+ if(N.ty==='exit')return b+`<div class="soon">${ic('lock',16)} Wkrótce</div>`;
+ if(S.exp)return b+`<button class="btn-main" data-act="map">${ic('walk',20)} Wróć na wyprawę</button>`;
+ if(N.ty==='town'){if(k===S.loc)return b+`<div class="here">${ic('flag',14)} Tu jest kompania</div><button class="btn-main" data-act="intown">${ic('nav_town',20)} Wejdź do miasta</button>`;
+  return b+`<button class="btn-main" data-act="travel" data-k="${k}" ${path?'':'disabled'}>${ic('walk',20)} Podróżuj (${d} d.)</button><div class="sub">Po drodze może się coś wydarzyć.</div>`}
+ /* miejsce wyprawy */
+ if(k==='polana'){const st=S.q.osadnicy&&S.q.osadnicy.s==='pieczec';return b+(st?`<div class="sub">Zalecany poziom bohaterów: 5+</div><button class="btn-main" data-act="polgo">${ic('walk',20)} Wyrusz na polanę</button>`:`<div class="sub">Pieczęć milczy. Na razie nie ma tu czego szukać.</div>`)}
+ const r=N.r,R=S.reg;if(!R.lv[r])return b+`<div class="soon">${ic('lock',16)} Zamknięte</div><div class="sub">Pokonaj bossa poprzedniej krainy, aby tu dotrzeć.</div>`;
+ if(!mapSel||mapSel.r!==r||R.lv[r]<mapSel.L)mapSel={r,L:R.lv[r]};const L=mapSel.L,st=expStage(r,L),ph=partyHeroes(),hurt=ph.filter(h=>h.hp<mh(h)*.6).length;
+ b+=`<div class="rlv">${[1,2,3,4].map(l=>{const op=R.lv[r]>=l,cl=l<4?R.lv[r]>l||R.done[r]:R.done[r];return `<button class="${L===l?'on':''} ${l===4?'bl':''}" data-act="rlv" data-r="${r}" data-l="${l}" ${op?'':'disabled'}>${op?(l===4?ic('boss',14):''):ic('lock',12)}${l<4?['','I','II','III'][l]:'Boss'}${cl?'<i class="ck">✓</i>':''}</button>`}).join('')}</div>`;
+ b+=`<div class="sub">${5+Math.min(L,3)} komnat · ${L>=4?'boss: '+ENEMIES[BIOMES[r].boss].name:'na końcu elita'} · zalecany poziom: ${Math.max(1,Math.round(st*.75))}</div>${hurt?`<div class="warn">${ic('hp',12)} Rannych: ${hurt} – rany nie goją się na wyprawie!</div>`:''}`;
+ b+=`<div class="mparty" data-act="formq">${[4,3,2,1,0].map(i=>{const h=S.slots[i]!=null?getHero(S.slots[i]):null;return `<span class="mp ${i<2?'f':''}">${h?bust(heroSprite(h),h.cls,30,1,-4):''}</span>`}).join('')}<small>Formacja ▸</small></div>`;
+ return b+`<div class="rgorow"><button class="mbag" data-act="tomarket" title="Zapasy">${ic('bag',18)}<span>${bagN()}/${bagCap()}</span></button><button class="btn-main" data-act="rgo" data-k="${k}" ${ph.length&&path?'':'disabled'}>${ic('walk',20)} ${k===here?'Wyrusz':'Podróżuj i wyrusz'}</button></div>`}
+/* podróż po mapie: travel() i finishTravel() w js/world/world-map.js */
 function mvCenterSoft(k){const m=document.getElementById('rmap');if(m){m.style.transition='transform .6s ease';setTimeout(()=>{if(m)m.style.transition=''},700)}mvCenter(k)}
-finishTravel=function(to,then){S.pend=null;const N=NODES[to];if(N.ty==='town'||N.ty==='poi')S.loc=to;else if(window._lp){const c=window._lp.filter(k=>NODES[k]&&(NODES[k].ty==='town'||NODES[k].ty==='poi'));if(c.length)S.loc=c[c.length-1]}window._lp=null;reveal(to);save();if(then){then();return}rSel=to;screen='region';render();
- if(N.ty==='town'){toast(`Kompania dociera do: ${N.n} (${dayTxt()})`);questGo(to)}else if(N.ty==='poi'){if(!questGo(to)&&!S.poi[to])setTimeout(()=>poiEvent(to),250)}};
-const _startSiteExp=startSiteExp;startSiteExp=function(k,r,L,extra){reveal(k,1);const l=S.loc;_startSiteExp(k,r,L,extra);if(NODES[l]&&(NODES[l].ty==='town'||NODES[l].ty==='poi')){S.loc=l;save()}};
 document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el||!S)return;switch(el.dataset.act){
  case 'mz':mvZoom(+el.dataset.z);break;case 'mzc':mvCenterSoft(hereNode());break;
  case 'poigo':poiEvent(el.dataset.k);break;case 'poiopt':poiResolve(+el.dataset.i);break;}},true);
@@ -148,7 +119,10 @@ function poiEvent(k){const E=POI[k];if(!E)return;curPoi=k;
 function poiResolve(i){const k=curPoi,E=POI[k],o=E&&E.o[i];if(!o||(o.c&&!RCLS(o.c))||(o.req&&!o.req()))return;S.poi[k]=1;const r=o.r();save();
  if(r.fight){closeModal();roadFight(r.fight,r.lbl);return}modal(`<h2>${E.n}</h2><p>${r.txt}</p><button class="btn-main" data-act="region">${ic('map',20)} Mapa</button>`)}
 /* obóz poza miastem */
-const _rst=renderSmallTown;renderSmallTown=function(){const N=NODES[S.loc];if(N&&N.ty==='poi'){renderField();return}_rst()};
 function renderField(){const k=S.loc,N=NODES[k],nb=S.roster.some(h=>h.free||tFree(h));
  document.getElementById('app').innerHTML=`<div class="townv stown"><div class="ttop"><button class="btn-small" data-act="tab" data-t="team">${ic('nav_team',18)}<span class="lbl">Drużyna</span>${nb?'<span class="badge">!</span>':''}</button><h2>${ic('camp',20)} Obóz: ${N.n} <small class="tsub">${dayTxt()}</small></h2><span class="pill gold">${ic('gold',18)} ${S.gold}</span><button class="btn-small" data-act="menu" aria-label="Menu">${ic('gear',18)}</button><button class="btn-main tgo" data-act="map">${ic('map',20)} Mapa</button></div>
- <div class="stbody"><div class="stpano" style="background-image:url(${VART.p_mglista})"><div class="stcap"><b>${N.n}</b><small>${N.t}</small></div></div><div class="stside"><p class="nd">${N.d}</p><p class="nd">Kompania rozbiła obóz. Usługi miejskie są dostępne tylko w miastach i wsiach – ruszaj dalej przez mapę.</p>${S.poi[k]?'':`<button class="btn-main" data-act="poigo" data-k="${k}">${ic('event',20)} Zbadaj to miejsce</button>`}</div></div></div>`}
+ <div class="stbody"><div class="stpano" style="background-image:url(${VART.p_mglista})"><div class="stcap"><b>${N.n}</b><small>${N.t}</small></div></div><div class="stside"><p class="nd">${N.d}</p><p class="nd">Kompania rozbiła obóz. Usługi miejskie są dostępne tylko w miastach i wsiach – ruszaj dalej przez mapę.</p>${S.poi[k]?'':`<button class="btn-main" data-act="poigo" data-k="${k}">${ic('event',20)} Zbadaj to miejsce</button>`}</div></div></div>`;
+ /* przyciski zadań, które prowadzą w to miejsce */
+ const s=document.querySelector('.stside');if(!s)return;const b=[];
+ for(const id of qActive()){const st=qSt(id);if(st&&st.obj&&st.obj.go===k&&st.obj.dlg)b.push(`<button class="btn-main" data-act="qdlg" data-d="${st.obj.dlg}">${ic('contract',20)} ${QD[id].n}</button>`)}
+ if(b.length)s.insertAdjacentHTML('beforeend',b.join(''))}

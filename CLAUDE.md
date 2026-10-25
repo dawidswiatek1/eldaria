@@ -8,6 +8,10 @@ no dependencies. Code comments and all in-game text are in Polish; keep it that 
 
 - **Must work opened straight from disk (`file://`).** No ES modules, no `fetch()` of local files,
   no reading pixels of image files. Everything is classic `<script src>` tags in `index.html`.
+- **One definition per function / data table.** Change the original; never patch it from a later
+  file (`const _f=f;f=function(){…}`, `X=function(){…}`, `Object.assign(TABLE,{…})` elsewhere).
+  One deliberate exception: `js/audio/sound.js` wraps a few functions (impact, flt, aura, die, checkEnd,
+  gainXp, toast, enterRoom, expWalk, chestModal, hurtAll) to play sound effects – keep sound there.
 - **Script order in `index.html` matters.** All files share one global scope (like the old single file).
   Top-level code may only use what earlier files defined. `js/main.js` stays last; it starts the game.
 - **Styles live in `css/*.css.js`** as plain CSS inside `` css`…` `` (see `css/_css.js` for why).

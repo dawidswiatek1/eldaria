@@ -78,7 +78,10 @@ function startTick(u){for(const k in u.cd)if(u.cd[k]>0)u.cd[k]--;const s=u.st;
  ['taunt','shield','evade','sunder','rally','weak','curse','haste','bear'].forEach(k=>{if(s[k]>0){s[k]--;if(!s[k]){delete s[k];delete s[k+'V'];if(k==='curse')delete s.curseSrc}}});
  if(s.regen){const g=s.regen;healQ(u,g.v);g.t--;if(g.t<=0)delete s.regen}
  if(s.bleed){const b=s.bleed;log(`${b.ic} ${u.name} traci ${b.dmg} PŻ.`,u.side==='h'?'r':'');const p=center(u,.5);particles(p,6,b.ic==='🔥'?FXC.fire:b.ic==='🧪'?FXC.poison:b.ic==='🌑'?FXC.dark:['#ff4a3a','#a01a1a'],{up:b.ic==='🩸'?0:24,r0:4,r1:18,d:.6});dmg(u,b.dmg,'dmg',(b.ic==='🩸'?'krwawienie':b.ic==='🔥'?'ogień':b.ic==='🌑'?'gnicie':'trucizna')+' ('+b.by+')');b.t--;if(b.t<=0)delete s.bleed}
- if(u.alive&&(u.sp==='troll'||u.sp==='golem')&&u.hp<u.maxHp)heal(u,Math.round(u.maxHp*(u.sp==='troll'?.05:.05)));updUnit(u)}
+ if(u.alive&&(u.sp==='troll'||u.sp==='golem')&&u.hp<u.maxHp)heal(u,Math.round(u.maxHp*(u.sp==='troll'?.05:.05)));updUnit(u);
+ /* regeneracja: leszy i borowy (nie gdy płoną) */
+ if(!u.alive)return;
+ if((u.sp==='leszy'||u.sp==='roots')&&u.hp<u.maxHp){if(burning(u)){if(!u._bm){u._bm=1;log(`🔥 ${u.name} płonie – nie może się odradzać!`,'g')}}else{heal(u,Math.round(u.maxHp*(u.sp==='leszy'?.06:.04)))}updUnit(u)}}
 async function battleLoop(){
  while(!B.over){B.round++;if(B.round===26)log('😫 Wyczerpanie! Od teraz wszyscy zadają coraz większe obrażenia.','r');B.order=B.units.filter(u=>u.alive).sort((a,b)=>spdOf(b)-spdOf(a)||Math.random()-.5);
   for(const u of B.order){while(B&&B.paused&&!B.over)await new Promise(r=>setTimeout(r,120));if(!B||B.over)return;if(!u.alive)continue;if(checkEnd())return;
@@ -107,7 +110,10 @@ function heroAI(u){const ready=k=>u.skills.includes(k)&&!(u.cd[k]>0);const al=al
   try{r=sk.ai?sk.ai(u,c):tt==='enemy'?[38+(sk.pw||1)*9,c.weak]:tt==='allEnemies'?aiAoe(u,c,44):null}catch(e){r=null}
   if(r&&r[0]>bs){bs=r[0];best=[k,r[1]]}}
  const tt=tOf(u,best[0]),cb=C(best[0]);if(tt==='enemy'&&(!best[1]||!best[1].alive||!canReach(u,best[1],best[0])))best[1]=cb.weak;if(tt==='ally'&&(!best[1]||!best[1].alive))best[1]=cb.low;return best}
-async function enemyAct(u){const hs=alive('h');if(!hs.length)return;if(await tryExecute(u))return;const ready=!(u.cd.sp>0);const rh=hs.filter(h=>canReach(u,h,'atak'));
+async function enemyAct(u){
+ /* bestie Velesii: własne zachowania (MAI w js/world/beasts.js) */
+ {const ai=MAI[u.sp];if(ai&&!(u.cd.sp>0)&&alive('h').length){try{if(await tryExecute(u))return;const c=aiCtx(u);if(await ai(u,c))return}catch(e){console.warn(e)}}}if(u.cd.br>0&&u.sp==='zmij')u.cd.br--;
+ const hs=alive('h');if(!hs.length)return;if(await tryExecute(u))return;const ready=!(u.cd.sp>0);const rh=hs.filter(h=>canReach(u,h,'atak'));
  const target=()=>{const tz=rh.filter(h=>h.st.taunt>0);if(tz.length)return pick(tz);if(Math.random()<.5)return lowest(rh);return pick(rh)};
  const two=()=>{const tz=rh.filter(h=>h.st.taunt>0);if(tz.length)return [tz[0]];return rh.slice().sort(()=>Math.random()-.5).slice(0,2)};
  const sp=(m,cd)=>{log(`${u.name}: ${m}`,'r');u.cd.sp=cd||4;flt(u,m.replace(/!$/,''),'info')};

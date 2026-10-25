@@ -1,6 +1,6 @@
 /* ===== WYPRAWY W STYLU DARKEST DUNGEON: mapa krain, korytarz, komnaty, wydarzenia ===== */
 const LV_N=['','Poziom I','Poziom II','Poziom III','Leże bossa'];
-let expStage=(r,L)=>r*5+Math.min(L,4);
+const expStage=(r,L)=>(BIOMES[r]&&BIOMES[r].sr!=null?BIOMES[r].sr:r)*5+Math.min(L,4);
 const propUrl=k=>GFX.P&&GFX.P[k]?GFX.P[k].u:'';
 const propImg=k=>{const P=GFX.P&&GFX.P[k];if(!P)return '';const s=Math.min(3,100/P.w,110/P.h);const q=Math.max(1,Math.floor(s*DPR()))/DPR();return `<img class="px" src="${P.u}" style="width:${Math.round(P.w*q)}px;height:${Math.round(P.h*q)}px" alt="">`};
 const ROOM={fight:{ic:'fight',n:'Walka'},elite:{ic:'skull',n:'Elita'},boss:{ic:'boss',n:'Boss'},chest:{ic:'chest',n:'Skrzynia'},event:{ic:'event',n:'Wydarzenie'},camp:{ic:'camp',n:'Obozowisko'}};
@@ -34,7 +34,9 @@ function finishExpBattle(){const E=S.exp,win=alive('e').length===0&&alive('h').l
   modal(`<div class="banner"><h1>Koniec gry</h1></div><div class="res"><p>Cała kompania poległa na wyprawie.</p><p>Najdalszy etap: <b>${st}</b>, wygrane walki: <b>${w}</b>, polegli: <b>${f}</b>.</p></div><button class="btn-main" data-act="gameover">Spróbuj ponownie</button>`);return}
  let i=0;const dl=()=>`style="animation-delay:${(0.3+(i++)*0.2).toFixed(2)}s"`;if(fallen.length)E.lost=1;
  if(!win){const fh=fateHtml(F,dl),tw=expEndTown(E,true,false);S.exp=null;save();const m=mainOf();
-  modal(`<div class="banner"><h1>Porażka…</h1></div><div class="res"><p ${dl()}>Drużyna została pokonana. Wyprawa przepadła razem z jej łupami.${m?` ${esc(m.name.split(' ')[0])} i ocaleni z trudem wracają do miasta.`:''}</p>${fh}${tw.map(t=>`<p ${dl()}>${t}</p>`).join('')}</div><button class="btn-main" data-act="tocamp">${ic('nav_town',22)} Do obozu</button>`);return}
+  modal(`<div class="banner"><h1>Porażka…</h1></div><div class="res"><p ${dl()}>Drużyna została pokonana. Wyprawa przepadła razem z jej łupami.${m?` ${esc(m.name.split(' ')[0])} i ocaleni z trudem wracają do miasta.`:''}</p>${fh}${tw.map(t=>`<p ${dl()}>${t}</p>`).join('')}</div><button class="btn-main" data-act="tocamp">${ic('nav_town',22)} Do obozu</button>`);
+  /* przegrana walka w drodze: podróż przepada */
+  if(E.road){S.pend=null;save()}return}
  const st=B.st,gold=Math.round((14+st*7)*(B.elite?1.6:1)+(boss?60+st*6:0)),xp=Math.round((12+st*5)*(B.elite?1.4:1)*(boss?1.6:1));E.gold+=Math.round(gold*(1+((E.fx&&E.fx.gold)||0)))+stolen;S.wins++;E.kills+=B.units.filter(u=>u.side==='e').length;
  lines.push(`${ic('gold',18)} +${gold} złota do łupów wyprawy`+(stolen?` (+${stolen} odzyskane)`:''),`${ic('xp',18)} +${xp} PD dla ocalałych`);
  B.units.filter(u=>u.side==='h'&&u.alive).forEach(u=>{const h=u.hero,l0=h.lvl;const msgs=gainXp(h,xp);if(h.lvl>l0)lv.push({h,msgs})});
@@ -50,12 +52,19 @@ function finishExpBattle(){const E=S.exp,win=alive('e').length===0&&alive('h').l
  save();modal(html+`</div><button class="btn-main" data-act="expback">${ic('walk',20)} Dalej</button>`)}
 /* --- koniec / odwrót --- */
 function bankLoot(E){let sold=0;E.loot.forEach(it=>{if(S.inv.length<INV_MAX)S.inv.push(it);else{S.gold+=sellPrice(it);sold++}});return sold}
-function expComplete(){if(!S.exp)return;const E=S.exp,bio=BIOMES[E.r],boss=E.L>=4,bonus=20+E.st*10+(boss?100+E.st*8:0);S.gold+=E.gold+bonus;const sold=bankLoot(E);regOk();const R=S.reg;let un='';
+function expComplete(){const E=S&&S.exp;if(!E)return;
+ /* walka w drodze i Mglista Polana kończą się inaczej niż zwykła wyprawa */
+ if(E.road){roadDone();return}
+ if(E.site==='polana'){const bonus=60+E.st*8;S.gold+=E.gold+bonus;bankLoot(E);partyHeroes().forEach(h=>h.exps=(h.exps||0)+1);const tw=expEndTown(E,false,true);questExp(E);S.exp=null;save();
+  modal(`<div class="banner"><div class="rays"></div><h1>${ic('flag',24)} Mglista Polana</h1></div><div class="res"><p>${ic('gold',18)} Łupy: ${E.gold} + premia ${bonus} zł</p><p>Mgła rzednie. W samym środku kręgu kamieni czeka pieczęć…</p>${tw.map(t=>`<p>${t}</p>`).join('')}</div><button class="btn-main" data-act="tocamp">${ic('walk',22)} Podejdź do pieczęci</button>`);return}
+ const qn=questExp(E);
+ const bio=BIOMES[E.r],boss=E.L>=4,bonus=20+E.st*10+(boss?100+E.st*8:0);S.gold+=E.gold+bonus;const sold=bankLoot(E);regOk();const R=S.reg;let un='';
  if(!boss){if(R.lv[E.r]<E.L+1){R.lv[E.r]=E.L+1;un=`Odblokowano: ${bio.n} – ${LV_N[E.L+1]}.`}}else{R.done[E.r]=1;if(E.r<4&&!R.lv[E.r+1]){R.lv[E.r+1]=1;un=`Odblokowano nową krainę: ${BIOMES[E.r+1].n}!`}else if(E.r===4)un='Żmij pokonany! Wszystkie krainy stoją otworem – możesz wracać po łupy.';else if(E.r>4)un=`${ENEMIES[bio.boss].name} ${gf({name:ENEMIES[bio.boss].name},'pokonany','pokonana')}! ${bio.n} jest bezpieczniejsze.`}
  const ns=boss?(E.r<=4?E.r*5+6:E.st+1):E.st+1;S.stage=Math.max(S.stage,Math.min(ns,25));if(S.stage>best())try{localStorage.setItem(BEST_KEY,String(S.stage))}catch(e){}
  partyHeroes().forEach(h=>h.exps=(h.exps||0)+1);const tw=expEndTown(E,false,true);genOffers();genShop();S.exp=null;save();
- modal(`<div class="banner"><div class="rays"></div><h1>${ic('flag',24)} Wyprawa zakończona!</h1></div><div class="res"><p>${ic('gold',18)} Łupy: ${E.gold} + premia ${bonus} = <b>${E.gold+bonus} złota</b></p><p>${ic('bag',18)} Przedmioty: <b>${E.loot.length}</b>${sold?` (${sold} sprzedano – pełny plecak)`:''}</p><p>${ic('skull',18)} Pokonani wrogowie: ${E.kills}</p>${un?`<p><b>${un}</b></p>`:''}${tw.map(t=>`<p>${t}</p>`).join('')}<p>${ic('tavern',16)}${ic('smith',16)} Nowi ochotnicy i nowy towar w mieście.</p></div><button class="btn-main" data-act="tocamp">${ic('nav_town',22)} Do obozu</button>`)}
-function expRetreat(){if(!S.exp)return;const E=S.exp,keep=Math.floor(E.gold/2);S.gold+=keep;const sold=bankLoot(E),tw=expEndTown(E,false,false);genOffers();genShop();S.exp=null;save();
+ modal(`<div class="banner"><div class="rays"></div><h1>${ic('flag',24)} Wyprawa zakończona!</h1></div><div class="res"><p>${ic('gold',18)} Łupy: ${E.gold} + premia ${bonus} = <b>${E.gold+bonus} złota</b></p><p>${ic('bag',18)} Przedmioty: <b>${E.loot.length}</b>${sold?` (${sold} sprzedano – pełny plecak)`:''}</p><p>${ic('skull',18)} Pokonani wrogowie: ${E.kills}</p>${un?`<p><b>${un}</b></p>`:''}${tw.map(t=>`<p>${t}</p>`).join('')}<p>${ic('tavern',16)}${ic('smith',16)} Nowi ochotnicy i nowy towar w mieście.</p></div><button class="btn-main" data-act="tocamp">${ic('nav_town',22)} Do obozu</button>`);
+ if(qn&&!S.qPend)toast('Dziennik: cel zadania wykonany!')}
+function expRetreat(){if(!S.exp)return;const E=S.exp;if(E.road){roadDone();return}const keep=Math.floor(E.gold/2);S.gold+=keep;const sold=bankLoot(E),tw=expEndTown(E,false,false);genOffers();genShop();S.exp=null;save();
  modal(`<h2>${ic('back',20)} Odwrót</h2><p>Drużyna wraca do miasta. Zachowujesz przedmioty (${E.loot.length}${sold?`, ${sold} sprzedano`:''}) i ${keep} z ${E.gold} złota.</p>${tw.map(t=>`<p class="sub">${t}</p>`).join('')}<button class="btn-main" data-act="tocamp">${ic('nav_town',22)} Do obozu</button>`)}
 /* --- wydarzenia --- */
 const EVENTS={

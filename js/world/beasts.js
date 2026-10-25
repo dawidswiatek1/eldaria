@@ -1,35 +1,8 @@
-/* ===== BESTIE VELESII: nowe potwory (sprite'y gracza), zachowania i mechaniki bossów ===== */
-Object.assign(ENEMIES,{
- dzik:{dt:'obuch',res:{ciete:15,trucizna:15,ogien:-20},name:'Dzik',hp:60,atk:12,def:4,spd:6,sp:'charge',d:'Szarżuje na oślep – potężny cios, może ogłuszyć.'},
- borowy:{dt:'obuch',nb:1,res:{trucizna:50,klute:25,ogien:-45},name:'Borowy',hp:118,atk:13,def:6,spd:3,sp:'roots',d:'Leśny duch. Oplata korzeniami (ogłusza) i powoli się odradza. Boi się ognia.'},
- bies:{dt:'klute',res:{ogien:50,mrok:30,swiete:-40},name:'Bies',hp:70,atk:13,def:3,spd:9,sp:'bies',d:'Złośliwy czort z widłami. Kradnie złoto i rzuca uroki osłabienia.'},
- szeptun:{res:{mrok:50,swiete:-35,ogien:-10},name:'Mroczny szeptun',hp:64,atk:13,def:2,spd:7,sp:'hex',fx:'dark',d:'Kultysta starych pieczęci. Klątwa na całą drużynę, przyzywa nietoperze.'},
- wilkolak:{dt:'ciete',res:{ciete:20,klute:20,swiete:-30,ogien:-20},name:'Wilkołak',hp:96,atk:15,def:4,spd:8,sp:'enrage',d:'Ranny wpada w szał: mocniejsze i podwójne ataki, krwawienie.'},
- wilkolakA:{dt:'ciete',res:{ciete:25,klute:25,swiete:-30,ogien:-20},name:'Wilkołak Alfa',hp:300,atk:17,def:6,spd:8,sp:'alfa',boss:true,d:'Przywódca watahy. Wyciem wzywa wilki, w szale tnie dwa razy.'},
- utopiec:{dt:'ciete',res:{lod:50,trucizna:30,ogien:-40},name:'Utopiec',hp:72,atk:12,def:3,spd:5,sp:'drown',d:'Wciąga pod wodę: ogłusza i dusi przez kilka tur. Odporny na lód, boi się ognia.'},
- utopiecS:{dt:'lod',res:{lod:75,trucizna:40,ogien:-35},name:'Utopiec Starszy',hp:340,atk:17,def:6,spd:4,sp:'utopS',boss:true,d:'Pan rozlewisk. Przyzywa utopce, fala lodowatej wody uderza w całą drużynę.'},
- leszy:{dt:'obuch',nb:1,res:{trucizna:60,klute:30,ogien:-50},name:'Leszy',hp:350,atk:17,def:7,spd:4,sp:'leszy',boss:true,d:'Pan puszczy. Regeneruje się, dopóki nie płonie. Wzywa wilki i oplata korzeniami.'},
- rusalka:{res:{lod:50,ogien:-30,mrok:20},name:'Rusałka',hp:60,atk:12,def:2,spd:8,sp:'charm',fx:'magic',d:'Śpiewem czaruje (bohater traci turę) i topi. Czerpie z tego siły.'},
- poludnica:{dt:'ciete',res:{ogien:60,swiete:20,mrok:-35,lod:-15},name:'Południca',hp:92,atk:14,def:3,spd:7,sp:'noon',d:'Zjawa z pól o południu. Żar i obłęd: obrażenia od ognia i osłabienie całej drużyny. Słaba na mrok.'},
- poludnicaK:{dt:'ciete',res:{ogien:70,swiete:20,mrok:-35,lod:-15},name:'Królowa Południc',hp:310,atk:17,def:5,spd:7,sp:'noonK',boss:true,d:'Gdy słońce w zenicie, jej żar pali wszystkich. Przyzywa południce.'},
- strzyga:{dt:'ciete',res:{mrok:40,trucizna:50,ogien:-40,swiete:-50},name:'Strzyga',hp:80,atk:14,def:3,spd:9,sp:'drain',fly:1,d:'Wysysa krew. Powstaje z martwych, chyba że dobije się ją ogniem lub świętością.'},
- bazyliszek:{dt:'trucizna',res:{trucizna:75,klute:20,lod:-30},name:'Bazyliszek',hp:86,atk:13,def:5,spd:6,sp:'gaze',d:'Spojrzenie zamienia w kamień (ogłuszenie i −50% obrony). Jadowite ukąszenie.'},
- zmij:{dt:'ciete',res:{ogien:75,trucizna:30,lod:-35},name:'Żmij',hp:390,atk:19,def:8,spd:6,sp:'zmij',boss:true,fly:0,d:'Smok z Wielkiego Grzbietu. Trzy fazy: kły i ogon, lot z ognistym oddechem, wściekłość.'},
- babajaga:{res:{mrok:40,trucizna:40,ogien:-25,swiete:-25},name:'Baba Jaga',hp:370,atk:17,def:5,spd:7,sp:'jaga',fx:'dark',boss:true,d:'Chata na kurzej stopce przyzywa sługi. Ranna Jaga wzlatuje w moździerzu: nieuchwytna, ciska klątwy.'}});
-BEASTS.push('dzik','wilkolak','wilkolakA','bazyliszek','zmij');
+/* ===== BESTIE VELESII: zachowania i mechaniki bossów =====
+   Dane bestii i krain: js/data/enemies.js. Powiązane mechaniki: strzyga – cheatDeath (js/battle/battle.js),
+   regeneracja leszego/borowego – startTick i specjalne ruchy (MAI) – enemyAct (js/battle/battle-layout.js),
+   wygląd rekrutów – makeHero (js/game/state.js). */
 GFX.S.poludnicaK=GFX.S.poludnica;if(typeof FACE!=='undefined')FACE.poludnicaK=FACE.poludnica;
-/* krainy: stare z nowymi bestiami + nowe miejsca Velesii (sr = poziom trudności) */
-BIOMES[0].pool=[[1,'goblin'],[1,'wilk'],[1,'szlam'],[1,'dzik'],[2,'pajak'],[3,'szaman'],[3,'borowy']];BIOMES[0].boss='leszy';
-BIOMES[1].pool.push([2,'bies']);
-BIOMES[2].pool.push([2,'strzyga'],[3,'szeptun']);
-BIOMES[3].pool.push([1,'wilkolak'],[2,'bazyliszek']);
-BIOMES[4].pool.push([0,'bazyliszek'],[0,'wilkolak']);BIOMES[4].boss='zmij';
-BIOMES.push(
- {k:'bagno',n:'Bagno Czarne',sr:2,pool:[[0,'utopiec'],[0,'szlam'],[0,'nietoperz'],[1,'rusalka'],[2,'bazyliszek']],boss:'utopiecS'},
- {k:'pola',n:'Pola Południcy',sr:1,pool:[[0,'dzik'],[0,'goblin'],[0,'wilk'],[1,'poludnica'],[2,'bies']],boss:'poludnicaK'},
- {k:'chata',n:'Chata na kurzej stopce',sr:3,pool:[[0,'bies'],[0,'nietoperz'],[0,'strzyga'],[1,'szeptun'],[2,'wilkolak']],boss:'babajaga'},
- {k:'las',n:'Wilcze Jary',sr:2,pool:[[0,'wilk'],[0,'dzik'],[1,'wilkolak'],[2,'borowy']],boss:'wilkolakA'});
-expStage=(r,L)=>(BIOMES[r]&&BIOMES[r].sr!=null?BIOMES[r].sr:r)*5+Math.min(L,4);
 function regFix(s){if(!s.reg)return;while(s.reg.lv.length<BIOMES.length){s.reg.lv.push(0);s.reg.done.push(0)}}
 /* --- zachowania --- */
 const MAI={};
@@ -69,12 +42,3 @@ MAI.jaga=async(u,c)=>{
  u.hut=(u.hut||0)+1;if(u.hut%3===1&&c.allies.length<3&&summon(u,pick(u.fly2?['strzyga','bies']:['nietoperz','bies','wilk']))){u.cd.sp=2;setF(u,'cast',600);flt(u,'Chatko, obróć się!','info');log('🏚️ Chata na kurzej stopce wypuszcza sługę!','r');await sleep(500);return 1}
  if(u.fly2&&Math.random()<.55){c.sp('Tłuczek z nieba!',2);await anim(u,c.hs,'dark');shake(true);c.hs.forEach(t=>{if(hit(u,t,.6,'dark')>0&&t.alive&&Math.random()<.35)weaken(t,2)});return 1}
  if(Math.random()<.5){c.sp('Klątwa starej wiedźmy!',2);const t=c.tgt();await anim(u,[t],'dark');const d=hit(u,t,1.2,'dark');if(d>0){weaken(t,3);setTimeout(()=>heal(u,Math.round(d*.4)),T(250))}return 1}};
-const _enemyAct=enemyAct;enemyAct=async function(u){const f=MAI[u.sp];if(f&&!(u.cd.sp>0)&&alive('h').length){try{if(await tryExecute(u))return;const c=aiCtx(u);if(await f(u,c))return}catch(e){console.warn(e)}}if(u.cd.br>0&&u.sp==='zmij')u.cd.br--;return _enemyAct(u)};
-/* regeneracja: leszy i borowy (nie gdy płoną) */
-const _startTick=startTick;startTick=function(u){_startTick(u);if(!u.alive)return;
- if((u.sp==='leszy'||u.sp==='roots')&&u.hp<u.maxHp){if(burning(u)){if(!u._bm){u._bm=1;log(`🔥 ${u.name} płonie – nie może się odradzać!`,'g')}}else{heal(u,Math.round(u.maxHp*(u.sp==='leszy'?.06:.04)))}updUnit(u)}};
-/* strzyga powstaje, jeśli nie dobito jej ogniem lub świętością */
-const _cheat=cheatDeath;cheatDeath=function(t){if(t.side==='e'&&t.key==='strzyga'&&!t.rose){const dt=(B.curFx&&FX2DT[B.curFx])||B.curDt||'';if(dt!=='ogien'&&dt!=='swiete'&&!burning(t)){t.rose=1;t.hp=Math.round(t.maxHp*.4);log(`🧛 ${t.name} powstaje z martwych! (dobij ogniem lub świętością)`,'r');setTimeout(()=>{if(B&&t.alive){flt(t,'Powstaje!','info');ring(t,'#b46cff')}},T(300));return true}}return _cheat(t)};
-/* wygląd rekrutów: łuczniczki, strażnicy grodu, rycerze Velesii */
-const _mkHero=makeHero;makeHero=function(cls,g){const h=_mkHero(cls,g);const fem=h.g==='k';
- if(cls==='lucznik'&&fem&&Math.random()<.5)h.skin='luczniczka';else if(cls==='wojownik'&&!fem&&Math.random()<.3)h.skin='straznik';else if(cls==='paladyn'&&!fem&&Math.random()<.35)h.skin='rycerz';return h};

@@ -20,7 +20,21 @@ const QD={
  skrzydlaci:{n:'Skrzydlaci',loc:'kregoszew',p:'husarz',st:{
   proba:{j:'Rotmistrz Zawisza przyjmuje tylko sprawdzonych: ukończ dowolną wyprawę na poziomie III albo pokonaj bossa.',obj:{exp:{r:-1,L:3}},next:'patent'},
   patent:{j:'Udaj się do Weleszowa po list z kancelarii (ojciec Światosław w świątyni).',obj:{go:'weleszow',dlg:'skr_patent'}},
-  przysiega:{j:'Wróć do Kręgoszewa i stań przed rotmistrzem Zawiszą.',obj:{go:'kregoszew',dlg:'skr_oath'}}}}
+  przysiega:{j:'Wróć do Kręgoszewa i stań przed rotmistrzem Zawiszą.',obj:{go:'kregoszew',dlg:'skr_oath'}}}},
+ /* v18 */
+ rusalki:{n:'Rusałki nad Veleską',loc:'sanow',p:'kupiec',st:{
+  szukaj:{j:'Dobrawa, córka rybaka Mirosza z Sanowa, poszła nad Rozlewiska Utopców i nie wróciła. Idź na Rozlewiska (na zachód od Sanowa, za Polami).',obj:{go:'rozlewiska',dlg:'rus_meet'}},
+  wianek:{j:'Rusałka odda Dobrawę za wianek ze Świętego Dębu. Poproś Wilę w Dąbrowie o wianek.',obj:{go:'dabrowa',dlg:'rus_wila'}},
+  wianek2:{j:'Zanieś wianek ze Świętego Dębu nad Rozlewiska.',obj:{go:'rozlewiska',dlg:'rus_wreath'}},
+  wroc:{j:'Odprowadź Dobrawę do ojca w Sanowie.',obj:{go:'sanow',dlg:'rus_end'}}}},
+ poludnica:{n:'Południca w polu',loc:'olszynow',p:'starszy',st:{
+  pole:{j:'Południca kręci głowy żniwiarzom z Olszynowa. Wyrusz na Pola Południcy i pokonaj ją (dowolna wyprawa na Pola).',obj:{exp:{r:6,L:1}},next:'pwroc'},
+  krag:{j:'Sołtys mówi, że Południcę można ułagodzić obrzędem przy Kręgu Kamiennym. Udaj się do Kręgu (na zachód od Brzeziny).',obj:{go:'krag',dlg:'pol_krag'}},
+  pwroc:{j:'Wróć do Olszynowa i opowiedz sołtysowi, co zaszło na polach.',obj:{go:'olszynow',dlg:'pol_end'}}}},
+ jaga:{n:'Chata na kurzej stopce',loc:'mokradla',p:'dziewczyna',st:{
+  wila:{j:'Baba Jaga porwała małego Jasia z Mokradeł. Tylko Wila z Dąbrowy wie, gdzie stoi chata na kurzej stopce. Porozmawiaj z nią.',obj:{go:'dabrowa',dlg:'jaga_wila'}},
+  chata:{j:'Wyrusz do Chaty na kurzej stopce (na zachodnich bagnach) i pokonaj Babę Jagę.',obj:{exp:{r:7,L:1}},next:'jwroc'},
+  jwroc:{j:'Wróć z Jasiem do Mokradeł.',obj:{go:'mokradla',dlg:'jaga_end'}}}}
 };
 const qS=id=>S.q[id]&&!S.q[id].done?S.q[id].s:(S.q[id]&&S.q[id].done?'done':null);
 const DLG={
@@ -90,7 +104,43 @@ const DLG={
  /* --- postacie poboczne --- */
  kasztelan:{p:'kasztelan',who:'Kasztelan Borzywoj',t:()=>'Kręgoszew to brama Velesii. Z Martwych Ziem co rusz ktoś próbuje się przez nią przecisnąć: koczownicy, upiory, ostatnio nawet orkowie z Grzbietu.\nKontrakty na zagrożenia graniczne wisią w komendanturze. Płacę rzetelnie.'+(S.rep.dwor>=20?' Dwór dobrze o was mówi – mam dla was premię.':''),o:[{t:'Zajrzymy do komendantury.',fx:()=>{tab='town';townView='castle'}},{t:'Bywaj, kasztelanie.'}]},
  kupiec:{p:'kupiec',who:'Mikuła, kupiec rzeczny',t:()=>{const r=[];if(!S.q.osadnicy)r.push('W Dąbrowie giną ludzie, włodarz szuka zbrojnych.');if(!S.q.bestia)r.push('W Kręgoszewie łowczyni Bogna szuka kogoś na bestię.');if(!S.q.artefakt)r.push('W stolicy dwa rody kłócą się o jakiś róg.');if(!S.q.skrzydlaci)r.push('Rotmistrz Skrzydlatych w Kręgoszewie podobno szuka śmiałków.');return 'Na rzece słychać wszystko! '+(r.length?'Mówią, że… '+r.join(' '):'Ale ostatnio to o was się mówi najwięcej.')},o:[{t:'Dzięki za wieści.'}]},
- kaplan_l:{p:'kaplan',who:'Ojciec Światosław, kanclerz',t:'Świątynia i dwór patrzą na szeptunów nieufnie. Ale ja czytałem kroniki: kręgi kamienne stały tu przed pierwszym kościołem i przed pierwszym królem. Może warto ich słuchać.',o:[{t:'Bywaj, ojcze.'}]}
+ kaplan_l:{p:'kaplan',who:'Ojciec Światosław, kanclerz',t:'Świątynia i dwór patrzą na szeptunów nieufnie. Ale ja czytałem kroniki: kręgi kamienne stały tu przed pierwszym kościołem i przed pierwszym królem. Może warto ich słuchać.',o:[{t:'Bywaj, ojcze.'}]},
+ /* v18 */
+ rus_start:{p:'kupiec',who:'Mirosz, rybak z Sanowa',t:'Moja Dobrawa… Poszła prać na Rozlewiska trzy dni temu. Sąsiedzi słyszeli śpiew nad wodą, a rano tylko wianek pływał przy brzegu.\nLudzie mówią: rusałki. Ja nie mam już siły w to nie wierzyć. Pomożecie?',
+  o:[{t:'Odnajdziemy ją.',fx:()=>{S.found.rozlewiska=1;routeFix();qSet('rusalki','szukaj');rep('lud',2);return {txt:'Mirosz ściska wam dłonie. Rozlewiska Utopców pojawiają się na mapie.'}}},{t:'Nie teraz.'}]},
+ rus_idle:{p:'kupiec',who:'Mirosz, rybak z Sanowa',t:()=>qS('rusalki')==='done'?(S.fl.rus==='walka'?'Dobrawa wróciła, ale po nocach płacze za „siostrami”. Dziękuję – i proszę, nie mówcie jej, co tam zrobiliście.':'Dobrawa wróciła. Mówi, że rusałka pocałowała ją w czoło na pożegnanie. Niech wam Weles błogosławi.'):'Wieści? Błagam, pospieszcie się.',o:[{t:'Bywaj.'}]},
+ rus_meet:{p:'rusalka',who:'Rusałka znad Veleski',t:'Ciii… Dobrawa jest teraz nasza. Tańczy z nami w świetle księżyca i nie czuje już zimna.\nChcecie ją z powrotem? Ludzie zawsze czegoś chcą. A co dacie nam?',
+  o:[{t:'Oddaj ją albo zginiesz!',fx:()=>{S.fl.rus='walka';qSet('rusalki','wroc');closeModal();roadFight(['rusalka','utopiec','rusalka'],'Rusałki nad Veleską',{bk:5,st:Math.max(6,S.stage)});return {fight:1}}},
+   {t:'Czego chcesz w zamian?',fx:()=>{qSet('rusalki','wianek');return {txt:'„Wianka. Ze Świętego Dębu w Dąbrowie, uplecionego rękami szeptuchy. Ja też kiedyś miałam taki… zanim utonęłam.” Rusałka zanurza się bez plusku.'}}},
+   {c:['bard','druid'],t:'Zaśpiewaj z nią pieśń o Kupale',fx:()=>{S.fl.rus='piesn';qSet('rusalki','wroc');rep('duchy',6);return {txt:'Wasze głosy splatają się nad wodą. Rusałka płacze – i wypuszcza Dobrawę z objęć mgły. Dziewczyna jest przemarznięta, ale żywa.'}}},
+   {t:'Wrócimy później.'}]},
+ rus_wila:{p:'szeptucha',who:'Wila, szeptucha',t:'Wianek dla rusałki? Mądrze. Topielica, która dostanie wianek, przypomina sobie, że była kiedyś dziewczyną. Uplotę go z ziół z dębu – ale zioła kosztują.',
+  o:[{t:'Zapłać 40 zł',req:()=>S.gold>=40,rq:'40 zł',fx:()=>{S.gold-=40;qSet('rusalki','wianek2');rep('duchy',2);return {txt:'Wila splata wianek z ruty, bylicy i dębowych liści, szepcząc nad każdym źdźbłem.'}}},
+   {c:['druid','kaplan'],t:'Pomóż jej przy obrzędzie',fx:()=>{qSet('rusalki','wianek2');rep('duchy',4);return {txt:'Razem z Wilą odmawiacie stare słowa. Wianek pachnie latem.'}}},{t:'Później.'}]},
+ rus_wreath:{p:'rusalka',who:'Rusałka znad Veleski',t:'Wianek… ze Świętego Dębu. Pamiętam zapach ruty. Pamiętam imię… Miłosława. Tak się nazywałam.',
+  o:[{t:'Oddaj wianek',fx:()=>{S.fl.rus='wianek';qSet('rusalki','wroc');rep('duchy',8);return {txt:'Rusałka wkłada wianek i rozpływa się w porannej mgle. Na brzegu leży Dobrawa – śpiąca, ciepła, żywa. Obok niej perła z dna Veleski.'}}}]},
+ rus_end:{p:'kupiec',who:'Mirosz, rybak z Sanowa',t:'Dobrawa! Córuchno! …Nie wiem, jak wam dziękować. Weźcie wszystko, co odłożyłem – i niech cały Sanów wie, kto ją uratował.',
+  o:[{t:'Przyjmij nagrodę',fx:()=>{const t=reward(120+S.stage*10,S.fl.rus==='walka'?null:1);rep('lud',10);qEnd('rusalki',(S.fl.rus==='walka'?'Pokonaliście rusałki i odbiliście Dobrawę siłą. ':'Dobrawa wróciła bez rozlewu krwi – rusałka odnalazła spokój. ')+t);return {txt:'Nagroda: '+t+'. Lud +10'}}},
+   {t:'Zatrzymaj złoto dla siebie, Miroszu.',fx:()=>{rep('lud',16);rep('duchy',2);qEnd('rusalki','Odmówiliście zapłaty od biednego rybaka. Sanów długo będzie o tym mówił.');return {txt:'Mirosz ma łzy w oczach. Po porcie szybko rozchodzi się wieść o waszej szczodrości. Lud +16'}}}]},
+ pol_start:{p:'starszy',who:'Sołtys Bogumił z Olszynowa',t:'Żniwa stoją. W samo południe na polach pojawia się wysoka biała pani z sierpem i pyta żniwiarzy o rzeczy, których żaden chłop nie wie. Kto nie odpowie – temu kręci głowę.\nTrzech już pochowaliśmy. Pomóżcie!',
+  o:[{t:'Wyruszymy na pola i ją pokonamy.',fx:()=>{S.found.pola=1;routeFix();qSet('poludnica','pole');rep('lud',2);return {txt:'Pola Południcy są otwarte na mapie (na południowy zachód od Sanowa).'}}},
+   {t:'Może da się ją ułagodzić?',fx:()=>{S.found.krag=1;routeFix();qSet('poludnica','krag');return {txt:'„Babka mówiła, że Południca to dusza dziewczyny zmarłej w dzień ślubu. Przy Kręgu Kamiennym palono dla niej ognie…” Krąg Kamienny widać na mapie.'}}},{t:'Nie teraz.'}]},
+ pol_idle:{p:'starszy',who:'Sołtys Bogumił',t:()=>qS('poludnica')==='done'?'Żniwa skończone! W Olszynowie zawsze znajdzie się dla was chleb.':'Czekamy, aż będzie można wyjść w pole.',o:[{t:'Bywaj.'}]},
+ pol_krag:{p:'poludnica',who:'Południca',t:'Kto pali ognie przy kamieniach w samo południe? …Pytanie za pytanie, wędrowcze. Co rośnie bez korzenia, biegnie bez nóg i zabiera bez rąk?',
+  o:[{t:'Czas.',fx:()=>{S.fl.pol='zagadka';qSet('poludnica','pwroc');rep('duchy',6);return {txt:'Południca uśmiecha się po raz pierwszy od stu lat. „Dobrze… Niech żną. Ale niech zostawią mi ostatni snop.” Znika w drżącym powietrzu.'}}},
+   {t:'Woda.',fx:()=>{S.fl.pol='zla';closeModal();qSet('poludnica','pwroc');roadFight(['poludnica','nietoperz'],'Gniew Południcy',{bk:6,st:Math.max(6,S.stage)});return {fight:1}}},
+   {c:['bard','mag'],t:'Odpowiedz jej zagadką',fx:()=>{S.fl.pol='zagadka';qSet('poludnica','pwroc');rep('duchy',8);partyHeroes().forEach(h=>gainXp(h,30+S.stage*6));return {txt:'Południca nie zna odpowiedzi na waszą zagadkę i śmieje się jak dziewczyna. „Dawno nikt mnie nie przechytrzył.” (Doświadczenie dla drużyny)'}}}]},
+ pol_end:{p:'starszy',who:'Sołtys Bogumił',t:()=>S.fl.pol==='zagadka'?'Ludzie mówią, że w południe na miedzy siedzi biała pani i patrzy na żniwa – ale nikogo nie rusza. Zostawimy jej ostatni snop, jak każe obyczaj.':'Południca przepadła! Wracamy w pole. Oto co zebraliśmy dla was, cała wieś się złożyła.',
+  o:[{t:'Dziękujemy.',fx:()=>{const t=reward(100+S.stage*8,1);rep('lud',8);if(S.fl.pol==='zagadka')rep('duchy',4);qEnd('poludnica',(S.fl.pol==='zagadka'?'Ułagodziliście Południcę obyczajem i rozumem. ':'Pokonaliście Południcę. ')+t);return {txt:'Nagroda: '+t}}}]},
+ jaga_start:{p:'dziewczyna',who:'Marysia z Mokradeł',t:'Jasio… mój braciszek… Poszedł zbierać chrust na bagna i usłyszałam, jak ktoś go woła słodkim głosem. Potem zatrzeszczało, jakby wielka kura szła przez las.\nTo Baba Jaga! Wszyscy wiedzą, że ona porywa dzieci! Proszę…',
+  o:[{t:'Znajdziemy Jasia.',fx:()=>{qSet('jaga','wila');rep('lud',3);return {txt:'„Tylko Wila z Dąbrowy wie, gdzie stoi chata. Babka mówiła, że one się znają.”'}}},{t:'Nie teraz.'}]},
+ jaga_idle:{p:'dziewczyna',who:'Marysia z Mokradeł',t:()=>qS('jaga')==='done'?'Jasio już nie chodzi sam na bagna. Dziękujemy wam!':'Proszę, pospieszcie się…',o:[{t:'Bywaj.'}]},
+ jaga_wila:{p:'szeptucha',who:'Wila, szeptucha',t:'Jaga… Znam ją. Kiedyś była taka jak ja. Potem zbyt długo rozmawiała z tym, co mieszka pod bagnem.\nChata stoi tam, gdzie bagno styka się z puszczą. Obraca się do wędrowca tyłem – trzeba powiedzieć: „Chatko, chatko, stań do lasu tyłem, a do mnie przodem”.',
+  o:[{t:'Pokaż nam drogę.',fx:()=>{S.found.chata=1;regOk();S.reg.lv[7]=1;routeFix();qSet('jaga','chata');rep('duchy',2);return {txt:'Chata na kurzej stopce pojawia się na mapie, na zachodnim skraju bagien. Wyprawa: Chata Baby Jagi.'}}},
+   {c:['druid','kaplan','czarnoksieznik'],t:'Daj nam coś przeciw jej czarom.',fx:()=>{S.found.chata=1;regOk();S.reg.lv[7]=1;routeFix();S.bless={name:'Amulet Wili',fx:{defP:.12,heal:.1}};qSet('jaga','chata');return {txt:'Wila zawiesza wam na szyjach woreczki z czosnkiem, solą i jarzębiną. (Amulet Wili: +12% obrony na następną wyprawę). Chata pojawia się na mapie.'}}}]},
+ jaga_end:{p:'dziewczyna',who:'Marysia z Mokradeł',t:'Jasio! Żywy! …Co tam było? Nie, nie mówcie. Babka zawsze mówiła, że z chaty Jagi nikt nie wraca. A wy wróciliście.',
+  o:[{t:'Weź kufer z chaty dla wsi.',fx:()=>{const t=reward(60+S.stage*6);rep('lud',12);qEnd('jaga','Pokonaliście Babę Jagę i oddaliście jej skarby Mokradłom. '+t);return {txt:'Mokradła będą o was śpiewać. '+t+', Lud +12'}}},
+   {t:'Zatrzymaj księgę zaklęć Jagi.',fx:()=>{const t=reward(40,2);rep('duchy',-6);unlockLore('asterion');qEnd('jaga','Księga Baby Jagi jest w waszym plecaku. Niektóre strony szepczą po nocach. '+t);return {txt:'Księga parzy w dłonie. '+t+', Duchy −6'}}}]}
 };
 const TALK={
  dabrowa:[{p:'wlodar',who:'Pan Dobiesław',s:'włodarz Dąbrowy',nw:()=>!S.q.osadnicy||qS('osadnicy')==='band_wroc'||qS('osadnicy')==='rozmowa',dlg:()=>!S.q.osadnicy?'osa_start':qS('osadnicy')==='rozmowa'?'osa_wl2':qS('osadnicy')==='band_wroc'?'osa_band_end':'osa_wl_idle'},
@@ -102,7 +152,12 @@ const TALK={
   {p:'magnat',who:'Pan Bogusz',s:'ród Gryfitów',nw:()=>qS('artefakt')==='odd_b',dlg:()=>!S.q.artefakt||qS('artefakt')==='wybor'?'art_b':qS('artefakt')==='odd_b'?'art_odd_b':'art_idle_b'},
   {p:'szpieg',who:'Mściwój',s:'„uczony” z archiwum',when:()=>qS('artefakt')==='demask',nw:()=>true,dlg:'art_spy'},
   {p:'kaplan',who:'Ojciec Światosław',s:'kanclerz i kapłan',nw:()=>qS('skrzydlaci')==='patent',dlg:()=>qS('skrzydlaci')==='patent'?'skr_patent':'kaplan_l'}],
- sanow:[{p:'kupiec',who:'Mikuła',s:'kupiec rzeczny – plotki',dlg:'kupiec'}],
- kurhanow:[{p:'starszy',who:'Radogost',s:'starszy osady',nw:()=>qS('artefakt')==='sledztwo',dlg:()=>qS('artefakt')==='sledztwo'?'art_starszy':null}]
+ sanow:[{p:'kupiec',who:'Mikuła',s:'kupiec rzeczny – plotki',dlg:'kupiec'},
+  {p:'kupiec',who:'Mirosz',s:'rybak z Sanowa',nw:()=>!S.q.rusalki||qS('rusalki')==='wroc',dlg:()=>!S.q.rusalki?'rus_start':qS('rusalki')==='wroc'?'rus_end':'rus_idle'}],
+ kurhanow:[{p:'starszy',who:'Radogost',s:'starszy osady',nw:()=>qS('artefakt')==='sledztwo',dlg:()=>qS('artefakt')==='sledztwo'?'art_starszy':null}],
+ /* wsie */
+ brzezina:[],
+ olszynow:[{p:'starszy',who:'Bogumił',s:'sołtys Olszynowa',nw:()=>!S.q.poludnica||qS('poludnica')==='pwroc',dlg:()=>!S.q.poludnica?'pol_start':qS('poludnica')==='pwroc'?'pol_end':'pol_idle'}],
+ mokradla:[{p:'dziewczyna',who:'Marysia',s:'siostra porwanego',nw:()=>!S.q.jaga||qS('jaga')==='jwroc',dlg:()=>!S.q.jaga?'jaga_start':qS('jaga')==='jwroc'?'jaga_end':'jaga_idle'}]
 };
 const emb=s=>`<img class="emb px" src="${VART.emblem}" style="width:${Math.round(s*39/50)}px;height:${s}px" alt="">`;
