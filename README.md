@@ -40,6 +40,16 @@ assets/
   events/             event illustrations
 ```
 
+## Class sprites
+
+Male heroes of most classes use hand-made sprites (PixelLab exports in `tools/art/classes/<class>/`).
+`tools/class_sprites.py` (Python 3 with numpy and Pillow) turns each export – the east-facing pose
+and the 8-frame east walk – into the game's 7-frame battle strip (stand, breathe, wind-up, strike,
+cast, hit, down) and writes `js/data/sprites-classes.js` (`CSPR`). `heroAnim` in `js/gfx/sprites.js`
+uses it for men without a unique look; women, unique companions and classes without a folder keep
+the layered sprites (whose look changes with equipment). To add or replace a class: put its export in
+`tools/art/classes/<class>/` and run `python3 tools/class_sprites.py` (`--debug` for a preview in `tools/out/`).
+
 ## Rules for editing
 
 1. **Script order matters.** All `js/` files share one global scope, just like the old single file.
@@ -60,8 +70,9 @@ assets/
 5. **Images.** To change a picture, replace the file in `assets/` and keep its name.
    Image lists live in `js/data/art.js` (maps, panoramas, portraits), `js/data/gfx-misc.js`
    (buildings, room objects) and `css/assets.css.js` (frames, textures, battle backgrounds).
-6. **Sprite sheets stay inside JS.** Hero layers, enemies, icons, battle effects and unique heroes
-   (`js/data/gfx-heroes.js`, `gfx-enemies.js`, `gfx-misc.js`, `sprites-v19.js`) are still stored
+6. **Sprite sheets stay inside JS.** Hero layers, enemies, icons, battle effects, unique heroes and
+   class sprites (`js/data/gfx-heroes.js`, `gfx-enemies.js`, `gfx-misc.js`, `sprites-v19.js`,
+   `sprites-classes.js`) are still stored
    as base64 text. The game reads their pixels to tint and combine layers, and browsers block that
    for separate image files opened from disk. These files are generated data: replace whole entries
    rather than editing them by hand.

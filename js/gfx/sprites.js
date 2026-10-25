@@ -2,7 +2,7 @@ const RCOL=['#c9c9c9','#4a9dff','#b45cff','#ff9a2a'];
 const hexI=c=>parseInt(c.slice(1),16);
 let GFX_READY=false;
 function loadImg(o){return new Promise(res=>{const im=new Image();const done=()=>{try{const c=document.createElement('canvas');c.width=o.w;c.height=o.h;const x=c.getContext('2d');x.drawImage(im,0,0);o._d=x.getImageData(0,0,o.w,o.h).data}catch(e){o._d=new Uint8ClampedArray(o.w*o.h*4)}o._t=new Set((o.t||[]).map(hexI));res()};im.onload=done;im.onerror=()=>{o._d=new Uint8ClampedArray(o.w*o.h*4);o._t=new Set();res()};im.src=o.u})}
-async function loadGfx(){const all=[...Object.values(GFX.L),...Object.values(GFX.S),...(typeof HSPR!=='undefined'?Object.values(HSPR):[]),...Object.values(GFX.F),GFX.I];await Promise.all(all.map(loadImg));GFX_READY=true}
+async function loadGfx(){const all=[...Object.values(GFX.L),...Object.values(GFX.S),...(typeof HSPR!=='undefined'?Object.values(HSPR):[]),...(typeof CSPR!=='undefined'?Object.values(CSPR):[]),...Object.values(GFX.F),GFX.I];await Promise.all(all.map(loadImg));GFX_READY=true}
 function tintFn(tint){const t=[1,3,5].map(i=>parseInt(tint.slice(i,i+2),16));return (r,g,b)=>{const L=(r*.299+g*.587+b*.114)/255,k=.2+1.15*L;return t.map(v=>Math.max(0,Math.min(255,Math.round(v*k))))}}
 /* składanie warstw; fw>0 => odbicie każdej klatki osobno */
 function composeData(list,w,h,fw){const out=new ImageData(w,h),D=out.data;
@@ -29,6 +29,9 @@ const FRAME={i0:0,i1:1,wind:2,strike:3,cast:4,hit:5,die:6};
 function helmLayer(k,r){if(k==='helm')return r>=3?'helm_helm3':r>=2?'helm_helm2':'helm_helm0';if(k==='diadem')return r>=2?'helm_diadem2':'helm_diadem0';return r>=3?'helm_kaptur3':'helm_kaptur0'}
 /* animacja bohatera: pasek 7 klatek + klatka 0 przycięta do rdzenia */
 function heroAnim(cls,eq,skin,g){eq=eq||{};const sk=skin&&typeof SKIN!=='undefined'?SKIN[skin]:null;if(!sk)skin='';g=g==='k'?'k':'m';const ck='H|'+cls+'|'+g+'|'+(skin||'')+'|'+['bron','zbroja','helm','amulet'].map(s=>eq[s]?eq[s].b+eq[s].r:'-').join('|');if(_sprCache[ck])return _sprCache[ck];
+ /* nowe sprite'y klas (mężczyźni bez unikalnego wyglądu): gotowy pasek klatek z js/data/sprites-classes.js;
+    ekwipunek nie zmienia ich wyglądu */
+ if(!sk&&g==='m'&&typeof CSPR!=='undefined'&&CSPR[cls]&&CSPR[cls]._d){const o=CSPR[cls],id=composeData([[o,null]],o.w,o.h,0);return _sprCache[ck]={url:dataURL(id,0,0,o.w,o.h),f0:dataURL(id,HM.pl,0,HM.cw,HM.ch+HM.pt),fw:HM.fw,fh:HM.fh,n:7,pl:HM.pl,pt:HM.pt,cw:HM.cw,ch:HM.ch}}
  if(sk&&sk.spr&&typeof HSPR!=='undefined'&&HSPR[sk.spr]&&HSPR[sk.spr]._d){const o=HSPR[sk.spr],id=composeData([[o,null]],o.w,o.h,faceOf('H_'+sk.spr)==='L'?HM.fw:0);shadeData(id.data,o.w,o.h);return _sprCache[ck]={url:dataURL(id,0,0,o.w,o.h),f0:dataURL(id,HM.pl,0,HM.cw,HM.ch+HM.pt),fw:HM.fw,fh:HM.fh,n:7,pl:HM.pl,pt:HM.pt,cw:HM.cw,ch:HM.ch}}
  const L=GFX.L,st0=GFX.STYLE[cls],st=g==='k'&&L['body_'+cls+'|'+st0+'_k']?st0+'_k':st0,list=[],add=(n,t)=>{const o=L[n+'|'+st];if(o)list.push([o,t||null])},tf=(it,al)=>it&&(al||it.r>0)?RCOL[it.r]:null;
  const gl=it=>it&&it.r>0?RCOL[it.r]:null,addG=(n,it)=>{const o=L[n+'|'+st];if(o)list.push([o,null,gl(it)])};
