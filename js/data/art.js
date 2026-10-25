@@ -35,6 +35,12 @@ const VART={
  "n_tymek":"assets/portraits/tymek.png",
  "n_nela":"assets/portraits/nela.png",
  "n_karolina":"assets/portraits/karolina.png",
+ "n_jaromir":"assets/portraits/jaromir.png",
+ "n_krol":"assets/portraits/krol.png",
+ "n_bankier":"assets/portraits/bankier.png",
+ "n_mieszczanin":"assets/portraits/mieszczanin.png",
+ "n_mieszczka":"assets/portraits/mieszczka.png",
+ "n_zielarka":"assets/portraits/zielarka.png",
  "n_rusalka":"assets/portraits/rusalka.png",
  "n_poludnica":"assets/portraits/poludnica.png",
  "n_babajaga":"assets/portraits/babajaga.png",
@@ -42,9 +48,9 @@ const VART={
  "n_utopiec":"assets/portraits/utopiec.png",
  "n_strzyga":"assets/portraits/strzyga.png",
  "e_husarz":"assets/events/husarz.png",
- /* panoramy wsi (te same obrazki) */
- "p_brzezina":"assets/towns/panorama-dabrowa.webp",
- "p_olszynow":"assets/towns/panorama-kurhanow.webp",
+ "p_brzezina":"assets/towns/panorama-brzezina.webp",
+ "p_olszynow":"assets/towns/panorama-olszynow.webp",
+ /* panoramy wsi bez własnego obrazka (te same obrazki) */
  "p_mokradla":"assets/towns/panorama-mglista.webp",
  "p_ustronie":"assets/towns/panorama-mglista.webp",
  "p_wschodnia":"assets/towns/panorama-kregoszew.webp"
@@ -57,6 +63,13 @@ const VART18={
  "t_kregoszew":"assets/towns/scene-kregoszew.webp",
  "t_sanow":"assets/towns/scene-sanow.webp",
  "t_kurhanow":"assets/towns/scene-kurhanow.webp",
+ "t_brzezina":"assets/towns/scene-brzezina.webp",
+ "t_olszynow":"assets/towns/scene-olszynow.webp",
+ /* wnętrza: sala tronowa, kantor „Złota Waga” i jego filia w Sanowie, audiencja u króla */
+ "h_zamek":"assets/halls/zamek.webp",
+ "h_kantor":"assets/halls/kantor.webp",
+ "h_kantor_s":"assets/halls/kantor-sanow.webp",
+ "a_tron":"assets/halls/audiencja.webp",
  "bg_bagno":"assets/backgrounds/bagno.webp",
  "bg_pola":"assets/backgrounds/pola.webp",
  "bg_chata":"assets/backgrounds/chata.webp"

@@ -1,10 +1,11 @@
 /* ===== MIASTA VELESII: nie każde miasto ma wszystko ===== */
-const ALLB=['zamek','karczma','kowal','swiatynia','targ','koszary','lecznica','alchemik','zaklinacz','cmentarz','gildia'];
+const ALLB=['zamek','bank','karczma','kowal','swiatynia','targ','koszary','lecznica','alchemik','zaklinacz','cmentarz','gildia'];
 const TOWNS={
  weleszow:{svc:ALLB,off:5,pano:'p_weleszow'},
  dabrowa:{svc:['karczma','alchemik','szept'],off:3,gosp:'Gospoda „Pod Starym Dębem”',alch:'Kupiec zielarski'},
- kregoszew:{svc:['karczma','kowal','koszary','zamek'],off:3,gosp:'Gospoda „Pod Strażnicą”',zamek:'Komendantura grodu'},
- sanow:{svc:['karczma','targ','gildia'],off:8,gosp:'Gospoda „Pod Kotwicą”',targ:'Kupcy portowi'},
+ kregoszew:{svc:['karczma','kowal','koszary','zamek'],off:3,gosp:'Gospoda „Pod Strażnicą”',zamek:'Komendantura grodu',
+  zamek_d:'Komendant grodu wydaje kontrakty na bestie i zbójów z pogranicza.',zamek_s:'3 kontrakty naraz, nagrody +25%'},
+ sanow:{svc:['karczma','targ','gildia','bank'],off:8,gosp:'Gospoda „Pod Kotwicą”',targ:'Kupcy portowi',bank:'Filia „Złotej Wagi”'},
  kurhanow:{svc:['karczma','cmentarz','starszy'],off:3,gosp:'Karczemka u Mogił',cmentarz:'Kurhany przodków'},
  /* wsie */
  brzezina:{svc:['karczma'],off:2,gosp:'Karczma „Pod Brzozą”'},
@@ -18,7 +19,7 @@ const curTown=()=>TOWNS[S&&S.loc]||TOWNS.weleszow;
 const hasSvc=k=>curTown().svc.includes(k);
 const bName=k=>(curTown()[k])||(BUILD[k]?BUILD[k].n:XB[k].n);
 const VIEW_B=v=>v==='szept'||v==='starszy'?v:BV[v];
-/* małe miasto: panorama + usługi + rozmowy */
+/* małe miasto: panorama albo scena + usługi + rozmowy */
 function renderSmallTown(){const k=S.loc,N=NODES[k];
  /* ciekawe miejsce: obóz w polu */
  if(N&&N.ty==='poi'){renderField();return}
@@ -27,15 +28,17 @@ function renderSmallTown(){const k=S.loc,N=NODES[k];
  app.innerHTML=`<div class="townv stown"><div class="ttop"><button class="btn-small" data-act="tab" data-t="team">${ic('nav_team',18)}<span class="lbl">Drużyna</span>${nb?'<span class="badge">!</span>':''}</button><button class="btn-small" data-act="tab" data-t="fallen" aria-label="Polegli">${ic('nav_fallen',18)}</button>
  <h2>${ic(N.ic,20)} ${N.n}</h2><button class="btn-small" data-act="journal">${ic('contract',18)}<span class="lbl"> Dziennik</span>${qBadge()}</button><span class="pill gold">${ic('gold',18)} ${S.gold}</span><button class="btn-small" data-act="menu" aria-label="Menu">${ic('gear',18)}</button><button class="btn-main tgo" data-act="map" ${S.team.length?'':'disabled'}>${ic(S.exp?'walk':'map',20)} Mapa</button></div>
  <div class="stbody"><div class="stpano" style="background-image:url(${VART['p_'+k]})"><div class="stcap"><b>${N.n}</b><small>${N.t}</small></div></div>
- <div class="stside"><p class="nd">${N.d}</p><div class="svcs">${svc}</div>${talkHtml(k)}</div></div></div>`;
+ <div class="stside"><p class="nd">${N.d}</p><div class="svcs">${svc}</div>${talkHtml(k,'')}</div></div></div>`;
  /* v18: tablica ogłoszeń, kupiec osobliwości i scena miasta */
  if(!NODES[k]||NODES[k].ty!=='town')return;
  const sv=document.querySelector('.stside .svcs');if(sv&&!SCN[k])sv.insertAdjacentHTML('beforeend',`<button class="svc" data-act="town" data-v="tablica">${ic('contract',28)}<span><b>Tablica ogłoszeń</b><small>zlecenia na bestie</small></span>${tabAlert()?'<em>!</em>':''}</button>`);
  if(sv&&k==='sanow')sv.insertAdjacentHTML('beforeend',`<button class="svc" data-act="town" data-v="osobl">${ic('bag',28)}<span><b>Kupiec osobliwości</b><small>rzadkie przedmioty</small></span></button>`);
  if(sv&&SCN[k])sv.insertAdjacentHTML('beforeend',`<button class="svc" data-act="town" data-v="tablica">${ic('contract',28)}<span><b>Tablica ogłoszeń</b><small>zlecenia na bestie</small></span>${tabAlert()?'<em>!</em>':''}</button>`);
  const p=document.querySelector('.stpano');if(p&&SCN[k]){p.classList.add('hasscn');p.style.backgroundImage='none';p.insertAdjacentHTML('afterbegin',`<img class="sblur" src="${VART18[SCN[k].img]}" alt="" aria-hidden="true">`+scnHtml(k))}}
-function talkHtml(k){const L=(TALK[k]||[]).filter(t=>!t.when||t.when());if(!L.length)return '';return `<h3>${ic('event',16)} Rozmowy</h3><div class="talks">${L.map((t,i)=>`<button class="talk" data-act="talk" data-k="${k}" data-i="${TALK[k].indexOf(t)}"><img class="px" src="${VART['n_'+t.p]}" alt=""><span><b>${t.who}</b><small>${typeof t.s==='function'?t.s():t.s}</small></span>${t.nw&&t.nw()?'<em>!</em>':''}</button>`).join('')}</div>`}
-const talkNew=k=>(TALK[k]||[]).some(t=>(!t.when||t.when())&&t.nw&&t.nw());
+/* rozmowy: w = gdzie (undefined – wszystkie, '' – na ulicy, 'zamek'/'bank' – tylko w tym budynku, pole „in” w TALK) */
+const talkIn=(t,w)=>w===undefined||(t.in||'')===w;
+function talkHtml(k,w){const L=(TALK[k]||[]).filter(t=>talkIn(t,w)&&(!t.when||t.when()));if(!L.length)return '';return `<h3>${ic('event',16)} Rozmowy</h3><div class="talks">${L.map((t,i)=>`<button class="talk" data-act="talk" data-k="${k}" data-i="${TALK[k].indexOf(t)}"><img class="px" src="${VART['n_'+t.p]}" alt=""><span><b>${t.who}</b><small>${typeof t.s==='function'?t.s():t.s}</small></span>${t.nw&&t.nw()?'<em>!</em>':''}</button>`).join('')}</div>`}
+const talkNew=(k,w)=>(TALK[k]||[]).some(t=>talkIn(t,w)&&(!t.when||t.when())&&t.nw&&t.nw());
 /* gospoda: nocleg w każdym mieście */
 const innCost=()=>Math.round(restCost()*.45);
 function innHtml(){const hurt=S.roster.some(h=>h.hp<stats(h).maxHp);return `<div class="inn"><span>${ic('camp',22)} <b>Nocleg</b><small>Ciepła strawa i łóżko: każdy odzyskuje połowę brakującego zdrowia.</small></span><button class="btn-small btn-gold" data-act="inn" ${!hurt||S.gold<innCost()?'disabled':''}>${innCost()} ${ic('gold',14)}</button></div>`}
