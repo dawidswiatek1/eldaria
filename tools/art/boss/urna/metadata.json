@@ -1,0 +1,49 @@
+{
+  "group_id": "01e7d4af-3ead-41e9-8d65-3e0f78ae8289",
+  "states": [
+    {
+      "character": {
+        "id": "de87d308-9f00-49ce-91b0-23b39ffc57b6",
+        "name": "Idle",
+        "prompt": "a stone urn on a stand with purple soul flames",
+        "size": {
+          "width": 80,
+          "height": 80
+        },
+        "template_id": "custom",
+        "directions": 8,
+        "view": "side",
+        "created_at": "2026-10-25T19:27:50.927182+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {
+          "Idle": {
+            "south-west": [
+              "Idle/animations/Idle/south-west/frame_000.png",
+              "Idle/animations/Idle/south-west/frame_001.png",
+              "Idle/animations/Idle/south-west/frame_002.png",
+              "Idle/animations/Idle/south-west/frame_003.png",
+              "Idle/animations/Idle/south-west/frame_004.png",
+              "Idle/animations/Idle/south-west/frame_005.png",
+              "Idle/animations/Idle/south-west/frame_006.png",
+              "Idle/animations/Idle/south-west/frame_007.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-25T19:46:52.776830"
+}

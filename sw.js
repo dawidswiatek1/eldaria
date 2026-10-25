@@ -1,6 +1,6 @@
 /* ===== ELDARIA – service worker: gra działa bez internetu po pierwszym uruchomieniu =====
    Wygenerowane przez tools/pwa_files.py (lista plików i wersja) – nie edytuj ręcznie. */
-const VER='d6a980fa85',CACHE='eldaria-'+VER;
+const VER='651217f198',CACHE='eldaria-'+VER;
 const FILES=[
   "./",
   "index.html",
@@ -40,6 +40,7 @@ const FILES=[
   "js/data/sprites-v19.js",
   "js/data/sprites-classes.js",
   "js/data/sprites-boss.js",
+  "js/data/fx-boss.js",
   "js/data/art.js",
   "js/data/velesia-roads.js",
   "js/core/util.js",
@@ -147,6 +148,15 @@ const FILES=[
   "assets/buildings/targ.png",
   "assets/buildings/gildia.png",
   "assets/buildings/karczma.png",
+  "assets/fx/gniew.png",
+  "assets/fx/zniwo.png",
+  "assets/fx/klatwa.png",
+  "assets/fx/oddech.png",
+  "assets/fx/topiel.png",
+  "assets/fx/pelnia.png",
+  "assets/fx/lawina.png",
+  "assets/fx/zenit.png",
+  "assets/fx/egzekucja.png",
   "assets/towns/scene-kregoszew.webp",
   "assets/towns/scene-brzezina.webp",
   "assets/towns/panorama-mglista.webp",

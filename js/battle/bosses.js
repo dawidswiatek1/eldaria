@@ -16,10 +16,21 @@ const bossU=()=>B&&B.units.find(u=>u.side==='e'&&u.boss&&BOSS[u.key]);
 const markT=c=>c&&c.tgt&&c.tgt.alive?c.tgt:lowest(alive('h'));
 /* prowokacja chroni oznaczonego: cios trafia w prowokującego */
 function taunted(t){const tz=alive('h').filter(h=>h.st.taunt>0);if(t&&tz.length&&!tz.includes(t)){const n=pick(tz);log(`🛡 ${n.name} przyjmuje cios za: ${t.name}!`,'g');return n}return t}
-async function bigAoe(u,mult,fx,on){const hs=alive('h');if(!hs.length)return;await anim(u,hs,fx);shake(true);hs.forEach(t=>{if(hit(u,t,mult,fx)>0&&t.alive&&on)on(t)})}
+/* efekt wielkiego ciosu (BFX z js/data/fx-boss.js, obrazki w assets/fx/): animacja na celu; jedna klatka = „wyrasta z ziemi” */
+function bfx(k,t){const F=typeof BFX!=='undefined'&&BFX[k];if(!F||!t||!B||!B.lay)return 0;const sc=B.lay.sc*(F.s||1),w=Math.round(F.fw*sc),h=Math.round(F.fh*sc),p=center(t,F.a==='f'?1:.45);
+ const d=addFx('bfx',{x:p.x,y:p.y+(F.a==='f'?4:0)});if(!d)return 0;d.style.cssText+=`;width:${w}px;height:${h}px;background-image:url(${F.u});background-size:${w*F.n}px ${h}px;transform:translate(-50%,${F.a==='f'?'-100%':'-50%'})`;
+ const dur=T(F.ms||600),a=F.n>1?d.animate([{backgroundPosition:'0 0'},{backgroundPosition:`${-w*F.n}px 0`}],{duration:dur,easing:`steps(${F.n})`,fill:'forwards'})
+  :d.animate([{clipPath:'inset(100% 0 0 0)'},{clipPath:'inset(0 0 0 0)',offset:.3},{clipPath:'inset(0 0 0 0)',opacity:1,offset:.75},{clipPath:'inset(0 0 0 0)',opacity:0}],{duration:dur,easing:'ease-out',fill:'forwards'});
+ a.finished.then(()=>d.remove()).catch(()=>d.remove());return F.ms||600}
+/* cios w całą drużynę: z efektem ef – boss rzuca, efekt na każdym, potem trafienia; bez – zwykła animacja */
+async function bigAoe(u,mult,fx,on,ef){const hs=alive('h');if(!hs.length)return;
+ if(ef&&typeof BFX!=='undefined'&&BFX[ef]){setF(u,'cast',900);await sleep(260);let ms=0;hs.forEach((t,i)=>setTimeout(()=>{if(B&&!B.over)ms=bfx(ef,t)},T(i*70)));await sleep(BFX[ef].ms*.55+hs.length*70)}else await anim(u,hs,fx);
+ shake(true);hs.forEach(t=>{if(hit(u,t,mult,fx)>0&&t.alive&&on)on(t)})}
+/* cios w jednego: efekt na celu razem z wypadem bossa */
+async function bigOne(u,t,ef,fx){if(ef&&typeof BFX!=='undefined'&&BFX[ef]){bfx(ef,t);await Promise.all([anim(u,[t],fx||'melee'),sleep(BFX[ef].ms*.45)])}else await anim(u,[t],fx||'melee')}
 const BOSS={
  leszy:{el:{k:'korzen',n:2},
-  big:{n:'Gniew Puszczy',d:'cała drużyna, może ogłuszyć',cd:3,ann:'wbija dłonie w ziemię – puszcza drży…',run:async u=>bigAoe(u,.9,'web',t=>{if(Math.random()<.4)stun(t)})},
+  big:{n:'Gniew Puszczy',d:'cała drużyna, może ogłuszyć',cd:3,ann:'wbija dłonie w ziemię – puszcza drży…',run:async u=>bigAoe(u,.9,'web',t=>{if(Math.random()<.4)stun(t)},'gniew')},
   ph:[{at:.5,n:'Puszcza się budzi',run:u=>{let n=0;while(n<2&&objN('korzen')<2&&summon(u,'korzen'))n++;if(n)log('🌳 Z ziemi wyrastają nowe święte korzenie!','r')}}],
   regen:u=>burning(u)?0:.02+.04*objN('korzen'),
   tip:u=>{const n=objN('korzen');return burning(u)?'Leszy płonie – nie może się leczyć.':n?`Święte korzenie (${n}) leczą Leszego o ${Math.round((.02+.04*n)*100)}% PŻ co turę – zetnij je albo podpal go.`:'Bez korzeni Leszy leczy się słabo (2%). Ogień zatrzyma to zupełnie.'},
@@ -27,7 +38,7 @@ const BOSS={
   tro:{b:'amulet',n:'Wieniec Leszego',res:{trucizna:20,mrok:10},d:'Trofeum: pan Mrocznej Puszczy.'}},
  herszt:{el:{k:'sztandar',n:1},
   setup:u=>{if(objN('sztandar'))B.eAtkP=.25},
-  big:{n:'Egzekucja',d:'potężny cios w oznaczonego bohatera',cd:3,mark:1,ann:'wskazuje ofiarę toporem…',run:async(u,c)=>{const t=taunted(markT(c));if(!t)return;await anim(u,[t],'melee');shake(true);hit(u,t,2.4)}},
+  big:{n:'Egzekucja',d:'potężny cios w oznaczonego bohatera',cd:3,mark:1,ann:'wskazuje ofiarę toporem…',run:async(u,c)=>{const t=taunted(markT(c));if(!t)return;await bigOne(u,t,'egzekucja');shake(true);hit(u,t,2.4)}},
   ph:[{at:.4,n:'Ostatnia stawka',run:u=>{u.atk=Math.round(u.atk*1.3);log(`🗡️ ${u.name} rzuca wszystko na jedną kartę (+30% ataku)!`,'r')}}],
   tip:u=>objN('sztandar')?'Sztandar zbójów: banda +25% ataku i posiłki – powal go!':'Sztandar leży – zbóje osłabieni, posiłków nie będzie.',
   elDie:(u,t)=>{B.eAtkP=0;u.noSum=1;alive('e').filter(e=>!e.obj).forEach(e=>{e.st.weak=Math.max(e.st.weak||0,2);updUnit(e)});log('🚩 Sztandar pada! Zbóje tracą ducha.','g')},
@@ -36,7 +47,7 @@ const BOSS={
   taken:(u,t)=>objN('urna')?.5:1,
   big:{n:'Żniwo dusz',d:'pochłania szkielety: cios w całą drużynę i leczenie',cd:3,ann:'unosi kostur – szkielety drżą…',
    run:async u=>{const sk=alive('e').filter(e=>e.key==='szkielet');sk.forEach(s=>{s.alive=false;s.hp=0;log(`💀 ${s.name} rozsypuje się w proch.`,'r');die(s)});const n=sk.length;
-    await bigAoe(u,.5+.35*n,'dark',t=>{if(n&&Math.random()<.4)weaken(t,2)});if(n)setTimeout(()=>{if(B&&u.alive)heal(u,Math.round(u.maxHp*.08*n))},T(300))}},
+    await bigAoe(u,.5+.35*n,'dark',t=>{if(n&&Math.random()<.4)weaken(t,2)},'zniwo');if(n)setTimeout(()=>{if(B&&u.alive)heal(u,Math.round(u.maxHp*.08*n))},T(300))}},
   bigTip:u=>{const n=alive('e').filter(e=>e.key==='szkielet').length;return n?`zabij szkielety (${n}), zanim je pochłonie`:''},
   ph:[{at:.5,n:'Nieumarły gniew',run:u=>{let n=0;while(n<2&&summon(u,'szkielet'))n++}}],
   tip:u=>objN('urna')?'Urna dusz: nekromanta otrzymuje o połowę mniej obrażeń – rozbij ją (święte i obuch działają najlepiej).':'Urna rozbita – nekromanta stracił barierę dusz.',
@@ -45,14 +56,14 @@ const BOSS={
  golem:{el:{k:'krysztal',n:2},
   taken:(u,t)=>objN('krysztal')?.6:u.cracked?1.2:1,
   regen:u=>objN('krysztal')?.05:0,
-  big:{n:'Lawina',d:'cała drużyna, pierwszy rząd może zostać ogłuszony',cd:3,ann:'unosi kamienne pięści nad głowę…',run:async u=>bigAoe(u,1,'melee',t=>{if(t.row==='f'&&Math.random()<.35)stun(t)})},
+  big:{n:'Lawina',d:'cała drużyna, pierwszy rząd może zostać ogłuszony',cd:3,ann:'unosi kamienne pięści nad głowę…',run:async u=>bigAoe(u,1,'melee',t=>{if(t.row==='f'&&Math.random()<.35)stun(t)},'lawina')},
   tip:u=>{const n=objN('krysztal');return n?`Kryształy runiczne (${n}): kamienna skóra (−40% obrażeń) i leczenie 5% co turę – rozbij je (obuch najlepszy).`:'Golem pęknięty – bierze więcej obrażeń i już się nie leczy.'},
   elDie:(u,t)=>{if(!objN('krysztal')&&!u.cracked){u.cracked=1;u.def=Math.round(u.def*.6);ring(u,'#ff9a3a');flt(u,'Pęka!','info');log('💥 Ostatni kryształ pęka – golem traci kamienną skórę!','g');updUnit(u)}else log(`💎 ${t.name} pęka!`,'g')},
   tro:{b:'amulet',n:'Serce Golema',st:{def:4},res:{obuch:20,ciete:10},d:'Trofeum: kamienny golem z Wielkiego Grzbietu.'}},
  zmij:{
   can:u=>!!u.flown,
   taken:(u,t)=>u.flown&&!(u.ground>0)&&B.curReach==='m'?.5:1,
-  big:{n:'Ognisty oddech',d:'ogień na całą drużynę, podpala',cd:2,ann:'nabiera powietrza – w paszczy żarzy się ogień…',run:async u=>bigAoe(u,.95,'fire',t=>{if(Math.random()<.5)bleed(u,t,2,u.atk*.25,'🔥')})},
+  big:{n:'Ognisty oddech',d:'ogień na całą drużynę, podpala',cd:2,ann:'nabiera powietrza – w paszczy żarzy się ogień…',run:async u=>bigAoe(u,.95,'fire',t=>{if(Math.random()<.5)bleed(u,t,2,u.atk*.25,'🔥')},'oddech')},
   onInt:u=>{if(u.flown){u.ground=2;log(`🐉 ${u.name} spada na ziemię!`,'g');setTimeout(()=>{if(B&&u.alive)flt(u,'Strącony!','info')},T(400))}},
   ph:[{at:.6,n:'Lot'},{at:.3,n:'Wściekłość'}],
   tip:u=>!u.flown?'Kły i ogon. Pod 60% PŻ wzleci w powietrze i zacznie ziać ogniem.':u.ground>0?'Strącony! Teraz bij czym się da.':'W powietrzu: ciosy wręcz zadają o połowę mniej. Przerwij oddech, a spadnie. Eliksir ognioodporności łagodzi ogień.',
@@ -60,24 +71,24 @@ const BOSS={
  troll:{
   regen:u=>burning(u)?0:.05,
   big:{n:'Wyrwane drzewo',d:'zamach w pierwszy rząd, może ogłuszyć',cd:3,ann:'wyrywa drzewo z korzeniami…',
-   run:async u=>{const f=alive('h').filter(h=>h.row==='f'),ts=f.length?f:alive('h').slice(0,2);if(!ts.length)return;await anim(u,ts,'melee');shake(true);ts.forEach(t=>{if(hit(u,t,1.4)>0&&t.alive&&Math.random()<.4)stun(t)})}},
+   run:async u=>{const f=alive('h').filter(h=>h.row==='f'),ts=f.length?f:alive('h').slice(0,2);if(!ts.length)return;ts.forEach(t=>bfx('lawina',t));await anim(u,ts,'melee');shake(true);ts.forEach(t=>{if(hit(u,t,1.4)>0&&t.alive&&Math.random()<.4)stun(t)})}},
   tip:u=>burning(u)?'Troll płonie – nie regeneruje się.':'Troll regeneruje 5% PŻ co turę – podpal go (ogień to jego słabość).'},
  utopiecS:{
-  big:{n:'Topiel',d:'wciąga oznaczonego bohatera pod wodę',cd:3,mark:1,ann:'wyciąga szpony po ofiarę…',run:async(u,c)=>{const t=taunted(markT(c));if(!t)return;await anim(u,[t],'melee');if(hit(u,t,1.7,'ice')>0&&t.alive){stun(t);bleed(u,t,2,u.atk*.3,'🧪')}}},
+  big:{n:'Topiel',d:'wciąga oznaczonego bohatera pod wodę',cd:3,mark:1,ann:'wyciąga szpony po ofiarę…',run:async(u,c)=>{const t=taunted(markT(c));if(!t)return;await bigOne(u,t,'topiel');if(hit(u,t,1.7,'ice')>0&&t.alive){stun(t);bleed(u,t,2,u.atk*.3,'🧪')}}},
   tip:u=>'Wzywa utopce i zalewa drużynę lodowatą falą. Przy Topieli osłoń oznaczonego (prowokacja, tarcza) albo przerwij.',
   tro:{b:'talizman',n:'Perła Topielca',res:{lod:25},d:'Trofeum: Utopiec Starszy z Bagna Czarnego.'}},
  poludnicaK:{
-  big:{n:'Zenit',d:'żar na całą drużynę, podpala',cd:3,ann:'unosi sierp ku słońcu – robi się nieznośnie gorąco…',run:async u=>bigAoe(u,1.05,'fire',t=>{if(Math.random()<.45)bleed(u,t,2,u.atk*.25,'🔥')})},
+  big:{n:'Zenit',d:'żar na całą drużynę, podpala',cd:3,ann:'unosi sierp ku słońcu – robi się nieznośnie gorąco…',run:async u=>bigAoe(u,1.05,'fire',t=>{if(Math.random()<.45)bleed(u,t,2,u.atk*.25,'🔥')},'zenit')},
   tip:u=>'Przyzywa południce. Zenit pali całą drużynę – przerwij go albo wypij eliksir ognioodporności.',
   tro:{b:'oko',n:'Oko Południcy',res:{ogien:20},d:'Trofeum: Królowa Południc z Pól.'}},
  babajaga:{
   big:{n:'Klątwa chaty',d:'przeklina całą drużynę (+25% otrzymywanych obrażeń)',cd:3,ann:'mamrocze nad kociołkiem…',
-   run:async u=>bigAoe(u,.4,'dark',t=>{t.st.curse=Math.max(t.st.curse||0,3);t.st.curseV=.25;weaken(t,2)})},
+   run:async u=>bigAoe(u,.4,'dark',t=>{t.st.curse=Math.max(t.st.curse||0,3);t.st.curseV=.25;weaken(t,2)},'klatwa')},
   tip:u=>u.fly2?'W moździerzu trudno ją trafić. Klątwa chaty osłabia całą drużynę – przerwij ją.':'Chata wypuszcza sługi co kilka tur. Ranna Jaga wzleci w moździerzu.',
   tro:{b:'kaptur',n:'Chusta Baby Jagi',res:{mrok:25},d:'Trofeum: Baba Jaga z chaty na kurzej stopce.'}},
  wilkolakA:{
   big:{n:'Krwawa pełnia',d:'trzy ciosy w oznaczonego bohatera',cd:3,mark:1,ann:'wyje do księżyca i patrzy na ofiarę…',
-   run:async(u,c)=>{const t=taunted(markT(c));for(let i=0;i<3&&t&&t.alive&&u.alive;i++){await anim(u,[t],'melee');if(hit(u,t,.8)>0&&t.alive&&i===2)bleed(u,t,3,u.atk*.3);await sleep(150)}}},
+   run:async(u,c)=>{const t=taunted(markT(c));if(t)bfx('pelnia',t);for(let i=0;i<3&&t&&t.alive&&u.alive;i++){await anim(u,[t],'melee');if(hit(u,t,.8)>0&&t.alive&&i===2)bleed(u,t,3,u.atk*.3);await sleep(150)}}},
   tip:u=>'Wyciem wzywa wilki, ranny wpada w szał. Przy Krwawej pełni osłoń oznaczonego albo przerwij.',
   tro:{b:'oko',n:'Kieł Alfy',st:{crit:6},res:{ciete:15},d:'Trofeum: Wilkołak Alfa z Wilczych Jarów.'}}};
 /* --- początek walki: elementy na tylnych polach (najsłabsi pomocnicy ustępują im miejsca) --- */
