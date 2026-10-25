@@ -12,6 +12,10 @@ It plays exactly the same as before.
   APK – the same way as opening `index.html` from disk. The back button acts like Esc.
   `android/eldaria.keystore` (password `eldaria`) signs these sideloaded builds so updates keep working; a Google
   Play release would need a new, secret key.
+- **Moving a save between devices:** each device/browser/app keeps its own save. Menu → "Przenieś zapis" (or the
+  save button on the title screen) exports it as a file or a code (`ELDARIA1:` + base64 of the gzipped save JSON)
+  and imports it on another device; the replaced save is kept as a backup that can be restored
+  (`js/game/transfer.js`).
 - **Web app (PWA):** every merge into `main` also publishes the game to GitHub Pages (`.github/workflows/pages.yml`,
   needs Settings → Pages → Source: GitHub Actions). There it can be installed from the browser ("Install app" /
   "Add to Home Screen") and plays offline: `js/core/pwa.js` adds `manifest.webmanifest` and the service worker

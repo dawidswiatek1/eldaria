@@ -37,4 +37,13 @@ css`
 .skill-line.locked{opacity:.45}
 .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);border:8px solid transparent;border-image:var(--fr-slot) 8 fill/8px;padding:4px 10px;z-index:60;animation:toastA 2.1s forwards;text-align:center;pointer-events:none;max-width:calc(90*var(--vw));text-shadow:1px 1px 0 #000}
 @keyframes toastA{0%{opacity:0;transform:translate(-50%,10px)}10%,80%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}
+
+/* przenoszenie zapisu (js/game/transfer.js) */
+.xfer h3{margin:12px 0 4px;font-size:1rem;display:flex;align-items:center;gap:6px}
+.xfer .row{flex-wrap:wrap;gap:6px}.xfer .row button{flex:1 1 auto}
+.xfi{font-size:.84rem;background:#0002;box-shadow:0 0 0 2px #0002;padding:6px 8px;margin:4px 2px}
+.xfta{display:block;width:100%;box-sizing:border-box;height:110px;margin:6px 0;padding:6px;font:inherit;font-size:.68rem;line-height:1.25;word-break:break-all;resize:vertical;background:#1a1216;color:#efe2c4;border:2px solid #6a4a30}
+@media (max-height:440px){.xfta{height:70px}.xfer h3{margin:6px 0 2px}}
+/* wąskie menu tytułowe: przycisk zapisu bez napisu */
+@media (max-width:760px){.tmenu .row button{min-width:0}.tmenu .xfb{flex:0 0 auto;padding-left:10px;padding-right:10px}.tmenu .xfb .lbl{display:none}.tmenu .sndb{padding-left:10px!important;padding-right:10px!important}}
 `;
