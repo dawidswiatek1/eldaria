@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Sprite'y klas bohaterów (wersje męskie) z eksportów PixelLab.
+"""Sprite'y klas bohaterów z eksportów PixelLab: folder <klasa> = mężczyzna, <klasa>_k = kobieta.
 
 Źródła: tools/art/classes/<klasa>/Idle/rotations/east.png (postać patrząca w prawo)
 i Idle/animations/Walking/east/frame_00N.png (chód w prawo).
@@ -10,7 +10,7 @@ Wynik: js/data/sprites-classes.js (CSPR, base64 – gra czyta piksele sprite'ów
     python3 tools/class_sprites.py            # zapisuje dane
     python3 tools/class_sprites.py --debug    # dodatkowo podgląd tools/out/classes.png
 
-Wymaga: Python 3, numpy, Pillow. Nowa klasa = nowy folder w tools/art/classes/ i ponowne uruchomienie.
+Wymaga: Python 3, numpy, Pillow. Nowa klasa = nowy folder w tools/art/classes/ (np. lotr, lotr_k) i ponowne uruchomienie.
 """
 import base64, glob, io, os, sys
 import numpy as np
@@ -116,7 +116,7 @@ def main():
         Image.fromarray(s).save(b, 'PNG', optimize=True)
         rows.append(' "%s":{"w":%d,"h":%d,"u":"data:image/png;base64,%s"}' % (c, FW * N, FH, base64.b64encode(b.getvalue()).decode()))
         prev.append(s)
-    src = ('/* ===== SPRITE\'Y KLAS (wersje męskie): paski 7 klatek 80×100 – stoi, oddech, zamach, cios, czar, trafiony, powalony =====\n'
+    src = ('/* ===== SPRITE\'Y KLAS („klasa” = mężczyzna, „klasa_k” = kobieta): paski 7 klatek 80×100 – stoi, oddech, zamach, cios, czar, trafiony, powalony =====\n'
            '   Wygenerowane przez tools/class_sprites.py z tools/art/classes/ – nie edytuj ręcznie. Base64, bo gra czyta piksele. */\n'
            'const CSPR={\n' + ',\n'.join(rows) + '};\n')
     out = os.path.join(ROOT, 'js/data/sprites-classes.js')
