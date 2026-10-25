@@ -1,6 +1,6 @@
 /* ===== ELDARIA – service worker: gra działa bez internetu po pierwszym uruchomieniu =====
    Wygenerowane przez tools/pwa_files.py (lista plików i wersja) – nie edytuj ręcznie. */
-const VER='b3a974d6b0',CACHE='eldaria-'+VER;
+const VER='d6a980fa85',CACHE='eldaria-'+VER;
 const FILES=[
   "./",
   "index.html",
