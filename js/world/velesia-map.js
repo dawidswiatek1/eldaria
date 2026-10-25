@@ -1,7 +1,8 @@
 /* ===== VELESIA v18: duża mapa (przesuwanie, zoom), mgła wojny, wioski, ciekawe miejsca, dni podróży ===== */
 const nodeVis=k=>nodeOk(k)||(S.found&&S.found[k]);
 /* mgła: odkryj sąsiadów miejsca (oprócz sekretnych) */
-const SECRET=['polana','chata'];
+/* sekretne miejsca: odsłania je dopiero rozmowa albo zadanie */
+const SECRET=['polana','chata','wyrab','kaplica','jagna','kurhan','czarnybor'];
 function reveal(k,quiet){const nw=[];EDGES.forEach(([a,b])=>{const o=a===k?b:b===k?a:null;if(o&&!SECRET.includes(o)&&NODES[o].hidden&&!S.found[o]){S.found[o]=1;nw.push(NODES[o].n)}});if(nw.length&&!quiet)toast('Odkryto na mapie: '+nw.join(', '));return nw}
 const fogN=k=>NODES[k].hidden&&!S.found[k]&&!SECRET.includes(k)&&EDGES.some(([a,b])=>(a===k&&nodeOk(b))||(b===k&&nodeOk(a)));
 /* znane miejsce bez znanej drogi: odsłoń najkrótszy szlak */
@@ -10,19 +11,25 @@ function routeFix(){if(!S||!NODES[S.loc])return;Object.keys(NODES).filter(k=>nod
 /* --- dni podróży --- */
 function passDays(n){for(let i=0;i<n;i++){S.day=(S.day||1)+1;if(S.day%3===0)S.roster.forEach(h=>{if(h.hosp>0)h.hosp--})}}
 const dayTxt=()=>`Dzień ${S.day||1}`;
-/* --- widok mapy z przesuwaniem i zoomem --- */
+/* --- widok mapy z przesuwaniem i zoomem ---
+   mapa to pixel-art 1024×640 (tools/velesia_map.py); zoom liczony tak, by piksel mapy
+   miał od „wypełnij widok” do 4 pikseli ekranu, domyślnie 2 */
+const MAPW=1024,MAPH=640;
 let MZ={z:1,x:null,y:null},_mp=null;
 function mvRect(){const v=document.getElementById('rview');if(!v)return null;const r=v.getBoundingClientRect();return {v,r,k:r.width/(v.offsetWidth||1)}}
-function mvBase(v){const W=v.offsetWidth,H=v.offsetHeight,ar=16/9;let w=W,h=W/ar;if(h<H){h=H;w=H*ar}return {W,H,w,h}}
-function mvApply(){const R=mvRect();if(!R)return;const m=document.getElementById('rmap'),B0=mvBase(R.v),w=B0.w*MZ.z,h=B0.h*MZ.z;
- if(MZ.x==null){const N=NODES[hereNode()]||NODES.weleszow;MZ.x=B0.W/2-N.x/100*w;MZ.y=B0.H/2-N.y/100*h}
+function mvBase(v){const W=v.offsetWidth,H=v.offsetHeight,ar=MAPW/MAPH;let w=W,h=W/ar;if(h<H){h=H;w=H*ar}return {W,H,w,h}}
+const mvMaxZ=B0=>Math.max(1,4*MAPW/B0.w);
+const mvDefZ=B0=>Math.min(mvMaxZ(B0),Math.max(1,(B0.H<420?1.5:2)*MAPW/B0.w));
+function mvApply(){const R=mvRect();if(!R)return;const m=document.getElementById('rmap'),B0=mvBase(R.v);
+ if(MZ.x==null){MZ.z=mvDefZ(B0);const N=NODES[hereNode()]||NODES.weleszow;MZ.x=B0.W/2-N.x/100*B0.w*MZ.z;MZ.y=B0.H/2-N.y/100*B0.h*MZ.z}
+ MZ.z=Math.min(mvMaxZ(B0),Math.max(1,MZ.z));const w=B0.w*MZ.z,h=B0.h*MZ.z;
  MZ.x=Math.min(0,Math.max(B0.W-w,MZ.x));MZ.y=Math.min(0,Math.max(B0.H-h,MZ.y));
  m.style.width=w+'px';m.style.height=h+'px';m.style.transform=`translate(${Math.round(MZ.x)}px,${Math.round(MZ.y)}px)`;
  const zl=document.getElementById('rzl');if(zl)zl.textContent=Math.round(MZ.z*100)+'%';ngoPlace();
  /* v19: etykiety przy krawędzi widoku nie są ucinane */
- m.querySelectorAll('.npin').forEach(p=>{const b=p.querySelector('b');if(!b)return;const px=MZ.x+parseFloat(p.style.left)/100*w,hw=b.offsetWidth/2;let dx=0;if(px-hw<3)dx=3-(px-hw);else if(px+hw>B0.W-3)dx=B0.W-3-(px+hw);b.style.translate=dx?Math.round(dx)+'px 0':''})}
+ m.querySelectorAll('.npin').forEach(p=>{const b=p.querySelector('b');if(!b)return;const px=MZ.x+parseFloat(p.style.left)/100*w,hw=b.offsetWidth/2;let dx=0;if(px<0||px>B0.W)dx=0;else if(px-hw<3)dx=3-(px-hw);else if(px+hw>B0.W-3)dx=B0.W-3-(px+hw);b.style.translate=dx?Math.round(dx)+'px 0':''})}
 function ngoPlace(){const g=document.getElementById('ngo');if(g&&!document.querySelector(`#rmap .npin[data-k="${g.dataset.k}"]`))g.remove()}
-function mvZoom(f,cx,cy){const R=mvRect();if(!R)return;const B0=mvBase(R.v),z0=MZ.z,z=Math.max(1,Math.min(3,z0*f));if(z===z0)return;
+function mvZoom(f,cx,cy){const R=mvRect();if(!R)return;const B0=mvBase(R.v),z0=MZ.z,z=Math.max(1,Math.min(mvMaxZ(B0),z0*f));if(z===z0)return;
  if(cx==null){cx=B0.W/2;cy=B0.H/2}const mx=(cx-MZ.x)/z0,my=(cy-MZ.y)/z0;MZ.z=z;MZ.x=cx-mx*z;MZ.y=cy-my*z;mvApply()}
 function mvCenter(k){const R=mvRect();if(!R)return;const B0=mvBase(R.v),N=NODES[k||hereNode()];MZ.x=B0.W/2-N.x/100*B0.w*MZ.z;MZ.y=B0.H/2-N.y/100*B0.h*MZ.z;mvApply()}
 /* trafienie: najbliższy węzeł w promieniu ~32 px ekranu (z etykietą) */
@@ -44,10 +51,11 @@ function mvBind(){const R=mvRect();if(!R)return;const v=R.v,P=new Map();let st=n
 function selNode(k){if(!nodeVis(k)&&!fogN(k))return;rSel=k;document.querySelectorAll('#rmap .npin').forEach(p=>p.classList.toggle('on',p.dataset.k===k));const g=document.getElementById('ngo');if(g)g.remove();
  const sd=document.getElementById('rside');if(sd)sd.innerHTML=nodePanel(k);const N=NODES[k],here=hereNode();
  if(fogN(k)||k===here||N.ty==='exit'||S.exp)return;const path=pathTo(here,k);if(!path)return;
- const m=document.getElementById('rview');if(m)m.insertAdjacentHTML('beforeend',`<button class="ngo" id="ngo" data-act="${N.ty==='site'&&N.r!=null&&S.reg.lv[N.r]?'rgo':k==='polana'?'polgo':'travel'}" data-k="${k}">${ic('walk',14)} ${N.ty==='site'&&N.r!=null&&S.reg.lv[N.r]?'Wyrusz':'Podróżuj'}: ${N.n} · ${path.length-1} d.</button>`);ngoPlace();typeof SND!=='undefined'&&SND.play('tap')}
+ const m=document.getElementById('rview');if(m)m.insertAdjacentHTML('beforeend',`<button class="ngo" id="ngo" data-act="${N.ty==='site'&&N.r!=null&&S.reg.lv[N.r]?'rgo':qsiteOpen(k)?'qsgo':'travel'}" data-k="${k}">${ic('walk',14)} ${(N.ty==='site'&&N.r!=null&&S.reg.lv[N.r])||qsiteOpen(k)?'Wyrusz':'Podróżuj'}: ${N.n} · ${path.length-1} d.</button>`);ngoPlace();typeof SND!=='undefined'&&SND.play('tap')}
 function nodeIc(k){const N=NODES[k];if(N.ty==='site'&&N.r!=null&&!S.reg.lv[N.r])return ic('lock',14);if(N.ty==='site'&&N.r!=null&&S.reg.done[N.r])return ic('flag',14);if(N.ty==='poi'&&S.poi&&S.poi[k])return ic('xp',14);return ic(N.ic||(N.ty==='site'?'fight':'nav_town'),14)}
 function renderRegion(){regOk();wOk();const here=hereNode();if(!rSel||!(nodeVis(rSel)||fogN(rSel)))rSel=here;const ks=Object.keys(NODES).filter(nodeOk),fg=Object.keys(NODES).filter(fogN);
- const P=k=>NODES[k],vis=k=>nodeOk(k),roads=EDGES.filter(e=>vis(e[0])&&vis(e[1])).map(([a,b])=>`<line x1="${P(a).x}" y1="${P(a).y}" x2="${P(b).x}" y2="${P(b).y}"/>`).join('')+EDGES.filter(e=>(vis(e[0])&&fogN(e[1]))||(vis(e[1])&&fogN(e[0]))).map(([a,b])=>`<line class="fg" x1="${P(a).x}" y1="${P(a).y}" x2="${P(b).x}" y2="${P(b).y}"/>`).join('');
+ const P=k=>NODES[k],vis=k=>nodeOk(k),/* drogi są narysowane na mapie; linie tylko dla ścieżek do sekretnych miejsc i do mgły */
+ roads=EDGES.filter(e=>vis(e[0])&&vis(e[1])&&(SECRET.includes(e[0])||SECRET.includes(e[1]))).map(([a,b])=>`<line x1="${P(a).x}" y1="${P(a).y}" x2="${P(b).x}" y2="${P(b).y}"/>`).join('')+EDGES.filter(e=>(vis(e[0])&&fogN(e[1]))||(vis(e[1])&&fogN(e[0]))).map(([a,b])=>`<line class="fg" x1="${P(a).x}" y1="${P(a).y}" x2="${P(b).x}" y2="${P(b).y}"/>`).join('');
  const m=mainOf()||S.roster[0];
  document.getElementById('app').innerHTML=`<div class="wv rv2"><div class="ttop"><button class="btn-small" data-act="back" data-esc="1">${ic('back',16)}<span class="lbl"> Obóz</span></button><button class="btn-small" data-act="world" title="Mapa świata">${ic('map',18)}<span class="lbl"> Świat</span></button><h2>${emb(18)} Velesia <small class="tsub">${dayTxt()}</small></h2><button class="btn-small" data-act="journal">${ic('contract',18)}<span class="lbl"> Dziennik</span>${qBadge()}</button><span class="pill gold">${ic('gold',18)} ${S.gold}</span></div>
  <div class="wbody"><div class="rview" id="rview"><div class="rmap" id="rmap"><img class="px" src="${VART18.map}" alt="Mapa Velesii" draggable="false"><svg class="roads" viewBox="0 0 100 100" preserveAspectRatio="none">${roads}</svg>
@@ -60,17 +68,17 @@ function renderRegion(){regOk();wOk();const here=hereNode();if(!rSel||!(nodeVis(
  if(!S.intro){S.intro=1;save();setTimeout(()=>{if(screen==='region')modal(loreHtml('velesia',true))},60)}}
 function nodePanel(k){const N=NODES[k];
  if(fogN(k))return `<div class="pano fogp"></div><h2>${ic('event',18)} Nieodkryte</h2><p class="nd">Mgła i dzikie ostępy. Dotrzyj do sąsiedniego miejsca, by zobaczyć, co tu jest.</p>`;
- if(N.ty==='poi'){const here=hereNode(),path=pathTo(here,k),d=path?path.length-1:0;let b=`<div class="pano" style="background-image:url(${VART['p_'+({mlyn:'dabrowa',kapliczka:'dabrowa',krag:'mglista',straznica:'kregoszew',ruiny:'kurhanow',doliny:'mglista',rozlewiska:'mglista'}[k])]})"></div><h2>${ic(N.ic,18)} ${N.n}</h2><div class="sub">${N.t}${d?` · ${d} ${d>1?'dni':'dzień'} drogi`:''}${S.poi[k]?' · zbadane':''}</div><p class="nd">${N.d}</p>`;
+ if(N.ty==='poi'){const here=hereNode(),path=pathTo(here,k),d=path?path.length-1:0;let b=`<div class="pano" style="background-image:url(${VART['p_'+({mlyn:'dabrowa',kapliczka:'dabrowa',krag:'mglista',straznica:'kregoszew',ruiny:'kurhanow',doliny:'mglista',rozlewiska:'mglista',wyrab:'dabrowa',kaplica:'mglista',jagna:'dabrowa'}[k]||'mglista')]})"></div><h2>${ic(N.ic,18)} ${N.n}</h2><div class="sub">${N.t}${d?` · ${d} ${d>1?'dni':'dzień'} drogi`:''}${S.poi[k]?' · zbadane':''}</div><p class="nd">${N.d}</p>`;
   if(S.exp)return b;if(k===here)return b+`<div class="here">${ic('flag',14)} Tu obozuje kompania</div>${S.poi[k]?'':`<button class="btn-main" data-act="poigo" data-k="${k}">${ic('event',20)} Zbadaj</button>`}`;
   return b+`<button class="btn-main" data-act="travel" data-k="${k}" ${path?'':'disabled'}>${ic('walk',20)} Podróżuj (${d} d.)</button>`}
  /* miasto, wieś, wyjście z mapy, miejsce wyprawy */
- const here=hereNode(),path=pathTo(here,k),d=path?path.length-1:0;let b=(N.ty==='site'&&N.r!=null?`<div class="pano scene bg-${BIOMES[N.r].k}">${sceneLayers(BIOMES[N.r].k,false)}</div>`:`<div class="pano" style="background-image:url(${N.ty==='town'&&N.vil?VART.p_dabrowa:VART['p_'+k]||VART['p_mglista']})"></div>`)+`<h2>${N.ty==='site'?ic('fight',18):N.ty==='exit'?ic('lock',16):ic('nav_town',18)} ${N.n}</h2><div class="sub">${N.t}${d&&N.ty!=='exit'?` · ${d} ${d>1?'dni':'dzień'} drogi`:''}</div><p class="nd">${N.d}</p>`;
+ const here=hereNode(),path=pathTo(here,k),d=path?path.length-1:0;const sr=N.r!=null?N.r:QSITE[k]?QSITE[k].r:null;let b=(N.ty==='site'&&sr!=null?`<div class="pano scene bg-${BIOMES[sr].k}">${sceneLayers(BIOMES[sr].k,false)}</div>`:`<div class="pano" style="background-image:url(${N.ty==='town'&&N.vil?VART.p_dabrowa:VART['p_'+k]||VART['p_mglista']})"></div>`)+`<h2>${N.ty==='site'?ic('fight',18):N.ty==='exit'?ic('lock',16):ic('nav_town',18)} ${N.n}</h2><div class="sub">${N.t}${d&&N.ty!=='exit'?` · ${d} ${d>1?'dni':'dzień'} drogi`:''}</div><p class="nd">${N.d}</p>`;
  if(N.ty==='exit')return b+`<div class="soon">${ic('lock',16)} Wkrótce</div>`;
  if(S.exp)return b+`<button class="btn-main" data-act="map">${ic('walk',20)} Wróć na wyprawę</button>`;
  if(N.ty==='town'){if(k===S.loc)return b+`<div class="here">${ic('flag',14)} Tu jest kompania</div><button class="btn-main" data-act="intown">${ic('nav_town',20)} Wejdź do miasta</button>`;
   return b+`<button class="btn-main" data-act="travel" data-k="${k}" ${path?'':'disabled'}>${ic('walk',20)} Podróżuj (${d} d.)</button><div class="sub">Po drodze może się coś wydarzyć.</div>`}
  /* miejsce wyprawy */
- if(k==='polana'){const st=S.q.osadnicy&&S.q.osadnicy.s==='pieczec';return b+(st?`<div class="sub">Zalecany poziom bohaterów: 5+</div><button class="btn-main" data-act="polgo">${ic('walk',20)} Wyrusz na polanę</button>`:`<div class="sub">Pieczęć milczy. Na razie nie ma tu czego szukać.</div>`)}
+ if(QSITE[k]){const Q=QSITE[k];return b+(qsiteOpen(k)?`<div class="sub">Zalecany poziom bohaterów: ${Q.lv}${Q.boss?` · boss: ${ENEMIES[Q.boss].name}`:''}</div><button class="btn-main" data-act="qsgo" data-k="${k}">${ic('walk',20)} ${k===hereNode()?'Wyrusz':'Podróżuj i wyrusz'}</button>`:`<div class="sub">${qS(Q.q)==='done'?'Tu już wszystko się wydarzyło.':Q.idle}</div>`)}
  const r=N.r,R=S.reg;if(!R.lv[r])return b+`<div class="soon">${ic('lock',16)} Zamknięte</div><div class="sub">Pokonaj bossa poprzedniej krainy, aby tu dotrzeć.</div>`;
  if(!mapSel||mapSel.r!==r||R.lv[r]<mapSel.L)mapSel={r,L:R.lv[r]};const L=mapSel.L,st=expStage(r,L),ph=partyHeroes(),hurt=ph.filter(h=>h.hp<mh(h)*.6).length;
  b+=`<div class="rlv">${[1,2,3,4].map(l=>{const op=R.lv[r]>=l,cl=l<4?R.lv[r]>l||R.done[r]:R.done[r];return `<button class="${L===l?'on':''} ${l===4?'bl':''}" data-act="rlv" data-r="${r}" data-l="${l}" ${op?'':'disabled'}>${op?(l===4?ic('boss',14):''):ic('lock',12)}${l<4?['','I','II','III'][l]:'Boss'}${cl?'<i class="ck">✓</i>':''}</button>`}).join('')}</div>`;
@@ -99,7 +107,7 @@ const POI={
   {t:'Przyłóż dłoń do największego głazu',r:()=>{unlockLore('asterion');return {txt:'Pod palcami czujesz wyryte runy i chłód. Wizja: krąg we mgle na północy… (Kronika: Pieczęcie Asterionu)'}}},
   {t:'Odejdź',r:()=>({txt:'Lepiej nie budzić tego, co śpi.'})}]},
  straznica:{ic:'flag',n:'Strażnica',t:'Opuszczona wieża sygnałowa. Schody skrzypią, ale wytrzymają.',o:[
-  {t:'Wejdź na szczyt i rozejrzyj się',r:()=>{['jama','doliny','martwe','grzbiet'].forEach(k=>S.found[k]=1);return {txt:'Na wschodzie ciągną się spękane Martwe Ziemie. Na północy dymi Smocza Jama. Odkryto nowe miejsca na mapie.'}}},
+  {t:'Wejdź na szczyt i rozejrzyj się',r:()=>{['jama','martwe','grzbiet','poludnie'].forEach(k=>S.found[k]=1);return {txt:'Na południowym wschodzie ciągną się spękane Martwe Ziemie, na południu – złote Równiny. Na północy, wysoko w górach, dymi Smocza Jama. Odkryto nowe miejsca na mapie.'}}},
   {t:'Przeszukaj magazyn',r:()=>Math.random()<.5?{fight:['goblin','goblin','wilk'],lbl:'Gobliny w strażnicy'}:{txt:'Stara skrzynia strażników. '+reward(20,1)}}]},
  ruiny:{ic:'event',n:'Ruiny Asterionu',t:'Kolumny z czarnego kamienia i łuk z runami, które jarzą się słabo, gdy podchodzisz bliżej.',o:[
   {t:'Odczytaj runy',c:['mag','czarnoksieznik','bard'],r:()=>{unlockLore('asterion');partyHeroes().forEach(h=>gainXp(h,40+S.stage*8));return {txt:'Runy mówią o siedmiu pieczęciach. Jedna z nich jest w Velesii… (Doświadczenie dla drużyny, wpis w Kronice)'}}},
@@ -107,15 +115,24 @@ const POI={
   {t:'Odejdź',r:()=>({txt:'Ruiny czekały tysiąc lat. Poczekają jeszcze.'})}]},
  doliny:{ic:'event',n:'Mgliste Doliny',t:'Mgła gęstnieje. Z niej dochodzi kobiecy płacz i twoje imię, wypowiadane głosem kogoś, kto dawno nie żyje.',o:[
   {t:'Idź za głosem',r:()=>({fight:['strzyga','nietoperz'],lbl:'Strzyga we mgle'})},
-  {t:'Zapal pochodnię i trzymaj się ścieżki',req:()=>(S.sup.pochodnia||0)>0,r:()=>{S.sup.pochodnia--;S.found.grzbiet=1;return {txt:'Ogień rozrywa mgłę. Na końcu ścieżki – przełęcz ku Wielkiemu Grzbietowi. (−1 pochodnia)'}}},
-  {t:'Zawróć',r:()=>({txt:'Głosy cichną dopiero przy Olszynowie.'})}]},
+  {t:'Zapal pochodnię i trzymaj się ścieżki',req:()=>(S.sup.pochodnia||0)>0,r:()=>{S.sup.pochodnia--;S.found.jary=1;return {txt:'Ogień rozrywa mgłę. Ścieżka wyprowadza was nad głębokie Wilcze Jary w północnej puszczy. (−1 pochodnia)'}}},
+  {t:'Zawróć',r:()=>({txt:'Głosy cichną dopiero pod murami Weleszowa.'})}]},
+ wyrab:{p:'leszy',n:'Opuszczony wyrąb',t:'Pnie, porzucone siekiery i wygasłe ognisko. Las wokół szumi już zwyczajnie – ale nikt z Dąbrowy nie chce tu wracać.',o:[
+  {t:'Zabierz porzucone siekiery i piły',r:()=>({txt:'Dobre żelazo. Kowal w Dąbrowie da za nie trochę grosza. '+reward(20+S.stage*3)})},
+  {t:'Odpocznij przy ognisku',r:()=>{S.roster.forEach(h=>h.hp=Math.min(stats(h).maxHp,h.hp+Math.round(stats(h).maxHp*.15)));return {txt:'Ciepło ognia i cisza lasu. (+15% zdrowia)'}}}]},
+ kaplica:{ic:'temple',n:'Opuszczona kaplica',t:'Kamienna kaplica na wzgórzu. Na ścianach wciąż widać wydrapane imiona.',o:[
+  {t:'Zapal świecę za zmarłych z Ustronia',r:()=>{rep('duchy',3);rep('lud',2);return {txt:'Płomień pali się równo, bez drżenia. Ktoś za ścianą szepcze „dziękuję”.'}}},
+  {t:'Przeszukaj zakrystię',r:()=>({txt:'Stare naczynia i księga z wyrwanymi kartami. '+reward(25,1)})}]},
+ jagna:{p:'szeptunka2',n:'Chata Jagny',t:()=>S.fl.dlug==='spalona'?'Z chaty zostały zgliszcza. Na płocie wciąż wiszą zwęglone wiązki ziół.':S.fl.dlug==='ofiara'?'Chata stoi pusta. Na progu ktoś zostawia świeże kwiaty.':'Jagna przesiewa zioła na ganku. „Siadajcie. Rany opatrzę, ale nie za darmo – zioła same nie rosną.”',o:[
+  {t:'Kup opatrunek z ziół (30 zł)',req:()=>S.gold>=30&&!['spalona','ofiara'].includes(S.fl.dlug),r:()=>{S.gold-=30;S.roster.forEach(h=>h.hp=Math.min(stats(h).maxHp,h.hp+Math.round(stats(h).maxHp*.4)));return {txt:'Maści pieką, ale rany zasklepiają się w oczach. (+40% zdrowia)'}}},
+  {t:'Rozejrzyj się i odejdź',r:()=>({txt:'Las wokół chaty pachnie rutą i dymem.'})}]},
  rozlewiska:{p:'dziewczyna',n:'Rozlewiska Utopców',t:'Na kamieniu nad wodą siedzi dziewczyna o zielonych włosach i czesze je grzebieniem z rybich ości. „Chodź, wędrowcze… woda jest ciepła.”',o:[
   {t:'Do broni! To rusałka!',r:()=>({fight:['rusalka','utopiec','utopiec'],lbl:'Rusałki nad Veleską'})},
   {t:'Zaśpiewaj jej pieśń w odpowiedzi',c:['bard'],r:()=>{rep('duchy',3);return {txt:'Rusałka słucha i płacze ze wzruszenia. Rzuca wam perłę z dna. '+reward(60+S.stage*5)}}},
   {t:'Zatkaj uszy woskiem i odejdź',r:()=>({txt:'Śpiew ciągnie się za wami aż do grobli.'})}]}};
 let curPoi=null;
 function poiEvent(k){const E=POI[k];if(!E)return;curPoi=k;
- modal(`<div class="dlg">${E.p?`<div class="dpor"><img class="px" src="${VART['n_'+E.p]}" alt=""></div>`:`<div class="dpor ic">${ic(E.ic,40)}</div>`}<div class="dtx"><h2>${E.n}</h2><p>${E.t}</p></div></div><div class="actions dopts">${E.o.map((o,i)=>{if(o.c&&!RCLS(o.c))return '';const ok=!o.req||o.req();return `<button data-act="poiopt" data-i="${i}" ${ok?'':'disabled'}>${o.c?clsTag(o.c)+' ':''}${o.t}</button>`}).join('')}</div>`)}
+ modal(`<div class="dlg">${E.p?`<div class="dpor"><img class="px" src="${VART['n_'+E.p]}" alt=""></div>`:`<div class="dpor ic">${ic(E.ic,40)}</div>`}<div class="dtx"><h2>${E.n}</h2><p>${typeof E.t==='function'?E.t():E.t}</p></div></div><div class="actions dopts">${E.o.map((o,i)=>{if(o.c&&!RCLS(o.c))return '';const ok=!o.req||o.req();return `<button data-act="poiopt" data-i="${i}" ${ok?'':'disabled'}>${o.c?clsTag(o.c)+' ':''}${o.t}</button>`}).join('')}</div>`)}
 function poiResolve(i){const k=curPoi,E=POI[k],o=E&&E.o[i];if(!o||(o.c&&!RCLS(o.c))||(o.req&&!o.req()))return;S.poi[k]=1;const r=o.r();save();
  if(r.fight){closeModal();roadFight(r.fight,r.lbl);return}modal(`<h2>${E.n}</h2><p>${r.txt}</p><button class="btn-main" data-act="region">${ic('map',20)} Mapa</button>`)}
 /* obóz poza miastem */

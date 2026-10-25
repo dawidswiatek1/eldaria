@@ -1,5 +1,5 @@
 /* ===== PODSTAWY: klucze zapisu, pomocnicze funkcje, ustawienia ===== */
-const SAVE_KEY='kompania_smialkow_v1',SAVE_VER=10,SET_KEY='kompania_ustawienia_v1',BEST_KEY='kompania_rekord_v1';
+const SAVE_KEY='kompania_smialkow_v1',SAVE_VER=11,SET_KEY='kompania_ustawienia_v1',BEST_KEY='kompania_rekord_v1';
 const TEAM_MAX=5,ROSTER_MAX=10,INV_MAX=30;
 const $=s=>document.querySelector(s);
 const rnd=(a,b)=>a+Math.random()*(b-a);

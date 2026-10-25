@@ -82,6 +82,11 @@ css`
 .qh div{display:flex;flex-direction:column}.qh b{color:#7a3a10;font-size:1.05rem}.qh small{color:#6a5038}
 .quest p{margin:4px 0}.quest .sub{color:#6a5038}.qcur{font-weight:bold}
 .quest summary{cursor:pointer;color:#7a3a10;font-size:.85rem}
+.qcamp{border:8px solid transparent;border-image:var(--fr-parch) 10/8px stretch;background:var(--tx-parch) 0 0/320px 320px;background-clip:padding-box;color:#3a2414;padding:4px 10px;margin:4px 0 10px}
+.qcamp>b{color:#7a3a10}.qcamp>small{color:#6a5038}
+.qcamp ol{list-style:none;margin:4px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:3px 16px}
+.qcamp li{font-size:.85rem;display:flex;align-items:center;gap:4px}.qcamp li small{color:#6a5038}
+.qcamp .c-done{color:#3a6a20}.qcamp .c-act{font-weight:bold}.qcamp .c-lk{color:#8a7a68}
 .repr{display:flex;gap:8px;align-items:center;border:8px solid transparent;border-image:var(--fr-panel) 10/8px stretch;background:var(--tx-wood) 0 0/320px 320px;background-clip:padding-box;padding:2px 6px;margin-bottom:6px}
 .rinf{flex:1;min-width:0}.rinf small{opacity:.8;font-size:.76rem}
 .rbar{position:relative;height:8px;background:#140d12;margin-top:3px;box-shadow:0 0 0 1px #6a4a30}
