@@ -42,12 +42,13 @@ assets/
 
 ## Class sprites
 
-Male heroes of most classes use hand-made sprites (PixelLab exports in `tools/art/classes/<class>/`).
+Heroes use hand-made sprites, one per class and gender (PixelLab exports in `tools/art/classes/<class>/`
+for men and `tools/art/classes/<class>_k/` for women).
 `tools/class_sprites.py` (Python 3 with numpy and Pillow) turns each export – the east-facing pose
 and the 8-frame east walk – into the game's 7-frame battle strip (stand, breathe, wind-up, strike,
 cast, hit, down) and writes `js/data/sprites-classes.js` (`CSPR`). `heroAnim` in `js/gfx/sprites.js`
-uses it for men without a unique look; women, unique companions and classes without a folder keep
-the layered sprites (whose look changes with equipment). To add or replace a class: put its export in
+uses it for every hero without a unique look (`heroSkin` in `js/game/state.js`: only unique companions
+keep their own sprite); a class without a folder would fall back to the old layered sprites. To add or replace a class: put its export in
 `tools/art/classes/<class>/` and run `python3 tools/class_sprites.py` (`--debug` for a preview in `tools/out/`).
 
 ## Rules for editing

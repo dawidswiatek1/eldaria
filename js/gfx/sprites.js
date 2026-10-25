@@ -29,9 +29,10 @@ const FRAME={i0:0,i1:1,wind:2,strike:3,cast:4,hit:5,die:6};
 function helmLayer(k,r){if(k==='helm')return r>=3?'helm_helm3':r>=2?'helm_helm2':'helm_helm0';if(k==='diadem')return r>=2?'helm_diadem2':'helm_diadem0';return r>=3?'helm_kaptur3':'helm_kaptur0'}
 /* animacja bohatera: pasek 7 klatek + klatka 0 przycięta do rdzenia */
 function heroAnim(cls,eq,skin,g){eq=eq||{};const sk=skin&&typeof SKIN!=='undefined'?SKIN[skin]:null;if(!sk)skin='';g=g==='k'?'k':'m';const ck='H|'+cls+'|'+g+'|'+(skin||'')+'|'+['bron','zbroja','helm','amulet'].map(s=>eq[s]?eq[s].b+eq[s].r:'-').join('|');if(_sprCache[ck])return _sprCache[ck];
- /* nowe sprite'y klas (mężczyźni bez unikalnego wyglądu): gotowy pasek klatek z js/data/sprites-classes.js;
-    ekwipunek nie zmienia ich wyglądu */
- if(!sk&&g==='m'&&typeof CSPR!=='undefined'&&CSPR[cls]&&CSPR[cls]._d){const o=CSPR[cls],id=composeData([[o,null]],o.w,o.h,0);return _sprCache[ck]={url:dataURL(id,0,0,o.w,o.h),f0:dataURL(id,HM.pl,0,HM.cw,HM.ch+HM.pt),fw:HM.fw,fh:HM.fh,n:7,pl:HM.pl,pt:HM.pt,cw:HM.cw,ch:HM.ch}}
+ /* sprite'y klas (bohaterowie bez unikalnego wyglądu): gotowy pasek klatek z js/data/sprites-classes.js,
+    klucz „klasa” (mężczyzna) albo „klasa_k” (kobieta); ekwipunek nie zmienia ich wyglądu */
+ const ck2=g==='k'?cls+'_k':cls;
+ if(!sk&&typeof CSPR!=='undefined'&&CSPR[ck2]&&CSPR[ck2]._d){const o=CSPR[ck2],id=composeData([[o,null]],o.w,o.h,0);return _sprCache[ck]={url:dataURL(id,0,0,o.w,o.h),f0:dataURL(id,HM.pl,0,HM.cw,HM.ch+HM.pt),fw:HM.fw,fh:HM.fh,n:7,pl:HM.pl,pt:HM.pt,cw:HM.cw,ch:HM.ch}}
  if(sk&&sk.spr&&typeof HSPR!=='undefined'&&HSPR[sk.spr]&&HSPR[sk.spr]._d){const o=HSPR[sk.spr],id=composeData([[o,null]],o.w,o.h,faceOf('H_'+sk.spr)==='L'?HM.fw:0);shadeData(id.data,o.w,o.h);return _sprCache[ck]={url:dataURL(id,0,0,o.w,o.h),f0:dataURL(id,HM.pl,0,HM.cw,HM.ch+HM.pt),fw:HM.fw,fh:HM.fh,n:7,pl:HM.pl,pt:HM.pt,cw:HM.cw,ch:HM.ch}}
  const L=GFX.L,st0=GFX.STYLE[cls],st=g==='k'&&L['body_'+cls+'|'+st0+'_k']?st0+'_k':st0,list=[],add=(n,t)=>{const o=L[n+'|'+st];if(o)list.push([o,t||null])},tf=(it,al)=>it&&(al||it.r>0)?RCOL[it.r]:null;
  const gl=it=>it&&it.r>0?RCOL[it.r]:null,addG=(n,it)=>{const o=L[n+'|'+st];if(o)list.push([o,null,gl(it)])};

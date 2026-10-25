@@ -30,9 +30,7 @@ function newGame(cls,name,g){S={v:SAVE_VER,gold:230,stage:1,roster:[],team:[],sl
  S.inv.push(makeItem(1,0,'kaftan'),makeItem(1,0,'pierscien'));townOk();save();screen='camp';tab='town';townView='tavern';render()}
 function makeHero(cls,g){const c=CLASSES[cls],v=()=>rnd(.9,1.1);g=g==='k'||g==='m'?g:(Math.random()<.5?'k':'m');const fn=pick(g==='k'?NAMES_K:NAMES_M);let ep=pick(EPI);if(g==='k'&&!/^z /.test(ep))ep=ep.replace(/[yi]$/,'a');
  const h={id:S.nextId++,name:fn+' '+ep,g,cls,lvl:1,xp:0,base:{hp:Math.round(c.hp*v()),atk:Math.round(c.atk*v()),def:Math.round(c.def*v()),spd:Math.round(c.spd*v()*10)/10},pts:{hp:0,atk:0,def:0,spd:0},free:0,tal:{},eq:{bron:null,zbroja:null,helm:null,amulet:null},kills:0};syncLoad(h);h.hp=stats(h).maxHp;
- /* wygląd rekrutów: łuczniczki, strażnicy grodu, rycerze Velesii */
- const fem=h.g==='k';
- if(cls==='lucznik'&&fem&&Math.random()<.5)h.skin='luczniczka';else if(cls==='wojownik'&&!fem&&Math.random()<.3)h.skin='straznik';else if(cls==='paladyn'&&!fem&&Math.random()<.35)h.skin='rycerz';return h}
+ return h}
 /* v20: płeć bohaterów (g:'m'|'k') i imiona dopasowane do płci */
 const NAMES_M=['Bogdan','Mieszko','Jarek','Zbyszko','Bolko','Radek','Witold','Leszek','Ziemowit','Przemko','Kazko','Bronek','Stach','Wojmir','Dobromir','Gniewko','Sambor','Racibor','Lech','Mirosław','Sobiesław','Borzywoj','Wszebor','Dobek'];
 const NAMES_K=['Wanda','Jadwiga','Dobrawa','Kasia','Sława','Gosia','Mirka','Bożena','Ludmiła','Hela','Ola','Danuta','Bogna','Rada','Jagna','Mila','Zofia','Wiesława','Dobromiła','Lubomira','Marzanna','Świętosława','Gorzysława','Milena'];
@@ -65,8 +63,11 @@ function changeHero(h,fn){const o=stats(h).maxHp;fn();const n=stats(h).maxHp;h.h
 function gainXp(h,x){const out=[];h.xp+=x;while(h.xp>=xpNeed(h.lvl)){h.xp-=xpNeed(h.lvl);h.lvl++;const g=CLASSES[h.cls].grow;
  h.base.hp+=g.hp;h.base.atk+=g.atk;h.base.def+=g.def;h.base.spd=Math.round((h.base.spd+g.spd)*10)/10;h.free+=3;h.hp=stats(h).maxHp;
  out.push(`⭐ ${h.name} – poziom ${h.lvl}! +3 punkty cech, +1 punkt talentu`);const i=SKL.indexOf(h.lvl);if(i>0){const u=SK[POOL[h.cls][i]];out.push(`🔓 ${h.name} odblokowuje: ${u.icon} ${u.name}`)}}syncLoad(h);return out}
-const heroSprite=h=>heroLook(h.cls,h.eq,h.skin,h.g);
-const heroA=h=>heroAnim(h.cls,h.eq,h.skin,h.g);
+/* własny wygląd mają tylko unikalni towarzysze; dawne wyglądy rekrutów (łuczniczka, strażnik, rycerz – h.skin
+   w starych zapisach) ustąpiły sprite'om klas z js/data/sprites-classes.js */
+const heroSkin=h=>h.uniq?h.skin:null;
+const heroSprite=h=>heroLook(h.cls,h.eq,heroSkin(h),h.g);
+const heroA=h=>heroAnim(h.cls,h.eq,heroSkin(h),h.g);
 /* portret całej postaci dopasowany do ramki (w całych pikselach ekranu, bez ucinania głowy i broni) */
 function heroPortrait(h){const big=LH()>=520,bw=big?124:92,bh=big?196:150,d=DPR(),s=Math.max(1,Math.floor(Math.min(2.5,(bh-8)/88,bw/58)*d*2))/(2*d);
  return `<div class="big c-${h.cls}" style="width:${bw}px;height:${bh}px">${animBox(heroA(h),s,'',`position:absolute;left:${Math.round(bw/2-28*s)}px;bottom:4px`)}</div>`}
