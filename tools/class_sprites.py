@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Sprite'y postaci z eksportów PixelLab: klasy bohaterów (tools/art/classes/: <klasa> = mężczyzna,
-<klasa>_k = kobieta), unikalni towarzysze (tools/art/companions/, + portret w assets/portraits/)
-i formy (tools/art/forms/, np. niedźwiedź druida – klatka 112 px).
+<klasa>_k = kobieta), unikalni towarzysze (tools/art/companions/, + portret w assets/portraits/),
+formy (tools/art/forms/, np. niedźwiedź druida – klatka 112 px) i postacie niezależne do scen
+(tools/art/npc/: król, bankier, mieszczanie – jedna klatka + portret).
 
 Źródła: tools/art/classes/<klasa>/Idle/rotations/east.png (postać patrząca w prawo)
 i Idle/animations/Walking/east/frame_00N.png (chód w prawo).
@@ -93,7 +94,7 @@ def build(d, fw=FW):
     """d = folder eksportu; fw = szerokość klatki (80 bohater, 112 forma niedźwiedzia)"""
     d = os.path.join(d, 'Idle')
     east = crop(load(os.path.join(d, 'rotations/east.png')))
-    walk = [crop(load(p)) for p in sorted(glob.glob(os.path.join(d, 'animations/Walking/east/frame_*.png')))]
+    walk = [crop(load(p)) for p in sorted(glob.glob(os.path.join(d, 'animations/[Ww]alking/east/frame_*.png')))]
     sp = sorted(range(len(walk)), key=lambda i: -spread(walk[i]))
     wide = sorted(sp[:2])                       # dwie klatki w rozkroku
     mid = sp[-1]                                 # klatka „w przejściu”
@@ -120,8 +121,9 @@ def portrait(d):
     a = crop(load(os.path.join(d, 'Idle/rotations/south-east.png')))
     h, w = a.shape[:2]
     top = a[:37]
-    ys, xs = np.where(top[..., 3] > 0)
-    cx = int((xs.min() + xs.max()) / 2) if len(xs) else w // 2
+    # środek kadru = mediana tułowia (skrzydła, kostury i peleryny nie przesuwają twarzy z kadru)
+    ys, xs = np.where(a[int(h * .35):int(h * .7), :, 3] > 0)
+    cx = int(np.median(xs)) if len(xs) else w // 2
     out = np.zeros((37, 33, 4), np.uint8)
     for y in range(37):
         for x in range(33):
@@ -135,6 +137,14 @@ def portrait(d):
     al = big[..., 3:] / 255.0
     bg = (big[..., :3] * al + bg * (1 - al)).astype(np.uint8)
     return Image.fromarray(bg)
+
+
+def npc_row(key, d, rot):
+    """postać do scen (miasto, sala tronowa): jedna klatka z ukosa, przycięta do sylwetki"""
+    a = crop(load(os.path.join(d, 'Idle/rotations', rot + '.png')))
+    b = io.BytesIO()
+    Image.fromarray(a).save(b, 'PNG', optimize=True)
+    return ' "%s":{"w":%d,"h":%d,"n":1,"u":"data:image/png;base64,%s"}' % (key, a.shape[1], a.shape[0], base64.b64encode(b.getvalue()).decode())
 
 
 def strip_row(key, s, fw):
@@ -160,8 +170,21 @@ def main():
             keys.append(c)
             if sub == 'companions':
                 portrait(d).save(os.path.join(ROOT, 'assets/portraits', c + '.png'), optimize=True)
+    # postacie niezależne (tools/art/npc/): portret do rozmów + postać w scenie
+    # („klucz” z ukosa w prawo, „klucz_l” z ukosa w lewo, „klucz_s” przodem)
+    base = os.path.join(ROOT, 'tools/art/npc')
+    for c in sorted(os.listdir(base)) if os.path.isdir(base) else []:
+        d = os.path.join(base, c)
+        if not os.path.isdir(d):
+            continue
+        rows.append(npc_row(c, d, 'south-east'))
+        rows.append(npc_row(c + '_l', d, 'south-west'))
+        rows.append(npc_row(c + '_s', d, 'south'))
+        keys.append(c)
+        portrait(d).save(os.path.join(ROOT, 'assets/portraits', c + '.png'), optimize=True)
     src = ('/* ===== SPRITE\'Y POSTACI: paski 7 klatek (fw×100) – stoi, oddech, zamach, cios, czar, trafiony, powalony =====\n'
-           '   klasy: „klasa” = mężczyzna, „klasa_k” = kobieta; unikalni towarzysze (np. „karolina”); formy (np. „niedzwiedz”).\n'
+           '   klasy: „klasa” = mężczyzna, „klasa_k” = kobieta; unikalni towarzysze (np. „karolina”); formy (np. „niedzwiedz”);\n'
+           '   postacie do scen (np. „krol”, „krol_l”, „krol_s”) – jedna klatka (n:1).\n'
            '   Wygenerowane przez tools/class_sprites.py z tools/art/ – nie edytuj ręcznie. Base64, bo gra czyta piksele. */\n'
            'const CSPR={\n' + ',\n'.join(rows) + '};\n')
     out = os.path.join(ROOT, 'js/data/sprites-classes.js')

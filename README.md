@@ -38,7 +38,7 @@ js/
   ui/                 camp, formation, hero screen, armory, touch/click handling
   battle/             battle logic and battle screen layout
   expedition/         expeditions (branching map with fog, rooms, events)
-  town/               town, buildings and services (phase 1 and 2)
+  town/               town, buildings and services (phase 1 and 2); court.js – royal court and the bank
   world/              world map, Velesia map, towns, travel, new beasts
   story/              reputation, quests (incl. the Act I campaign), dialogs, journal, unique companions
   audio/sound.js      sound effects and music
@@ -50,7 +50,8 @@ assets/
   ui/                 frames, buttons, textures, emblem
   backgrounds/        battle backgrounds (far / mid / ground layers)
   maps/               world map, Velesia map (velesia-big.png, generated), regions map
-  towns/              town panoramas and town scenes
+  towns/              town panoramas and town scenes (towns and the villages Brzezina, Olszynów)
+  halls/              building interiors: throne hall, bank and its Sanów branch, audience picture
   buildings/          building pictures shown at the top of each town service
   portraits/          NPC portraits
   objects/            chests, camp, shrine… shown in expedition rooms
@@ -68,9 +69,21 @@ uses it for every hero without a unique look (`heroSkin` in `js/game/state.js`: 
 keep their own sprite); a class without a folder would fall back to the old layered sprites. To add or replace a class: put its export in
 `tools/art/classes/<class>/` and run `python3 tools/class_sprites.py` (`--debug` for a preview in `tools/out/`).
 
-Unique companions recruited through personal quests (Ignacy, Tymek, Nela, Karolina) live in
+Unique companions (Ignacy, Tymek, Nela, Karolina and the hussar Jaromir) live in
 `tools/art/companions/` – the tool also writes their dialog portraits to `assets/portraits/` – and the druid's
 bear form in `tools/art/forms/niedzwiedz/` (112 px frames; shown in battle while the `bear` status lasts).
+Townsfolk and court figures (king, banker, townsman, townswoman, herbalist) live in `tools/art/npc/`: for each the
+tool writes a portrait and three single frames for scenes – `<name>` (facing right), `<name>_l` (left), `<name>_s`
+(front) – which `sprFrame` in `js/world/velesia-towns.js` draws in town scenes and building interiors.
+
+## Royal court and bank
+
+`js/town/court.js`. In Weleszów the castle opens as a throne hall: a picture with clickable figures (`HALL`; talks
+are `TALK` entries with `in:'zamek'`) and a side panel – the company's title and the court, plus the chancellery
+with contracts. King Przemysław's quest chain `QD.krol` („Na służbie Korony”) grants titles (`S.tyt` 1–3) with perks.
+The castle in Kręgoszew stays a plain contracts board. The bank (Kantor „Złota Waga”, Weleszów + branch in Sanów)
+holds the vault (`S.vault`, interest after each expedition), an item stash (`S.stash`) and loans (`S.loan`).
+A quest step with `at:'zamek'`/`at:'bank'` waits inside that building instead of popping up on arrival.
 
 ## Quests and events
 

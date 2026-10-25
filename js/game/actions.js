@@ -17,7 +17,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
  case 'jtab':jTab=el.dataset.t;render();break;
  case 'jback':{const f=jFrom||{screen:'camp',tab:'town',townView:null};screen=f.screen==='journal'?'camp':f.screen;tab=f.tab;townView=f.townView;render();break}
  /* Weleszów: rozmowy z mieszkańcami (w małych miastach są na liście obok usług) */
- case 'wtalk':modal(`<h2>${ic('event',20)} Rozmowy w Weleszowie</h2>${talkHtml('weleszow').replace(/<h3>.*?<\/h3>/,'')||'<p class="sub">Nikt nie ma teraz do was sprawy.</p>'}<div class="row"><button data-act="close">Zamknij</button></div>`);break;
+ case 'wtalk':modal(`<h2>${ic('event',20)} Rozmowy w Weleszowie</h2>${talkHtml('weleszow','').replace(/<h3>.*?<\/h3>/,'')||'<p class="sub">Nikt nie ma teraz do was sprawy.</p>'}<p class="sub">${ic('b_zamek',14)} Król i dworzanie przyjmują w Zamku królewskim, bankier – w Kantorze.</p><div class="row"><button data-act="close">Zamknij</button></div>`);break;
  case 'talk':{const t=TALK[el.dataset.k][+el.dataset.i];const d=typeof t.dlg==='function'?t.dlg():t.dlg;if(d)showDlg(d);else{townView='starszy';render()}break}
  case 'dopt':dlgOpt(+el.dataset.i);break;
  case 'dclose':closeModal();render();if(S.qPend){const d=S.qPend;S.qPend=null;save();setTimeout(()=>showDlg(d),60)}break;

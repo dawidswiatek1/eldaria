@@ -66,6 +66,7 @@ function _render(){applySpeed();if(S){syncForm();townOk()}const app=document.get
  if(screen==='region'){enterAnim('region');renderRegion();return}
  if(screen==='journal'){enterAnim('journal');renderJournal();return}
  if(tab==='town'&&!townView){enterAnim('town'+(S.loc||''));renderTown();return}
+ if(tab==='town'&&hallKind(townView)){enterAnim('hall'+townView+(S.loc||''));renderHall(townView);return}
  enterAnim('camp'+tab+(townView||''));
  const team=S.team.map(getHero).filter(Boolean),reserve=S.roster.filter(h=>!S.team.includes(h.id));let body='';
  const hurt=S.roster.some(h=>h.hp<stats(h).maxHp),boss=S.stage%5===0,bio=biomeOf(S.stage);

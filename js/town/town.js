@@ -1,6 +1,8 @@
-/* ===== MIASTO: mapa z lotu ptaka, usługi (bez rozbudowy), kontrakty, skarbiec, koszary, szpital, targ ===== */
+/* ===== MIASTO: mapa z lotu ptaka, usługi (bez rozbudowy), kontrakty, koszary, szpital, targ =====
+   (dwór królewski i kantor „Złota Waga” ze skarbcem: js/town/court.js) */
 const BUILD={
- zamek:{n:'Zamek',ic:'b_zamek',v:'castle',t:'kontrakty',d:'Siedziba kompanii: tablica kontraktów i skarbiec.',s:'3 kontrakty naraz, nagrody +25% · skarbiec do 1000 zł (8% odsetek po wyprawie)'},
+ zamek:{n:'Zamek królewski',ic:'b_zamek',v:'castle',t:'dwór i kontrakty',d:'Sala tronowa króla Przemysława: audiencje, zadania Korony i kancelaria z kontraktami.',s:'3 kontrakty naraz, nagrody +25% · tytuły i przywileje Korony'},
+ bank:{n:'Kantor',ic:'vault',v:'bank',t:'skarbiec i pożyczki',d:'Kantor „Złota Waga”: skarbiec na procent, skrytka na przedmioty i pożyczki.',s:'skarbiec do 1000 zł (8% odsetek po wyprawie) · skrytka na 8 przedmiotów · pożyczki'},
  karczma:{n:'Karczma',ic:'tavern',v:'tavern',t:'werbunek',d:'Werbunek ochotników na towarzyszy.',s:'5 ochotników, czasem doświadczeni weterani'},
  kowal:{n:'Kowal',ic:'smith',v:'smith',t:'ekwipunek',d:'Kupno i sprzedaż ekwipunku.',s:'8 przedmiotów, nowy towar po każdej wyprawie'},
  swiatynia:{n:'Świątynia',ic:'temple',v:'temple',t:'leczenie',d:'Leczenie ran i reset talentów.',s:'Pełne leczenie kompanii i reset talentów'},
@@ -13,10 +15,10 @@ const BUILD={
  gildia:{n:'Gildia łowców',ic:'b_gildia',v:'guild',t:'trofea',d:'Trofea, bestiariusz i nagrody za łowy.',s:'Skup trofeów (+25%) · bestiariusz po 6 zabiciach · 3 łowy'}
 };
 /* budynki nie mają już poziomów – każda usługa działa na stałym poziomie */
-const TL_FIX={zamek:2,karczma:2,kowal:2,swiatynia:2,targ:3,koszary:2,lecznica:3,alchemik:3,zaklinacz:3,cmentarz:2,gildia:2};
+const TL_FIX={zamek:2,bank:2,karczma:2,kowal:2,swiatynia:2,targ:3,koszary:2,lecznica:3,alchemik:3,zaklinacz:3,cmentarz:2,gildia:2};
 const BV={};for(const k in BUILD)if(BUILD[k].v)BV[BUILD[k].v]=k;
 function townOk(){if(typeof wOk==='function')wOk();if(S.town)delete S.town;
- if(S.vault==null)S.vault=0;if(!S.sup)S.sup={pochodnia:1,bandaz:2,prowiant:1};if(!S.con)S.con={av:[],act:[],n:0};if(!S.con.av.length)rollCon();
+ if(S.vault==null)S.vault=0;if(!S.stash)S.stash=[];if(S.loan===undefined)S.loan=null;if(!S.tyt)S.tyt=0;if(!S.sup)S.sup={pochodnia:1,bandaz:2,prowiant:1};if(!S.con)S.con={av:[],act:[],n:0};if(!S.con.av.length)rollCon();
  S.roster.forEach(h=>{fateOk(h);if(h.tr==null)h.tr=0});ensureMain();if(!S.mat)S.mat={odl:0,esc:0};if(!S.tro)S.tro={};if(!S.kills)S.kills={};if(!S.bnt)rollBnt();if(S.spirit===undefined)S.spirit=null}
 const tl=k=>TL_FIX[k]||1;
 const rosterMax=()=>ROSTER_MAX+2*tl('koszary');
@@ -25,7 +27,7 @@ const pips=(l,m)=>Array.from({length:m||3},(_,i)=>`<i class="pip ${i<l?'on':''}"
 let _tScroll=null;
 function renderTown(){townOk();if(S.loc&&S.loc!=='weleszow'){renderSmallTown();return}const app=document.getElementById('app'),nb=S.roster.some(h=>h.free||tFree(h));
  app.innerHTML=`<div class="townv"><div class="ttop wel" style="background-image:linear-gradient(90deg,#140d12f0 0%,#140d12a0 30%,#140d1240 55%,#140d12c8 85%),url(${VART.p_weleszow})"><button class="btn-small" data-act="tab" data-t="team">${ic('nav_team',18)}<span class="lbl">Drużyna</span>${nb?'<span class="badge">!</span>':''}</button><button class="btn-small" data-act="tab" data-t="fallen" aria-label="Polegli">${ic('nav_fallen',18)}</button>
- <h2>${emb(20)} Weleszów <small class="tsub">stolica Velesii</small></h2><button class="btn-small" data-act="wtalk" aria-label="Rozmowy">${ic('event',18)}<span class="lbl"> Rozmowy</span>${talkNew('weleszow')?'<span class="badge">!</span>':''}</button><button class="btn-small" data-act="journal">${ic('contract',18)}<span class="lbl"> Dziennik</span>${qBadge()}</button><span class="pill gold">${ic('gold',18)} ${S.gold}</span><button class="btn-small" data-act="menu" aria-label="Menu">${ic('gear',18)}</button><button class="btn-main tgo" data-act="map" ${S.team.length?'':'disabled'}>${ic(S.exp?'walk':'map',20)} ${S.exp?'Wyprawa':'Mapa'}</button></div>
+ <h2>${emb(20)} Weleszów <small class="tsub">stolica Velesii</small></h2><button class="btn-small" data-act="wtalk" aria-label="Rozmowy">${ic('event',18)}<span class="lbl"> Rozmowy</span>${talkNew('weleszow','')?'<span class="badge">!</span>':''}</button><button class="btn-small" data-act="journal">${ic('contract',18)}<span class="lbl"> Dziennik</span>${qBadge()}</button><span class="pill gold">${ic('gold',18)} ${S.gold}</span><button class="btn-small" data-act="menu" aria-label="Menu">${ic('gear',18)}</button><button class="btn-main tgo" data-act="map" ${S.team.length?'':'disabled'}>${ic(S.exp?'walk':'map',20)} ${S.exp?'Wyprawa':'Mapa'}</button></div>
  <div class="tscroll" id="tscroll"><div class="tmap" id="tmap"></div></div><div class="thint">${ic('walk',12)} Przesuń, by rozejrzeć się po mieście · dotknij budynku</div></div>`;
  layoutTown()}
 /* Weleszów: nowa mapa miasta (przewijana poziomo) – sceny i hotspoty: SCN w js/world/velesia-towns.js */
@@ -34,21 +36,21 @@ function layoutTown(){const sc=document.getElementById('tscroll'),m=document.get
  for(const k in D.b){const B=BUILD[k],r=D.b[k],hot=bldAlert(k);h+=`<button class="thit" data-act="tbld" data-k="${k}" aria-label="${B.n}" style="left:${r[0]}%;top:${r[1]}%;width:${r[2]}%;height:${r[3]}%;z-index:${400+r[5]}"></button>`;
   h+=`<button class="tlab" data-act="tbld" data-k="${k}" style="left:${r[4]}%;top:${r[5]}%;z-index:${600+r[5]}">${ic(B.ic,11)}<b>${B.n}</b><span>${B.t}</span>${hot?'<em>!</em>':''}</button>`}
  D.x.forEach(o=>{const X=XNAME[o.v],r=o.r;h+=`<button class="tlab tx" data-act="town" data-v="${o.v}" style="left:${r[4]}%;top:${r[5]}%;z-index:${600+r[5]}">${ic(X[1],11)}<b>${X[0]}</b><span>zlecenia</span>${tabAlert()?'<em>!</em>':''}</button>`});
- D.g.forEach((g,i)=>{h+=`<button class="snpc" data-act="rumor" data-i="${i}" style="left:${g.x}%;top:${g.y}%;height:${g.h}%;z-index:${500+g.y}" aria-label="Strażnik">${sprFrame(g.s)}<span>${ic('event',10)}</span></button>`});
+ D.g.forEach((g,i)=>{h+=`<button class="snpc" data-act="rumor" data-i="${i}" style="left:${g.x}%;top:${g.y}%;height:${g.h}%;z-index:${500+g.y}" aria-label="${npcName(g)}">${sprFrame(g.s,g.f)}<span>${ic('event',10)}</span></button>`});
  m.innerHTML=h;{let bl=sc.querySelector('.sblur');if(W<sc.clientWidth-2){if(!bl)sc.insertAdjacentHTML('afterbegin',`<img class="sblur" src="${VART18.t_weleszow}" alt="" aria-hidden="true">`)}else if(bl)bl.remove()}
  if(_tScroll==null)_tScroll=Math.max(0,W*.5-sc.clientWidth/2);sc.scrollLeft=_tScroll;
  const ls=[...m.querySelectorAll('.tlab')].sort((a,b)=>a.offsetTop-b.offsetTop),R=[];ls.forEach(e=>{let r=e.getBoundingClientRect();for(let n=0;n<4;n++){const o=R.find(q=>r.left<q.right&&q.left<r.right&&r.top<q.bottom&&q.top<r.bottom);if(!o)break;e.style.top=(e.offsetTop+(o.bottom-r.top)/UIZ+1)+'px';r=e.getBoundingClientRect()}R.push(r)})}
 addEventListener('scroll',e=>{if(e.target&&e.target.id==='tscroll')_tScroll=e.target.scrollLeft},true);
 addEventListener('resize',()=>{if(screen==='camp'&&tab==='town'&&!townView)setTimeout(layoutTown,120)});
 /* --- nagłówek budynku (usługa) --- */
-function bldAlert(k){if(!S)return false;if(k==='zamek')return S.con.act.some(c=>c.ok);if(k==='lecznica')return S.roster.some(h=>h.hosp>0);if(k==='gildia')return (S.bnt||[]).some(t=>(S.tro[t.k]||0)>=t.n);return false}
-function bldHead(k){townOk();const B=BUILD[k],o=GFX.BLD[k],sc=Math.min(2,64/o.h,96/o.w);
- return `<div class="bhead"><div class="bimg"><img class="px" src="${o.u}" style="width:${Math.round(o.w*sc)}px;height:${Math.round(o.h*sc)}px" alt=""></div><div class="binf"><div class="row1"><button class="btn-small" data-act="town" data-v="">${ic('back',16)}<span class="lbl"> ${S.loc&&NODES[S.loc]?NODES[S.loc].n:'Miasto'}</span></button><h2>${ic(B.ic,20)} ${bName(k)}</h2></div>
- <div class="sub">${B.d}</div><div class="sub gold">${ic('flag',12)} ${B.s}</div></div></div>`}
+function bldAlert(k){if(!S)return false;if(k==='zamek')return S.con.act.some(c=>c.ok)||talkNew(S.loc||'weleszow','zamek');if(k==='bank')return talkNew(S.loc||'weleszow','bank')||loanLate();if(k==='lecznica')return S.roster.some(h=>h.hosp>0);if(k==='gildia')return (S.bnt||[]).some(t=>(S.tro[t.k]||0)>=t.n);return false}
+function bldHead(k){townOk();const B=BUILD[k],o=GFX.BLD[k],T=curTown(),sc=o?Math.min(2,64/o.h,96/o.w):1;
+ return `<div class="bhead"><div class="bimg">${o?`<img class="px" src="${o.u}" style="width:${Math.round(o.w*sc)}px;height:${Math.round(o.h*sc)}px" alt="">`:ic(B.ic,44)}</div><div class="binf"><div class="row1"><button class="btn-small" data-act="town" data-v="">${ic('back',16)}<span class="lbl"> ${S.loc&&NODES[S.loc]?NODES[S.loc].n:'Miasto'}</span></button><h2>${ic(B.ic,20)} ${bName(k)}</h2></div>
+ <div class="sub">${T[k+'_d']||B.d}</div><div class="sub gold">${ic('flag',12)} ${T[k+'_s']||B.s}</div></div></div>`}
 function bldView(v){const k=BV[v];let b=bldHead(k);
  if(v==='castle')b+=castleHtml();else if(v==='barracks')b+=barracksHtml();else if(v==='infirmary')b+=infirmaryHtml();else if(v==='market')b+=marketHtml();else if(v==='alchemist')b+=alchHtml();else if(v==='enchanter')b+=enchHtml();else if(v==='graveyard')b+=graveHtml();else if(v==='guild')b+=guildHtml();return b}
 /* --- KONTRAKTY --- */
-const CON_N=()=>1+tl('zamek');
+const CON_N=()=>1+tl('zamek')+(S.tyt>=1?1:0);
 function conGen(){regOk();const R=S.reg,open=R.lv.map((l,i)=>l?i:-1).filter(i=>i>=0),r=pick(open),bio=BIOMES[r],st=expStage(r,Math.max(1,Math.min(3,R.lv[r]))),mul=1+.25*(tl('zamek')-1),G=v=>Math.round(v*mul/5)*5;
  const pool=bio.pool.filter(p=>Math.min(3,R.lv[r])+1>=p[0]).map(p=>p[1]),opts=[];
  const e=pick(pool),n=4+Math.floor(Math.random()*4);opts.push({t:'kill',e,n,g:G(30+st*9+n*4),txt:`Upoluj: ${ENEMIES[e].name} ×${n}`,s:`${bio.n}`});
@@ -74,15 +76,12 @@ function conEv(type,d){if(S&&S.con){const done=[];S.con.act.forEach(c=>{if(c.ok)
  if(type==='kill')questKill(d)}
 function conCard(c,act){const pr=c.t==='gold'?(c.p>=c.n?'✔':'0/1'):`${c.p}/${c.n}`;return `<div class="con ${c.ok?'ok':''}"><div class="ci">${ic('contract',28)}</div><div class="cinf"><b>${esc(c.txt)}</b><small>${esc(c.s||'')}</small><small class="rw">${ic('gold',12)} ${c.g}${c.it?` + przedmiot (${RAR[c.it].n.toLowerCase()}+)`:''}</small>${act?`<i class="bar xp"><i style="width:${(c.t==='gold'?(c.ok?1:0):c.p/c.n)*100}%"></i></i><small>Postęp: ${pr}</small>`:''}</div>
  ${act?(c.ok?`<button class="btn-small btn-gold" data-act="conclaim" data-id="${c.id}">Odbierz</button>`:`<button class="btn-small" data-act="condrop" data-id="${c.id}" aria-label="Porzuć">✕</button>`):`<button class="btn-small btn-green" data-act="contake" data-id="${c.id}" ${S.con.act.length>=CON_N()?'disabled':''}>Przyjmij</button>`}</div>`}
-function castleHtml(){const L=tl('zamek'),cap=[0,300,1000,3000][L],rate=[0,5,8,12][L];
- let b=`<h2>${ic('contract',20)} Tablica kontraktów <small class="sub">(aktywne ${S.con.act.length}/${CON_N()})</small></h2>`;
+/* tablica kontraktów: komendantura w Kręgoszewie i kancelaria na dworze królewskim */
+function castleHtml(){let b=`<h2>${ic('contract',20)} Tablica kontraktów <small class="sub">(aktywne ${S.con.act.length}/${CON_N()})</small></h2>`;
  b+=S.con.act.length?'<div class="cols">'+S.con.act.map(c=>conCard(c,1)).join('')+'</div>':`<div class="empty">Brak przyjętych kontraktów.</div>`;
  b+=`<div class="sub" style="margin:6px 0 4px">Nowe zlecenia (zmieniają się po każdej wyprawie):</div>`+(S.con.av.length?'<div class="cols">'+S.con.av.map(c=>conCard(c,0)).join('')+'</div>':`<div class="empty">Tablica pusta – wróć po wyprawie.</div>`);
  b+=`<button style="width:100%;margin-top:4px" data-act="conreroll" ${S.gold<20?'disabled':''}>${ic('reroll',18)} Nowe zlecenia (20 ${ic('gold',14)})</button>`;
- b+=`<h2>${ic('vault',20)} Skarbiec kompanii</h2><div class="vault"><div class="vv">${ic('vault',32)}<span><b>${S.vault} / ${cap} zł</b><small>Po każdej wyprawie skarbiec przynosi ${rate}% odsetek (do limitu).</small></span></div>
- <div class="row"><button class="btn-small" data-act="vin" data-n="50" ${S.gold<1||S.vault>=cap?'disabled':''}>Wpłać 50</button><button class="btn-small" data-act="vin" data-n="all" ${S.gold<1||S.vault>=cap?'disabled':''}>Wpłać max</button><button class="btn-small" data-act="vout" data-n="50" ${S.vault<1?'disabled':''}>Wypłać 50</button><button class="btn-small" data-act="vout" data-n="all" ${S.vault<1?'disabled':''}>Wypłać wszystko</button></div></div>`;
  return b}
-function vaultTick(){const L=tl('zamek'),cap=[0,300,1000,3000][L],rate=[0,.05,.08,.12][L];const v=Math.max(0,Math.min(cap-S.vault,Math.floor(S.vault*rate)));S.vault+=v;return v}
 /* --- KOSZARY: trening --- */
 const trSlots=()=>tl('koszary');
 const trCost=h=>Math.round(30+h.lvl*15);
@@ -152,7 +151,7 @@ function supApply(k,id,inBattle){if(!(S.sup[k]>0))return;const E=S.exp;
 const litRoom=i=>S.exp&&S.exp.torch!=null&&expCol(S.exp,i)<=S.exp.torch;
 /* --- wspólne zdarzenia końca wyprawy --- */
 function expEndTown(E,lost,done){const o=[];if(done)conEv('exp',{r:E.r,L:E.L,lost:!!E.lost,gold:E.gold});
- hospApply().forEach(t=>o.push(t));const v=vaultTick();if(v)o.push(`${ic('vault',14)} Skarbiec: +${v} zł odsetek`);trainPayout().forEach(t=>o.push(`${ic('train',14)} ${t}`));
+ hospApply().forEach(t=>o.push(t));bankTick().forEach(t=>o.push(t));trainPayout().forEach(t=>o.push(`${ic('train',14)} ${t}`));
  S.con.av=[];rollCon();rollBnt();return o}
 /* --- obsługa dotyku --- */
 document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el||!S)return;const a=el.dataset.act,id=+el.dataset.id;
@@ -162,8 +161,6 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
  case 'condrop':S.con.act=S.con.act.filter(c=>c.id!==id);save();render();break;
  case 'conclaim':{const c=S.con.act.find(c=>c.id===id&&c.ok);if(!c)return;S.gold+=c.g;let t=`Nagroda: ${c.g} zł`;if(c.it){const it=makeItem(Math.max(2,S.stage),rollRar(.2,c.it));if(S.inv.length<INV_MAX){S.inv.push(it);t+=` i ${it.n}`}else{S.gold+=sellPrice(it);t+=` (+${sellPrice(it)} zł za przedmiot – plecak pełny)`}}S.con.act=S.con.act.filter(x=>x!==c);save();render();toast(t+'!');break}
  case 'conreroll':if(S.gold<20)return;S.gold-=20;rollCon();save();render();break;
- case 'vin':{const cap=[0,300,1000,3000][tl('zamek')],n=Math.min(S.gold,cap-S.vault,el.dataset.n==='all'?1e9:50);if(n<=0)return;S.gold-=n;S.vault+=n;save();render();break}
- case 'vout':{const n=Math.min(S.vault,el.dataset.n==='all'?1e9:50);S.vault-=n;S.gold+=n;save();render();break}
  case 'trgo':{const h=getHero(id);if(!h||S.exp||S.roster.filter(x=>x.tr).length>=trSlots()||S.gold<trCost(h))return;S.gold-=trCost(h);h.tr=1;S.team=S.team.filter(x=>x!==id);save();render();break}
  case 'trstop':{const h=getHero(id);if(h){h.tr=0;save();render()}break}
  case 'injheal':{const h=getHero(id),k=el.dataset.k;if(!h||!h.inj.includes(k))return;const c=injCost(h,k);if(S.gold<c||INJ[k].p)return;S.gold-=c;h.inj=h.inj.filter(x=>x!==k);if(h.hp>stats(h).maxHp)h.hp=stats(h).maxHp;save();render();toast(`${h.name.split(' ')[0]}: wyleczono – ${INJ[k].n}.`);break}
