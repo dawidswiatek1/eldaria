@@ -2,7 +2,7 @@ const RCOL=['#c9c9c9','#4a9dff','#b45cff','#ff9a2a'];
 const hexI=c=>parseInt(c.slice(1),16);
 let GFX_READY=false;
 function loadImg(o){return new Promise(res=>{const im=new Image();const done=()=>{try{const c=document.createElement('canvas');c.width=o.w;c.height=o.h;const x=c.getContext('2d');x.drawImage(im,0,0);o._d=x.getImageData(0,0,o.w,o.h).data}catch(e){o._d=new Uint8ClampedArray(o.w*o.h*4)}o._t=new Set((o.t||[]).map(hexI));res()};im.onload=done;im.onerror=()=>{o._d=new Uint8ClampedArray(o.w*o.h*4);o._t=new Set();res()};im.src=o.u})}
-async function loadGfx(){const all=[...Object.values(GFX.L),...Object.values(GFX.S),...(typeof HSPR!=='undefined'?Object.values(HSPR):[]),...(typeof CSPR!=='undefined'?Object.values(CSPR):[]),...Object.values(GFX.F),GFX.I];await Promise.all(all.map(loadImg));GFX_READY=true}
+async function loadGfx(){const all=[...Object.values(GFX.L),...Object.values(GFX.S),...(typeof HSPR!=='undefined'?Object.values(HSPR):[]),...(typeof CSPR!=='undefined'?Object.values(CSPR):[]),...(typeof BSPR!=='undefined'?Object.values(BSPR):[]),...Object.values(GFX.F),GFX.I];await Promise.all(all.map(loadImg));GFX_READY=true}
 function tintFn(tint){const t=[1,3,5].map(i=>parseInt(tint.slice(i,i+2),16));return (r,g,b)=>{const L=(r*.299+g*.587+b*.114)/255,k=.2+1.15*L;return t.map(v=>Math.max(0,Math.min(255,Math.round(v*k))))}}
 /* składanie warstw; fw>0 => odbicie każdej klatki osobno */
 function composeData(list,w,h,fw){const out=new ImageData(w,h),D=out.data;
@@ -46,7 +46,7 @@ function heroAnim(cls,eq,skin,g){eq=eq||{};const sk=skin&&typeof SKIN!=='undefin
 function heroLook(cls,eq,skin,g){return heroAnim(cls,eq,skin,g).f0}
 /* v20: kierunek – FACE[k] mówi, gdzie patrzy sprite natywnie; faceL=true -> wróg ma patrzeć w LEWO (na drużynę) */
 function faceOf(k){return (typeof FACE!=='undefined'&&FACE[k])||'R'}
-function enemyAnim(k,faceL){const flip=faceL?faceOf(k)==='R':faceOf(k)==='L';const ck='E|'+k+'|'+(flip?1:0);if(_sprCache[ck])return _sprCache[ck];const o=GFX.S[k];
+function enemyAnim(k,faceL){const flip=faceL?faceOf(k)==='R':faceOf(k)==='L';const ck='E|'+k+'|'+(flip?1:0);if(_sprCache[ck])return _sprCache[ck];const o=GFX.S[k]||(typeof BSPR!=='undefined'&&BSPR[k]);
  if(o.n<2){const id=composeData([[o,null]],o.w,o.h,flip?o.w:0);shadeData(id.data,o.w,o.h);const u=dataURL(id,0,0,o.w,o.h);return _sprCache[ck]={url:u,f0:u,fw:o.w,fh:o.h,n:1,pl:0,pt:0,cw:o.w,ch:o.h}}
  const id=composeData([[o,null]],o.w,o.h,flip?o.fw:0),pl=flip?o.pr:o.pl;shadeData(id.data,o.w,o.h);
  return _sprCache[ck]={url:dataURL(id,0,0,o.w,o.h),f0:dataURL(id,pl,o.pt,o.cw,o.ch),fw:o.fw,fh:o.h,n:o.n,pl,pt:o.pt,cw:o.cw,ch:o.ch}}

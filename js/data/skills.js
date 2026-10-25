@@ -10,7 +10,7 @@ const aiHeal=(u,c,lim)=>c.low&&rat(c.low)<(lim||.55)?[60+(1-rat(c.low))*50,c.low
 const aiHealAll=(u,c,n)=>c.al.filter(a=>rat(a)<.65).length>=(n||2)?[78,null]:null;
 const aiBuffAll=(u,c,k)=>c.al.some(a=>a.st[k]>0)?null:[54+(c.boss?10:0)+c.fo.length*2,null];
 const aiDebuff=(u,c,k,s)=>{const t=c.fo.filter(e=>!(e.st[k]>0)).sort((a,b)=>b.atk*b.hp-a.atk*a.hp)[0];return t?[s||52,t]:null};
-const aiCC=(u,c,s)=>{const t=c.fo.filter(e=>!e.boss&&!(e.st.stun>0)).sort((a,b)=>b.atk-a.atk)[0]||c.weak;return [(s||50)+(t&&!t.boss?6:-12),t]};
+const aiCC=(u,c,s)=>{const bc=c.fo.find(e=>e.boss&&e.chg);if(bc)return [(s||50)+40,bc];const t=c.fo.filter(e=>!e.boss&&!(e.st.stun>0)).sort((a,b)=>b.atk-a.atk)[0]||c.weak;return [(s||50)+(t&&!t.boss?6:-12),t]};
 const aiAoe=(u,c,b)=>c.fo.length>1?[(b||46)+c.fo.length*6,null]:[28,null];
 
 const SK={

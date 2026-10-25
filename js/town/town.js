@@ -18,7 +18,7 @@ const BUILD={
 const TL_FIX={zamek:2,bank:2,karczma:2,kowal:2,swiatynia:2,targ:3,koszary:2,lecznica:3,alchemik:3,zaklinacz:3,cmentarz:2,gildia:2};
 const BV={};for(const k in BUILD)if(BUILD[k].v)BV[BUILD[k].v]=k;
 function townOk(){if(typeof wOk==='function')wOk();if(S.town)delete S.town;
- if(S.vault==null)S.vault=0;if(!S.stash)S.stash=[];if(S.loan===undefined)S.loan=null;if(!S.tyt)S.tyt=0;if(!S.sup)S.sup={pochodnia:1,bandaz:2,prowiant:1};if(!S.con)S.con={av:[],act:[],n:0};if(!S.con.av.length)rollCon();
+ if(S.vault==null)S.vault=0;if(!S.bk)S.bk={};if(!S.stash)S.stash=[];if(S.loan===undefined)S.loan=null;if(!S.tyt)S.tyt=0;if(!S.sup)S.sup={pochodnia:1,bandaz:2,prowiant:1};if(!S.con)S.con={av:[],act:[],n:0};if(!S.con.av.length)rollCon();
  S.roster.forEach(h=>{fateOk(h);if(h.tr==null)h.tr=0});ensureMain();if(!S.mat)S.mat={odl:0,esc:0};if(!S.tro)S.tro={};if(!S.kills)S.kills={};if(!S.bnt)rollBnt();if(S.spirit===undefined)S.spirit=null}
 const tl=k=>TL_FIX[k]||1;
 const rosterMax=()=>ROSTER_MAX+2*tl('koszary');

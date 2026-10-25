@@ -13,12 +13,12 @@ const ENEMIES={
  nietoperz:{dt:'ciete',res:{mrok:25,klute:-25,swiete:-20},name:'Nietoperz',hp:26,atk:7,def:1,spd:11,sp:'drain',fly:1,d:'Wysysa życie.'},
  ghul:{dt:'ciete',res:{trucizna:75,mrok:25,swiete:-40,ogien:-25},name:'Ghul',hp:58,atk:11,def:3,spd:4,sp:'poison',d:'Gnijące pazury – trucizna.'},
  upior:{nb:1,res:{ciete:50,klute:50,obuch:50,trucizna:100,mrok:50,swiete:-60,arkana:-20},name:'Upiór',hp:44,atk:11,def:2,spd:7,sp:'drain',fx:'dark',eth:1,d:'Bezcielesny (25% uniku), wysysa życie.'},
- kultysta:{res:{mrok:40,swiete:-25},name:'Kultysta',hp:40,atk:9,def:2,spd:6,sp:'rally',fx:'dark',d:'Mroczne błogosławieństwo: +30% ataku wrogów.'},
+ kultysta:{res:{mrok:40,swiete:-25},g:'m',name:'Kultysta',hp:40,atk:9,def:2,spd:6,sp:'rally',fx:'dark',d:'Mroczne błogosławieństwo: +30% ataku wrogów.'},
  harpia:{dt:'ciete',res:{lod:25,klute:-25},name:'Harpia',hp:46,atk:11,def:2,spd:9,sp:'multi',fly:1,d:'Pikuje na dwa cele.'},
  mroczny:{dt:'ciete',res:{ciete:30,klute:30,mrok:25,obuch:-20,swiete:-25},name:'Mroczny rycerz',hp:80,atk:14,def:8,spd:4,sp:'guard',d:'Ciężka zbroja, unosi gardę.'},
  troll:{dt:'obuch',res:{trucizna:25,ogien:-50},name:'Troll',hp:215,atk:14,def:5,spd:3,sp:'troll',boss:true,d:'Regeneruje się i miażdży.'},
  herszt:{dt:'ciete',res:{ciete:20},name:'Herszt bandytów',hp:240,atk:15,def:6,spd:5,sp:'herszt',boss:true,d:'Wzywa bandytów i dodaje im odwagi.'},
- nekromanta:{res:{mrok:60,trucizna:50,swiete:-40},name:'Nekromanta',hp:230,atk:15,def:5,spd:6,sp:'necro',fx:'dark',boss:true,d:'Przyzywa szkielety, wysysa życie.'},
+ nekromanta:{res:{mrok:60,trucizna:50,swiete:-40},g:'m',name:'Nekromanta',hp:230,atk:15,def:5,spd:6,sp:'necro',fx:'dark',boss:true,d:'Przyzywa szkielety, wysysa życie.'},
  golem:{dt:'obuch',nb:1,res:{ciete:40,klute:50,trucizna:100,lod:25,obuch:-30,arkana:-15},name:'Kamienny golem',hp:320,atk:17,def:10,spd:2,sp:'golem',boss:true,d:'Kamienna skóra, regeneracja, miażdżenie.'},
  smok:{dt:'ciete',res:{ogien:75,trucizna:25,lod:-35},name:'Smok',hp:300,atk:19,def:8,spd:6,sp:'fire',boss:true,d:'Ognisty oddech pali całą drużynę.'},
  /* bestie Velesii */
@@ -37,7 +37,12 @@ const ENEMIES={
  strzyga:{dt:'ciete',res:{mrok:40,trucizna:50,ogien:-40,swiete:-50},name:'Strzyga',hp:80,atk:14,def:3,spd:9,sp:'drain',fly:1,d:'Wysysa krew. Powstaje z martwych, chyba że dobije się ją ogniem lub świętością.'},
  bazyliszek:{dt:'trucizna',res:{trucizna:75,klute:20,lod:-30},name:'Bazyliszek',hp:86,atk:13,def:5,spd:6,sp:'gaze',d:'Spojrzenie zamienia w kamień (ogłuszenie i −50% obrony). Jadowite ukąszenie.'},
  zmij:{dt:'ciete',res:{ogien:75,trucizna:30,lod:-35},name:'Żmij',hp:390,atk:19,def:8,spd:6,sp:'zmij',boss:true,fly:0,d:'Smok z Wielkiego Grzbietu. Trzy fazy: kły i ogon, lot z ognistym oddechem, wściekłość.'},
- babajaga:{res:{mrok:40,trucizna:40,ogien:-25,swiete:-25},name:'Baba Jaga',hp:370,atk:17,def:5,spd:7,sp:'jaga',fx:'dark',boss:true,d:'Chata na kurzej stopce przyzywa sługi. Ranna Jaga wzlatuje w moździerzu: nieuchwytna, ciska klątwy.'}
+ babajaga:{res:{mrok:40,trucizna:40,ogien:-25,swiete:-25},name:'Baba Jaga',hp:370,atk:17,def:5,spd:7,sp:'jaga',fx:'dark',boss:true,d:'Chata na kurzej stopce przyzywa sługi. Ranna Jaga wzlatuje w moździerzu: nieuchwytna, ciska klątwy.'},
+ /* elementy walk z bossami (obj: nie atakują, każdy może je trafić; mechaniki: js/battle/bosses.js) */
+ korzen:{obj:1,nb:1,dt:'obuch',res:{trucizna:60,ogien:-50,ciete:-20},name:'Święty korzeń',hp:55,atk:0,def:3,spd:0,d:'Leczy Leszego, dopóki stoi. Słaby na ogień i ostrza.'},
+ sztandar:{obj:1,nb:1,dt:'obuch',res:{trucizna:100,ogien:-30},name:'Sztandar zbójów',hp:60,atk:0,def:2,spd:0,d:'Dodaje zbójom odwagi (+25% ataku) i ściąga posiłki.'},
+ urna:{obj:1,nb:1,g:'k',dt:'obuch',res:{mrok:80,trucizna:100,swiete:-50,obuch:-25},name:'Urna dusz',hp:65,atk:0,def:4,spd:0,d:'Bariera dusz: nekromanta otrzymuje o połowę mniej obrażeń.'},
+ krysztal:{obj:1,nb:1,dt:'obuch',res:{ciete:30,klute:40,trucizna:100,obuch:-50,arkana:-25},name:'Kryształ runiczny',hp:50,atk:0,def:6,spd:0,d:'Daje golemowi kamienną skórę i regenerację.'}
 };
 const BIOMES=[
  {k:'las',n:'Mroczna Puszcza',pool:[[1,'goblin'],[1,'wilk'],[1,'szlam'],[1,'dzik'],[2,'pajak'],[3,'szaman'],[3,'borowy']],boss:'leszy'},

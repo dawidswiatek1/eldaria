@@ -44,6 +44,7 @@ js/
   audio/sound.js      sound effects and music
   main.js             starts the game – must stay LAST
 tools/
+  boss_sprites.py     draws the objects in boss fights (js/data/sprites-boss.js)
   velesia_map.py      draws the Velesia map (assets/maps/velesia-big.png) – see "Velesia map" below
 assets/
   fonts/              Pixelify Sans (SIL Open Font License 1.1)
@@ -84,6 +85,15 @@ with contracts. King Przemysław's quest chain `QD.krol` („Na służbie Korony
 The castle in Kręgoszew stays a plain contracts board. The bank (Kantor „Złota Waga”, Weleszów + branch in Sanów)
 holds the vault (`S.vault`, interest after each expedition), an item stash (`S.stash`) and loans (`S.loan`).
 A quest step with `at:'zamek'`/`at:'bank'` waits inside that building instead of popping up on arrival.
+
+## Bosses
+
+`js/battle/bosses.js` (`BOSS`): every region boss has a signature attack announced one turn ahead (the boss glows and
+the boss bar at the top right shows it). The party can interrupt it by dealing 12% of the boss's HP before its next
+turn or by stunning it (bosses are otherwise immune to stun); an interrupted boss takes +25% damage for a while.
+Leszy, the bandit chief, the necromancer and the golem also bring things to destroy (sacred roots, war banner, soul
+urn, rune crystals – `ENEMIES` entries with `obj:1`, drawn by `tools/boss_sprites.py` into `js/data/sprites-boss.js`).
+The first win over each boss gives a named legendary trophy (`S.bk`).
 
 ## Quests and events
 
