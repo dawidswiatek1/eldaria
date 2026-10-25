@@ -1,0 +1,49 @@
+{
+  "group_id": "cad3a560-a5ac-455b-9887-5efdae61690d",
+  "states": [
+    {
+      "character": {
+        "id": "93ba9873-1152-4d3a-87b9-a81d213b4027",
+        "name": "Idle",
+        "prompt": "attack - purple souls and skulls bursting",
+        "size": {
+          "width": 108,
+          "height": 108
+        },
+        "template_id": "custom",
+        "directions": 8,
+        "view": "side",
+        "created_at": "2026-10-25T19:37:33.403736+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {
+          "Walking": {
+            "west": [
+              "Idle/animations/Walking/west/frame_000.png",
+              "Idle/animations/Walking/west/frame_001.png",
+              "Idle/animations/Walking/west/frame_002.png",
+              "Idle/animations/Walking/west/frame_003.png",
+              "Idle/animations/Walking/west/frame_004.png",
+              "Idle/animations/Walking/west/frame_005.png",
+              "Idle/animations/Walking/west/frame_006.png",
+              "Idle/animations/Walking/west/frame_007.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-25T19:47:07.524643"
+}

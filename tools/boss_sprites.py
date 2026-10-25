@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
-"""Sprite'y elementów walk z bossami (rzeczy do zniszczenia na polu bitwy), rysowane w kodzie:
+"""Sprite'y elementów walk z bossami (rzeczy do zniszczenia na polu bitwy):
 
   korzen   – Święty korzeń (Leszy: leczy go, dopóki stoi)
   sztandar – Sztandar zbójów (Herszt: odwaga i posiłki)
   urna     – Urna dusz (Nekromanta: bariera dusz)
   krysztal – Kryształ runiczny (Golem: kamienna skóra i regeneracja)
 
-Wynik: js/data/sprites-boss.js (BSPR, base64 – gra czyta piksele, jak u innych wrogów).
+Źródło: eksport PixelLab w tools/art/boss/<klucz>/ – animacja „Idle” (wszystkie klatki, pętla) albo,
+gdy jej nie ma, widok z przodu (rotations/south.png). Bez folderu – zapasowy rysunek z kodu poniżej.
+Wynik: js/data/sprites-boss.js (BSPR, base64 – gra czyta piksele, jak u innych wrogów):
+pasek klatek jak u wrogów (n, fw, pl/pr/pt/cw/ch = ramka treści), face:'L' – patrzy w lewo (na drużynę).
 
     python3 tools/boss_sprites.py            # zapisuje dane
-    python3 tools/boss_sprites.py --debug    # dodatkowo podgląd tools/out/boss.png
+    python3 tools/boss_sprites.py --debug    # dodatkowo podgląd tools/out/boss.png (pierwsze klatki)
 
 Wymaga: Python 3, numpy, Pillow.
 """
-import base64, io, os, sys
+import base64, glob, io, os, sys
 import numpy as np
 from PIL import Image, ImageDraw
 
@@ -186,17 +189,64 @@ def urna():
     return im
 
 
-def row(key, im):
+def pack_frames(d):
+    """klatki z eksportu PixelLab: animacja Idle (dowolny kierunek), inaczej widok z przodu"""
+    an = sorted(glob.glob(os.path.join(d, 'Idle/animations/Idle/*')))
+    if an:
+        return [Image.open(p).convert('RGBA') for p in sorted(glob.glob(os.path.join(an[0], 'frame_*.png')))]
+    for r in ('south', 'south-west'):
+        p = os.path.join(d, 'Idle/rotations', r + '.png')
+        if os.path.exists(p):
+            return [Image.open(p).convert('RGBA')]
+    return []
+
+
+def strip(frames):
+    """pasek klatek przycięty do wspólnej ramki treści (stopy = dół ramki)"""
+    a = [np.array(f) for f in frames]
+    m = np.zeros(a[0].shape[:2], bool)
+    for x in a:
+        m |= x[..., 3] > 0
+    ys, xs = np.where(m)
+    x0, x1, y0, y1 = xs.min(), xs.max() + 1, ys.min(), ys.max() + 1
+    pad = 2
+    x0, y0 = max(0, x0 - pad), max(0, y0 - pad)
+    x1, y1 = min(a[0].shape[1], x1 + pad), y1
+    fw, fh = x1 - x0, y1 - y0
+    out = Image.new('RGBA', (fw * len(a), fh))
+    for i, x in enumerate(a):
+        out.alpha_composite(Image.fromarray(x[y0:y1, x0:x1]), (i * fw, 0))
+    return out, fw
+
+
+def row(key, im, n=1, fw=None):
     b = io.BytesIO()
     im.save(b, 'PNG', optimize=True)
-    return ' "%s":{"w":%d,"h":%d,"n":1,"u":"data:image/png;base64,%s"}' % (key, im.width, im.height, base64.b64encode(b.getvalue()).decode())
+    fw = fw or im.width
+    meta = '"n":%d,"fw":%d,"pl":0,"pr":0,"pt":0,"cw":%d,"ch":%d,"face":"L",' % (n, fw, fw, im.height) if n > 1 else '"n":1,"face":"L",'
+    return ' "%s":{"w":%d,"h":%d,%s"u":"data:image/png;base64,%s"}' % (key, im.width, im.height, meta, base64.b64encode(b.getvalue()).decode())
+
+
+DRAWN = {'korzen': korzen, 'sztandar': sztandar, 'urna': urna, 'krysztal': krysztal}
 
 
 def main():
-    items = [('korzen', korzen()), ('sztandar', sztandar()), ('urna', urna()), ('krysztal', krysztal())]
-    src = ('/* ===== ELEMENTY WALK Z BOSSAMI: rzeczy do zniszczenia (pojedyncza klatka, n:1) =====\n'
+    items, rows = [], []
+    for k, draw in DRAWN.items():
+        fr = pack_frames(os.path.join(ROOT, 'tools/art/boss', k))
+        if fr:
+            im, fw = strip(fr)
+            rows.append(row(k, im, len(fr), fw))
+            items.append((k, im.crop((0, 0, fw, im.height))))
+            print(k, '– z eksportu:', len(fr), 'klatek', fw, 'x', im.height)
+        else:
+            im = draw()
+            rows.append(row(k, im))
+            items.append((k, im))
+            print(k, '– rysunek z kodu')
+    src = ('/* ===== ELEMENTY WALK Z BOSSAMI: rzeczy do zniszczenia (pasek klatek animacji albo jedna klatka) =====\n'
            '   Wygenerowane przez tools/boss_sprites.py – nie edytuj ręcznie. Base64, bo gra czyta piksele. */\n'
-           'const BSPR={\n' + ',\n'.join(row(k, im) for k, im in items) + '};\n')
+           'const BSPR={\n' + ',\n'.join(rows) + '};\n')
     out = os.path.join(ROOT, 'js/data/sprites-boss.js')
     open(out, 'w', encoding='utf-8').write(src)
     print('zapisano', out, len(src) // 1024, 'KB:', ', '.join(k for k, _ in items))

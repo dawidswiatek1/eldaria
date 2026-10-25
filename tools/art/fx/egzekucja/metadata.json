@@ -1,0 +1,49 @@
+{
+  "group_id": "89728f53-123e-4aba-9233-49a5b178d11b",
+  "states": [
+    {
+      "character": {
+        "id": "e23d3d05-a948-415a-8588-d2bfa527f350",
+        "name": "Idle",
+        "prompt": "one heavy diagonal axe slash",
+        "size": {
+          "width": 96,
+          "height": 96
+        },
+        "template_id": "custom",
+        "directions": 8,
+        "view": "side",
+        "created_at": "2026-10-25T19:31:20.048396+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {
+          "Running": {
+            "west": [
+              "Idle/animations/Running/west/frame_000.png",
+              "Idle/animations/Running/west/frame_001.png",
+              "Idle/animations/Running/west/frame_002.png",
+              "Idle/animations/Running/west/frame_003.png",
+              "Idle/animations/Running/west/frame_004.png",
+              "Idle/animations/Running/west/frame_005.png",
+              "Idle/animations/Running/west/frame_006.png",
+              "Idle/animations/Running/west/frame_007.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-25T19:50:29.046348"
+}

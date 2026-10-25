@@ -25,8 +25,13 @@ css`
 .unit.marked .shadow{background:radial-gradient(#ff3a2a,#ff3a2a66 55%,transparent 72%);height:16px;bottom:-6px;animation:pulse .7s infinite}
 .unit.marked .un{color:#ff8a7a}
 .unit.marked .un::before{content:'🎯 '}
-/* elementy do zniszczenia: delikatna poświata */
+/* elementy do zniszczenia: delikatna poświata i pętla animacji (wszystkie klatki paska); zniszczone znikają */
 .unit.obj .fxw{filter:drop-shadow(0 0 4px #ffd87088)}
+.unit.obj .spr{animation:objA 1.1s infinite steps(8)}
+@keyframes objA{to{background-position-x:calc(var(--fw) * -8)}}
+.unit.obj.dead .mv{opacity:0;transition:opacity .6s}
+/* efekty wielkich ciosów (bfx) */
+.bfx{position:absolute;z-index:8;pointer-events:none;background-repeat:no-repeat;image-rendering:pixelated}
 .unit.obj .un{color:#ffd870}
 .note.bossn{background:#2a1a24;color:#f0e4d0;box-shadow:0 0 0 2px #140d12,inset 3px 0 0 #ff8a5a;font-size:.78rem}.note.bossn b{color:#ffd870}
 .sub.trod{color:#ffb07a}

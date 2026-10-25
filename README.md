@@ -44,7 +44,8 @@ js/
   audio/sound.js      sound effects and music
   main.js             starts the game – must stay LAST
 tools/
-  boss_sprites.py     draws the objects in boss fights (js/data/sprites-boss.js)
+  boss_sprites.py     objects in boss fights from tools/art/boss/ (js/data/sprites-boss.js)
+  fx_sprites.py       boss attack effects from tools/art/fx/ (assets/fx/, js/data/fx-boss.js)
   velesia_map.py      draws the Velesia map (assets/maps/velesia-big.png) – see "Velesia map" below
 assets/
   fonts/              Pixelify Sans (SIL Open Font License 1.1)
@@ -57,6 +58,7 @@ assets/
   portraits/          NPC portraits
   objects/            chests, camp, shrine… shown in expedition rooms
   events/             event illustrations
+  fx/                 boss attack effects (frame strips, made by tools/fx_sprites.py)
 ```
 
 ## Class sprites
@@ -92,7 +94,11 @@ A quest step with `at:'zamek'`/`at:'bank'` waits inside that building instead of
 the boss bar at the top right shows it). The party can interrupt it by dealing 12% of the boss's HP before its next
 turn or by stunning it (bosses are otherwise immune to stun); an interrupted boss takes +25% damage for a while.
 Leszy, the bandit chief, the necromancer and the golem also bring things to destroy (sacred roots, war banner, soul
-urn, rune crystals – `ENEMIES` entries with `obj:1`, drawn by `tools/boss_sprites.py` into `js/data/sprites-boss.js`).
+urn, rune crystals – `ENEMIES` entries with `obj:1`). Their pictures are PixelLab exports in `tools/art/boss/<key>/`
+(idle animation loops in battle); `tools/boss_sprites.py` turns them into `js/data/sprites-boss.js` (base64, like
+other enemies) and falls back to simple code drawings when a folder is missing. Each big attack plays an effect on its
+targets (`bfx`): PixelLab exports in `tools/art/fx/<key>/`, packed by `tools/fx_sprites.py` into frame strips in
+`assets/fx/` and the list `js/data/fx-boss.js` (`BFX`: anchor at the feet or the middle, scale, duration).
 The first win over each boss gives a named legendary trophy (`S.bk`).
 
 ## Quests and events

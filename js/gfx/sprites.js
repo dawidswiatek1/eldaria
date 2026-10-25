@@ -45,7 +45,7 @@ function heroAnim(cls,eq,skin,g){eq=eq||{};const sk=skin&&typeof SKIN!=='undefin
  return _sprCache[ck]={url:dataURL(id,0,0,fw*n,fh),f0:dataURL(id,HM.pl,0,HM.cw,HM.ch+HM.pt),fw,fh,n,pl:HM.pl,pt:HM.pt,cw:HM.cw,ch:HM.ch}}
 function heroLook(cls,eq,skin,g){return heroAnim(cls,eq,skin,g).f0}
 /* v20: kierunek – FACE[k] mówi, gdzie patrzy sprite natywnie; faceL=true -> wróg ma patrzeć w LEWO (na drużynę) */
-function faceOf(k){return (typeof FACE!=='undefined'&&FACE[k])||'R'}
+function faceOf(k){return (typeof FACE!=='undefined'&&FACE[k])||(typeof BSPR!=='undefined'&&BSPR[k]&&BSPR[k].face)||'R'}
 function enemyAnim(k,faceL){const flip=faceL?faceOf(k)==='R':faceOf(k)==='L';const ck='E|'+k+'|'+(flip?1:0);if(_sprCache[ck])return _sprCache[ck];const o=GFX.S[k]||(typeof BSPR!=='undefined'&&BSPR[k]);
  if(o.n<2){const id=composeData([[o,null]],o.w,o.h,flip?o.w:0);shadeData(id.data,o.w,o.h);const u=dataURL(id,0,0,o.w,o.h);return _sprCache[ck]={url:u,f0:u,fw:o.w,fh:o.h,n:1,pl:0,pt:0,cw:o.w,ch:o.h}}
  const id=composeData([[o,null]],o.w,o.h,flip?o.fw:0),pl=flip?o.pr:o.pl;shadeData(id.data,o.w,o.h);
