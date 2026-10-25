@@ -28,10 +28,15 @@ css`
 .npin em{position:absolute;top:-6px;right:-2px;font-style:normal;font-weight:bold;color:#2a1408;background:#ffd23a;border:2px solid #140d12;width:16px;height:16px;line-height:12px;text-align:center;font-size:.7rem;animation:qpulse 1.2s ease-in-out infinite}
 @keyframes qpulse{50%{transform:scale(1.2)}}
 .roads{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.roads line{stroke:#f4e2b0;stroke-width:3;stroke-dasharray:6 5;vector-effect:non-scaling-stroke;opacity:.85;filter:drop-shadow(1px 1px 0 #3a2414)}
+.roads line,.roads polyline{stroke:#f4e2b0;stroke-width:3;stroke-dasharray:6 5;vector-effect:non-scaling-stroke;opacity:.85;fill:none;stroke-linejoin:round;filter:drop-shadow(1px 1px 0 #3a2414)}
 .party{position:absolute;transform:translate(-50%,-92%);z-index:3;pointer-events:none;transition:left calc(.55s * var(--sp)) linear,top calc(.55s * var(--sp)) linear;filter:drop-shadow(0 2px 0 #000)}
 .party .pfig{display:block;width:28px;height:58px}
 .party .pflag{position:absolute;right:-10px;top:-2px}
+.party.fl .pfig{transform:scaleX(-1)}
+.party.walk .pfig{animation:pwalk .5s steps(2) infinite}
+.party.fl.walk .pfig{animation-name:pwalkfl}
+@keyframes pwalk{50%{transform:translateY(-2px)}}
+@keyframes pwalkfl{0%,100%{transform:scaleX(-1)}50%{transform:scaleX(-1) translateY(-2px)}}
 @media (max-height:500px){.party .pfig{width:20px;height:42px}}
 .pano{height:96px;flex:0 0 auto;margin:0 -2px;background:#223 center/cover no-repeat;image-rendering:pixelated;box-shadow:0 0 0 2px #6a4a30;position:relative;overflow:hidden}
 .pano.scene .amb{display:none}
@@ -82,6 +87,11 @@ css`
 .qh div{display:flex;flex-direction:column}.qh b{color:#7a3a10;font-size:1.05rem}.qh small{color:#6a5038}
 .quest p{margin:4px 0}.quest .sub{color:#6a5038}.qcur{font-weight:bold}
 .quest summary{cursor:pointer;color:#7a3a10;font-size:.85rem}
+.qcamp{border:8px solid transparent;border-image:var(--fr-parch) 10/8px stretch;background:var(--tx-parch) 0 0/320px 320px;background-clip:padding-box;color:#3a2414;padding:4px 10px;margin:4px 0 10px}
+.qcamp>b{color:#7a3a10}.qcamp>small{color:#6a5038}
+.qcamp ol{list-style:none;margin:4px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:3px 16px}
+.qcamp li{font-size:.85rem;display:flex;align-items:center;gap:4px}.qcamp li small{color:#6a5038}
+.qcamp .c-done{color:#3a6a20}.qcamp .c-act{font-weight:bold}.qcamp .c-lk{color:#8a7a68}
 .repr{display:flex;gap:8px;align-items:center;border:8px solid transparent;border-image:var(--fr-panel) 10/8px stretch;background:var(--tx-wood) 0 0/320px 320px;background-clip:padding-box;padding:2px 6px;margin-bottom:6px}
 .rinf{flex:1;min-width:0}.rinf small{opacity:.8;font-size:.76rem}
 .rbar{position:relative;height:8px;background:#140d12;margin-top:3px;box-shadow:0 0 0 1px #6a4a30}

@@ -41,11 +41,13 @@ const VART={
  /* panoramy wsi (te same obrazki) */
  "p_brzezina":"assets/towns/panorama-dabrowa.webp",
  "p_olszynow":"assets/towns/panorama-kurhanow.webp",
- "p_mokradla":"assets/towns/panorama-mglista.webp"
+ "p_mokradla":"assets/towns/panorama-mglista.webp",
+ "p_ustronie":"assets/towns/panorama-mglista.webp",
+ "p_wschodnia":"assets/towns/panorama-kregoszew.webp"
 };
 /* grafika v18 (mapa Velesii, miasta, tła walk) – generowane przez src/art/v18/v18art.py */
 const VART18={
- "map":"assets/maps/velesia-large.webp",
+ "map":"assets/maps/velesia-big.png",
  "t_weleszow":"assets/towns/scene-weleszow.webp",
  "t_dabrowa":"assets/towns/scene-dabrowa.webp",
  "t_kregoszew":"assets/towns/scene-kregoszew.webp",

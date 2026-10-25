@@ -9,7 +9,9 @@ const TOWNS={
  /* wsie */
  brzezina:{svc:['karczma'],off:2,gosp:'Karczma „Pod Brzozą”'},
  olszynow:{svc:['karczma','targ'],off:2,gosp:'Karczma „Złoty Kłos”',targ:'Jarmark wiejski'},
- mokradla:{svc:['karczma','alchemik'],off:1,gosp:'Karczma na palach',alch:'Zielarz z grobli'}
+ mokradla:{svc:['karczma','alchemik'],off:1,gosp:'Karczma na palach',alch:'Zielarz z grobli'},
+ ustronie:{svc:['karczma'],off:1,gosp:'Karczma „Pod Lipą”'},
+ wschodnia:{svc:['karczma','targ'],off:2,gosp:'Gospoda „Ostatni Postój”',targ:'Targ pasterski'}
 };
 const XB={szept:{n:'Szeptunka',ic:'ziola',t:'zioła i obrzędy',d:'Leczenie ziołami, odczynianie urazów i obrzędy przed wyprawą.'},starszy:{n:'Starszy osady',ic:'event',t:'opowieści',d:'Najstarszy z mieszkańców pamięta legendy o przodkach i Asterionie.'}};
 const curTown=()=>TOWNS[S&&S.loc]||TOWNS.weleszow;

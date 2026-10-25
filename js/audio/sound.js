@@ -68,7 +68,7 @@ const SND=(()=>{let ac=null,master,mus,sfx,nbuf,cur=null,curK='',tmr=null,last={
    if(T.pad&&i%16===0){const b=T.bass[Math.floor(i/4)%T.bass.length];[0,2,4].forEach(x=>tone(N(T.r,deg(sc,b+x)),sp*15,Object.assign({},o,{w:'sine',v:.035,a:sp*4})))}
    const dc=T.dr&&T.dr[i%T.dr.length];if(dc==='k')tone(110,.12,Object.assign({},o,{w:'sine',v:.3,to:40}));else if(dc==='s')noise(.1,Object.assign({},o,{f:1800,q:.8,v:.12}));else if(dc==='h')noise(.03,Object.assign({},o,{ft:'highpass',f:7000,v:.06}));
    cur.step++;cur.next+=sp}}
- function pickTrack(){if(!ac)return;let k='town';try{if(screen==='battle'&&B)k=B.units.some(u=>u.side==='e'&&u.boss)?'boss':'battle';else if(screen==='exp'&&S&&S.exp)k='amb'+(S.exp.r||0)}catch(e){}startTrack(k)}
+ function pickTrack(){if(!ac)return;let k='town';try{if(screen==='battle'&&B)k=B.units.some(u=>u.side==='e'&&u.boss)?'boss':'battle';else if(screen==='exp'&&S&&S.exp){const r=S.exp.r||0;/* nowe krainy (bagno, pola, chata, jary) grają muzykę podobnej krainy */k='amb'+(TR['amb'+r]?r:[2,1,2,0][r-5]||0)}}catch(e){}startTrack(k)}
  document.addEventListener('visibilitychange',()=>{if(!ac)return;document.hidden?ac.suspend():ac.resume()});
  ['pointerdown','keydown','touchend'].forEach(e=>document.addEventListener(e,init,{capture:true,passive:true}));
  return {play,vol,init,get ac(){return ac},get track(){return curK}}})();

@@ -19,6 +19,7 @@ function migrate(s){if(!s||!Array.isArray(s.roster))return null;
  if(s.v===8){S=s;s.roster.forEach(h=>{if(h.g!=='m'&&h.g!=='k')h.g=heroG(h)});(s.offers||[]).forEach(o=>{if(o.hero&&o.hero.g!=='m'&&o.hero.g!=='k')o.hero.g=heroG(o.hero)});(s.fallen||[]).forEach(f=>{if(!f.g)f.g=genderOf(f.name)});s.v=9;
   loadMsg=(loadMsg?loadMsg+' ':'')+'Bohaterowie i bohaterki! Każda postać ma teraz płeć (przypisaną według imienia) – kobiety mają własny wygląd, a dziennik walki odmienia słowa (zadała, padła…).'}
  if(s.v===9){S=s;s.v=10;loadMsg=(loadMsg?loadMsg+' ':'')+'Nowość: rozgałęzione wyprawy! Mapa wyprawy ma kilka ścieżek – na rozstajach sam wybierasz drogę. Widzisz tylko najbliższe komnaty, a pochodnia oświetla 2 kolejne kroki na wszystkich ścieżkach. Elity po drodze są opcjonalne: ryzyko za lepsze łupy.'+(s.exp&&!s.exp.road?' Wyprawę, która trwa, dokończysz jeszcze po staremu.':'')}
+ if(s.v===10){S=s;s.v=11;loadMsg=(loadMsg?loadMsg+' ':'')+'Nowość: nowa, większa mapa Velesii – przesuwaj ją palcem albo myszką i przybliżaj. Miasta stanęły jak na dawnych mapach królestwa (Kręgoszew strzeże teraz zachodu), doszły wsie Wschodnia i Ustronie. Rusza kampania „Akt I: Szepty Velesii” – nowe zadania czekają w Ustroniu, Olszynowie i Kręgoszewie, a „Znikający osadnicy” to teraz „Szepty spod korzeni”.'}
  if(s.v===SAVE_VER)return s;
  return null}
 function load(){const raw=localStorage.getItem(SAVE_KEY);if(!raw)return null;try{const s=migrate(JSON.parse(raw));if(s){s.roster.forEach(upHero);return s}}catch(e){console.warn('zapis',e)}

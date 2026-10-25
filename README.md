@@ -25,14 +25,16 @@ js/
   expedition/         expeditions (branching map with fog, rooms, events)
   town/               town, buildings and services (phase 1 and 2)
   world/              world map, Velesia map, towns, travel, new beasts
-  story/              reputation, quests, dialogs, journal, unique companions
+  story/              reputation, quests (incl. the Act I campaign), dialogs, journal, unique companions
   audio/sound.js      sound effects and music
   main.js             starts the game – must stay LAST
+tools/
+  velesia_map.py      draws the Velesia map (assets/maps/velesia-big.png) – see "Velesia map" below
 assets/
   fonts/              Pixelify Sans (SIL Open Font License 1.1)
   ui/                 frames, buttons, textures, emblem
   backgrounds/        battle backgrounds (far / mid / ground layers)
-  maps/               world map, Velesia maps, regions map
+  maps/               world map, Velesia map (velesia-big.png, generated), regions map
   towns/              town panoramas and town scenes
   buildings/          building pictures shown at the top of each town service
   portraits/          NPC portraits
@@ -77,6 +79,21 @@ keep their own sprite); a class without a folder would fall back to the old laye
    as base64 text. The game reads their pixels to tint and combine layers, and browsers block that
    for separate image files opened from disk. These files are generated data: replace whole entries
    rather than editing them by hand.
+
+## Velesia map
+
+`assets/maps/velesia-big.png` is pixel art drawn by code: `tools/velesia_map.py` (Python 3 with numpy,
+scipy and Pillow – only needed to redraw the map, not to play). It reads place positions and roads from
+`NODES`/`EDGES` in `js/world/world-map.js` and the secret places from `SECRET` in `js/world/velesia-map.js`,
+so towns, roads and pins always line up. The landscape (rivers, forests, mountains, fields) and the
+drawing of each place (`landmarks()`) are in the script.
+
+It also writes `js/data/velesia-roads.js` (`ROADS`): the shape of every road, which the company walks
+along when travelling and which the dashed lines to secret places follow.
+
+To add a place: add it to `NODES` (and roads to `EDGES`), give it a drawing in `landmarks()` if it needs
+one, then run `python3 tools/velesia_map.py` (add `--debug` for a labelled preview in `tools/out/`).
+The map is 1024×640; the game shows it scaled without smoothing, 2 screen pixels per map pixel by default.
 
 ## History
 

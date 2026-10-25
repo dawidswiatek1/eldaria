@@ -12,33 +12,46 @@ const KINGDOMS=[
 ];
 const NODES={
  weleszow:{n:'Weleszów',t:'Stolica Velesii',ty:'town',x:53,y:17,ic:'b_zamek',d:'Zamek na skalistym wzgórzu nad Veleską, rynek z fontanną, kościół z czerwonej cegły i port rzeczny. Serce królestwa.'},
- dabrowa:{n:'Dąbrowa',t:'Osada w świętym gaju',ty:'town',x:35.5,y:30.5,ic:'ziola',d:'Osada przy prastarym dębie, słynna z szeptunów i handlu ziołami. Wokół stoją kamienne kręgi.'},
- kregoszew:{n:'Kręgoszew',t:'Gród graniczny',ty:'town',x:75,y:53,ic:'b_koszary',d:'Drewniana warownia na skale, ostatnia straż przed Martwymi Ziemiami. Kowale, koszary i kontrakty graniczne.'},
- sanow:{n:'Sanów',t:'Miasto kupców',ty:'town',x:46,y:62.5,ic:'tavern',d:'Ruchliwe miasto targowe na skrzyżowaniu traktów. Spichlerze, przystań i najwięcej najemników w Velesii.'},
- kurhanow:{n:'Kurhanów',t:'Osada przy kurhanach',ty:'town',x:60.5,y:63,ic:'b_cmentarz',d:'Mała osada u stóp starych mogił. Mieszkańcy strzegą pamięci przodków.'},
- brzezina:{n:'Brzezina',t:'Wieś',ty:'town',vil:1,x:41,y:42,ic:'nav_town',d:'Spokojna wieś wśród brzóz. Karczma, plotki i kilku chętnych do wojaczki.'},
- olszynow:{n:'Olszynów',t:'Wieś rolnicza',ty:'town',vil:1,x:62,y:36,ic:'nav_town',hidden:1,d:'Bogata wieś wśród złotych pól. Chłopi szepczą o białej pani, która chodzi w południe po zbożu.'},
- mokradla:{n:'Mokradła',t:'Wieś na grobli',ty:'town',vil:1,x:22,y:68,ic:'nav_town',hidden:1,d:'Chaty na palach na skraju Bagna Czarnego. Zielarze i rybacy, którzy nie chodzą nad wodę po zmroku.'},
- mlyn:{n:'Młyn nad Veleską',t:'Ciekawe miejsce',ty:'poi',x:29.5,y:49.5,ic:'event',hidden:1,d:'Stary młyn wodny. Młynarz podobno ma układ z wodnikiem.'},
- kapliczka:{n:'Leśna kapliczka',t:'Ciekawe miejsce',ty:'poi',x:18,y:41,ic:'temple',hidden:1,d:'Drewniana kapliczka na rozstaju leśnych dróg. Wędrowcy zostawiają tu dary.'},
- krag:{n:'Krąg Kamienny',t:'Ciekawe miejsce',ty:'poi',x:26,y:22,ic:'event',hidden:1,d:'Omszałe głazy ustawione w krąg. Szeptunki przychodzą tu w noc Kupały.'},
- straznica:{n:'Strażnica',t:'Ciekawe miejsce',ty:'poi',x:84,y:40,ic:'flag',hidden:1,d:'Opuszczona wieża sygnałowa u stóp gór. Z jej szczytu widać Martwe Ziemie.'},
- ruiny:{n:'Ruiny Asterionu',t:'Ciekawe miejsce',ty:'poi',x:61.5,y:73,ic:'event',hidden:1,d:'Kolumny i łuki z czasów dawnych magów. Na kamieniach wciąż widać runy.'},
- doliny:{n:'Mgliste Doliny',t:'Ciekawe miejsce',ty:'poi',x:77,y:27,ic:'event',hidden:1,d:'Doliny wiecznie spowite mgłą. Ludzie słyszą tu głosy zmarłych.'},
- rozlewiska:{n:'Rozlewiska Utopców',t:'Ciekawe miejsce',ty:'poi',x:28,y:59,ic:'event',hidden:1,d:'Zalane łąki nad Veleską. Rusałki i utopce wciągają tu nieostrożnych.'},
- polana:{n:'Mglista Polana',t:'Sekretna lokacja',ty:'site',hidden:1,x:13,y:11,ic:'event',d:'Krąg runicznych kamieni w mgle – miejsce pieczęci Asterionu.'},
- puszcza:{n:'Mroczna Puszcza',t:'Wyprawa · kraina I',ty:'site',r:0,x:11,y:30,home:'dabrowa',d:'Prastara puszcza na zachodzie. Gobliny, wilki, dziki – i Leszy, pan lasu.'},
- trakt:{n:'Trakt Bandytów',t:'Wyprawa · kraina II',ty:'site',r:1,x:13,y:50,home:'dabrowa',hidden:1,d:'Leśny trakt kupiecki, od lat nękany przez zbójców. Biesy podobno im pomagają.'},
- kurhany:{n:'Kurhany Przodków',t:'Wyprawa · kraina III',ty:'site',r:2,x:50,y:85,home:'kurhanow',hidden:1,d:'Kurhany i krypty pod nimi. Strzygi i szeptuni nie dają spać przodkom.'},
- grzbiet:{n:'Wielki Grzbiet',t:'Wyprawa · kraina IV',ty:'site',r:3,x:68,y:8,home:'weleszow',hidden:1,d:'Ośnieżone turnie granicznego pasma. Orkowie, harpie, wilkołaki i bazyliszki.'},
- jama:{n:'Smocza Jama',t:'Wyprawa · kraina V',ty:'site',r:4,x:87.5,y:20,home:'kregoszew',hidden:1,d:'Rozżarzona pieczara w zboczu gór. Leże Żmija.'},
- bagno:{n:'Bagno Czarne',t:'Wyprawa · bagna',ty:'site',r:5,x:11,y:79,home:'mokradla',hidden:1,d:'Czarna woda, martwe drzewa i błędne ogniki. Królestwo Utopca Starszego.'},
- pola:{n:'Pola Południcy',t:'Wyprawa · pola',ty:'site',r:6,x:37,y:71,home:'sanow',hidden:1,d:'Złote łany, gdzie w samo południe nikt nie odważy się pracować.'},
- chata:{n:'Chata na kurzej stopce',t:'Sekretna wyprawa',ty:'site',r:7,x:5,y:60,home:'mokradla',hidden:1,d:'Płot z czaszek, a za nim chata, która obraca się na kurzej nodze. Dom Baby Jagi.'},
- jary:{n:'Wilcze Jary',t:'Łowisko',ty:'site',r:8,x:31,y:10,home:'dabrowa',hidden:1,d:'Głębokie jary w północnej puszczy. Wataha wilkołaka Alfy poluje tu każdej pełni.'},
- poludnie:{n:'Równiny Południowe',t:'ku Avarii',ty:'exit',x:82,y:88,ic:'lock',hidden:1,d:'Szeroki trakt na południe, ku stepom Avarii. Granica zamknięta – wkrótce.'},
- martwe:{n:'Martwe Ziemie',t:'granica',ty:'exit',x:93,y:56,ic:'skull',hidden:1,d:'Spękana, wymarła ziemia za wschodnią granicą. Stąd przychodzi zło – wkrótce.'}};
-const EDGES=[['weleszow','dabrowa'],['weleszow','brzezina'],['weleszow','olszynow'],['weleszow','grzbiet'],['dabrowa','puszcza'],['dabrowa','jary'],['dabrowa','krag'],['dabrowa','kapliczka'],['dabrowa','brzezina'],['dabrowa','polana'],['krag','polana'],['kapliczka','trakt'],['kapliczka','mlyn'],['trakt','chata'],['brzezina','mlyn'],['brzezina','sanow'],['mlyn','rozlewiska'],['rozlewiska','mokradla'],['rozlewiska','pola'],['mokradla','bagno'],['mokradla','chata'],['sanow','pola'],['sanow','kurhanow'],['sanow','kurhany'],['kurhanow','ruiny'],['kurhanow','kregoszew'],['ruiny','poludnie'],['kurhanow','poludnie'],['olszynow','kregoszew'],['olszynow','doliny'],['kregoszew','straznica'],['kregoszew','martwe'],['straznica','jama'],['straznica','doliny'],['doliny','grzbiet']];
+ dabrowa:{n:'Dąbrowa',t:'Osada w świętym gaju',ty:'town',x:25,y:35,ic:'ziola',d:'Osada przy prastarym dębie, słynna z szeptunów i handlu ziołami. Wokół stoją kamienne kręgi.'},
+ kregoszew:{n:'Kręgoszew',t:'Gród graniczny',ty:'town',x:19,y:58,ic:'b_koszary',d:'Kamienna strażnica na skale na zachodnim skraju puszczy, brama Velesii od strony bagien i dzikich ostępów. Kowale, koszary i kontrakty graniczne.'},
+ sanow:{n:'Sanów',t:'Miasto kupców',ty:'town',x:56,y:45,ic:'tavern',d:'Ruchliwe miasto targowe na skrzyżowaniu traktów. Spichlerze, przystań i najwięcej najemników w Velesii.'},
+ kurhanow:{n:'Kurhanów',t:'Osada przy kurhanach',ty:'town',x:44,y:72,ic:'b_cmentarz',d:'Mała osada u stóp starych mogił. Mieszkańcy strzegą pamięci przodków.'},
+ brzezina:{n:'Brzezina',t:'Wieś',ty:'town',vil:1,x:40,y:32,ic:'nav_town',d:'Spokojna wieś wśród brzóz. Karczma, plotki i kilku chętnych do wojaczki.'},
+ olszynow:{n:'Olszynów',t:'Wieś rolnicza',ty:'town',vil:1,x:65,y:27,ic:'nav_town',hidden:1,d:'Bogata wieś wśród złotych pól. Chłopi szepczą o białej pani, która chodzi w południe po zbożu.'},
+ mokradla:{n:'Mokradła',t:'Wieś na grobli',ty:'town',vil:1,x:20,y:80,ic:'nav_town',hidden:1,d:'Chaty na palach na skraju Bagna Czarnego. Zielarze i rybacy, którzy nie chodzą nad wodę po zmroku.'},
+ wschodnia:{n:'Wschodnia',t:'Wieś pod górami',ty:'town',vil:1,x:77,y:43,ic:'nav_town',hidden:1,d:'Ostatnia wieś przed przełęczami Wielkiego Grzbietu. Kamienne chaty, wieża strażnicza i pasterze, którzy znają każdą ścieżkę w górach.'},
+ ustronie:{n:'Ustronie',t:'Wieś na uboczu',ty:'town',vil:1,x:70,y:11,ic:'nav_town',hidden:1,d:'Wieś zagubiona w północno-wschodnich lasach. Ludzie są tu uprzejmi, ale dziwnie nieobecni – jakby o czymś zapomnieli.'},
+ wyrab:{n:'Opuszczony wyrąb',t:'Ciekawe miejsce',ty:'poi',x:15,y:22,ic:'event',hidden:1,d:'Porzucony obóz drwali w północnej puszczy. Siekiery wciąż tkwią w pniach.'},
+ kaplica:{n:'Opuszczona kaplica',t:'Ciekawe miejsce',ty:'poi',x:80,y:6,ic:'temple',hidden:1,d:'Kamienna kaplica na wzgórzu nad Ustroniem. Od lat nikt tu nie przychodzi.'},
+ jagna:{n:'Chata Jagny',t:'Ciekawe miejsce',ty:'poi',x:9,y:64,ic:'ziola',hidden:1,d:'Chata szeptunki Jagny w lesie na zachód od Kręgoszewa. Na płocie suszą się zioła.'},
+ czarnybor:{n:'Czarny Bór',t:'Wyprawa · finał Aktu I',ty:'site',x:5,y:25,ic:'boss',hidden:1,home:'dabrowa',d:'Najstarsza i najciemniejsza część puszczy, na samym zachodzie. Drzewa są tu tak gęste, że w południe panuje zmierzch.'},
+ kurhan:{n:'Kurhan bez imienia',t:'Wyprawa',ty:'site',x:72,y:33,ic:'skull',hidden:1,home:'olszynow',d:'Kurhan odkryty pod pługiem na polach Olszynowa. Po zmroku dochodzą z niego odgłosy walki.'},
+ mlyn:{n:'Młyn nad Veleską',t:'Ciekawe miejsce',ty:'poi',x:29,y:49,ic:'event',hidden:1,d:'Stary młyn wodny. Młynarz podobno ma układ z wodnikiem.'},
+ kapliczka:{n:'Leśna kapliczka',t:'Ciekawe miejsce',ty:'poi',x:13,y:46,ic:'temple',hidden:1,d:'Drewniana kapliczka na rozstaju leśnych dróg. Wędrowcy zostawiają tu dary.'},
+ krag:{n:'Krąg Kamienny',t:'Ciekawe miejsce',ty:'poi',x:32,y:24,ic:'event',hidden:1,d:'Omszałe głazy ustawione w krąg. Szeptunki przychodzą tu w noc Kupały.'},
+ straznica:{n:'Strażnica',t:'Ciekawe miejsce',ty:'poi',x:85,y:69,ic:'flag',hidden:1,d:'Opuszczona wieża sygnałowa u południowych stóp Wielkiego Grzbietu. Z jej szczytu widać Martwe Ziemie.'},
+ ruiny:{n:'Ruiny Asterionu',t:'Ciekawe miejsce',ty:'poi',x:63,y:79.5,ic:'event',hidden:1,d:'Kolumny i łuki z czasów dawnych magów. Na kamieniach wciąż widać runy.'},
+ doliny:{n:'Mgliste Doliny',t:'Ciekawe miejsce',ty:'poi',x:38,y:12,ic:'event',hidden:1,d:'Doliny wiecznie spowite mgłą. Ludzie słyszą tu głosy zmarłych.'},
+ rozlewiska:{n:'Rozlewiska Utopców',t:'Ciekawe miejsce',ty:'poi',x:29,y:64,ic:'event',hidden:1,d:'Zalane łąki nad Veleską. Rusałki i utopce wciągają tu nieostrożnych.'},
+ polana:{n:'Mglista Polana',t:'Sekretna lokacja',ty:'site',hidden:1,x:22,y:11,ic:'event',d:'Krąg runicznych kamieni w mgle – miejsce pieczęci Asterionu.'},
+ puszcza:{n:'Mroczna Puszcza',t:'Wyprawa · kraina I',ty:'site',r:0,x:7,y:33,home:'dabrowa',d:'Prastara puszcza na zachodzie. Gobliny, wilki, dziki – i Leszy, pan lasu.'},
+ trakt:{n:'Trakt Bandytów',t:'Wyprawa · kraina II',ty:'site',r:1,x:5,y:52,home:'kregoszew',hidden:1,d:'Leśny trakt kupiecki, od lat nękany przez zbójców. Biesy podobno im pomagają.'},
+ kurhany:{n:'Kurhany Przodków',t:'Wyprawa · kraina III',ty:'site',r:2,x:43,y:86,home:'kurhanow',hidden:1,d:'Kurhany i krypty pod nimi. Strzygi i szeptuni nie dają spać przodkom.'},
+ grzbiet:{n:'Wielki Grzbiet',t:'Wyprawa · kraina IV',ty:'site',r:3,x:88,y:35,home:'wschodnia',hidden:1,d:'Ośnieżone turnie granicznego pasma. Orkowie, harpie, wilkołaki i bazyliszki.'},
+ jama:{n:'Smocza Jama',t:'Wyprawa · kraina V',ty:'site',r:4,x:92,y:14,home:'wschodnia',hidden:1,d:'Rozżarzona pieczara w zboczu gór. Leże Żmija.'},
+ bagno:{n:'Bagno Czarne',t:'Wyprawa · bagna',ty:'site',r:5,x:10,y:89,home:'mokradla',hidden:1,d:'Czarna woda, martwe drzewa i błędne ogniki. Królestwo Utopca Starszego.'},
+ pola:{n:'Pola Południcy',t:'Wyprawa · pola',ty:'site',r:6,x:47,y:61,home:'sanow',hidden:1,d:'Złote łany, gdzie w samo południe nikt nie odważy się pracować.'},
+ chata:{n:'Chata na kurzej stopce',t:'Sekretna wyprawa',ty:'site',r:7,x:4,y:74,home:'mokradla',hidden:1,d:'Płot z czaszek, a za nim chata, która obraca się na kurzej nodze. Dom Baby Jagi.'},
+ jary:{n:'Wilcze Jary',t:'Łowisko',ty:'site',r:8,x:10,y:17,home:'dabrowa',hidden:1,d:'Głębokie jary w północnej puszczy. Wataha wilkołaka Alfy poluje tu każdej pełni.'},
+ poludnie:{n:'Równiny Południowe',t:'ku Avarii',ty:'exit',x:72,y:92,ic:'lock',hidden:1,d:'Szeroki trakt na południe, ku stepom Avarii. Granica zamknięta – wkrótce.'},
+ martwe:{n:'Martwe Ziemie',t:'granica',ty:'exit',x:96,y:85,ic:'skull',hidden:1,d:'Spękana, wymarła ziemia za wschodnią granicą. Stąd przychodzi zło – wkrótce.'}};
+const EDGES=[['weleszow','dabrowa'],['weleszow','brzezina'],['weleszow','olszynow'],['weleszow','doliny'],['weleszow','sanow'],
+ ['dabrowa','brzezina'],['dabrowa','puszcza'],['dabrowa','jary'],['dabrowa','krag'],['dabrowa','kapliczka'],['dabrowa','polana'],['dabrowa','wyrab'],['wyrab','czarnybor'],['krag','polana'],['krag','doliny'],
+ ['brzezina','mlyn'],['brzezina','sanow'],['kapliczka','mlyn'],['kapliczka','trakt'],['kapliczka','kregoszew'],['trakt','chata'],
+ ['kregoszew','jagna'],['kregoszew','mokradla'],['kregoszew','rozlewiska'],['kregoszew','kurhanow'],['mlyn','rozlewiska'],['rozlewiska','pola'],['rozlewiska','mokradla'],
+ ['mokradla','bagno'],['mokradla','chata'],['sanow','pola'],['pola','kurhanow'],['kurhanow','kurhany'],['kurhanow','ruiny'],['ruiny','poludnie'],
+ ['sanow','wschodnia'],['olszynow','kurhan'],['olszynow','ustronie'],['olszynow','wschodnia'],['ustronie','kaplica'],
+ ['wschodnia','grzbiet'],['wschodnia','jama'],['wschodnia','straznica'],['straznica','martwe']];
 const SITE_OF_R=['puszcza','trakt','kurhany','grzbiet','jama','bagno','pola','chata','jary'];
 const nodeOk=k=>NODES[k]&&(!NODES[k].hidden||(S.found&&S.found[k]));
 const nbrs=k=>EDGES.filter(e=>e.includes(k)).map(e=>e[0]===k?e[1]:e[0]).filter(nodeOk);
@@ -65,11 +78,27 @@ function renderWorld(){const K=KINGDOMS.find(k=>k.k===wSel)||KINGDOMS[0];
  fitBox('wfit',16/9)}
 /* --- mapa Velesii (widok: js/world/velesia-map.js) --- */
 function qMark(k){return Object.keys(S.q).some(id=>{const q=S.q[id];if(q.done)return false;const st=QD[id]&&QD[id].st[q.s];return st&&st.obj&&(st.obj.go===k||st.obj.site===k||(st.obj.exp&&SITE_OF_R[st.obj.exp.r]===k))})||(NODES[k].ty==='town'&&talkNew(k))}
-/* --- podróż: znacznik idzie po drogach, po drodze 30% szans na wydarzenie --- */
-function travel(to,then){if(_trav)return;const path=pathTo(hereNode(),to);if(!path||path.length<2){if(then)then();return}_trav=true;window._lp=path;const g=document.getElementById('ngo');if(g)g.remove();const mk=document.getElementById('pmark');let i=0;
- if(mk&&NODES[to]){mvCenterSoft(to)}
- const step=()=>{i++;if(i>=path.length||!mk){passDays(path.length-1);arrive(to,then,path.length-1);return}const N=NODES[path[i]];reveal(path[i],1);mk.style.left=N.x+'%';mk.style.top=N.y+'%';typeof SND!=='undefined'&&SND.play('tap');setTimeout(step,T(520))};
- if(mk)mk.classList.add('mv');setTimeout(step,T(60))}
+/* --- podróż: kompania idzie po narysowanych drogach, po drodze 30% szans na wydarzenie --- */
+/* kształt drogi a→b z mapy (ROADS w js/data/velesia-roads.js, punkty w % mapy); bez danych – prosto */
+function roadLine(a,b){const r=ROADS[a+'|'+b];if(r)return r;const q=ROADS[b+'|'+a];if(q)return q.slice().reverse();return [[NODES[a].x,NODES[a].y],[NODES[b].x,NODES[b].y]]}
+const WALK_PX=.05;/* piksele mapy na milisekundę (przy prędkości gry ×1); dotknięcie mapy w marszu przyspiesza ×4 */
+function travel(to,then){if(_trav)return;const path=pathTo(hereNode(),to);if(!path||path.length<2){if(then)then();return}_trav=true;window._lp=path;const g=document.getElementById('ngo');if(g)g.remove();const mk=document.getElementById('pmark');
+ const rv=document.getElementById('rview');let hurry=false;const hz=()=>{hurry=true};
+ const done=()=>{if(rv)rv.removeEventListener('pointerdown',hz);if(mk){mk.classList.remove('walk','fl');mk.style.transition=''}passDays(path.length-1);arrive(to,then,path.length-1)};
+ if(!mk){done();return}
+ /* jedna linia przez wszystkie odcinki; at[n] = indeks punktu, w którym kompania mija n-te miejsce */
+ const pts=[],at=[0];path.slice(1).forEach((k,i)=>{roadLine(path[i],k).forEach((p,j)=>{if(i&&!j)return;pts.push(p)});at.push(pts.length-1)});
+ const d=[0];for(let i=1;i<pts.length;i++)d.push(d[i-1]+Math.hypot((pts[i][0]-pts[i-1][0])*MAPW/100,(pts[i][1]-pts[i-1][1])*MAPH/100));
+ const tot=d[d.length-1]||1,v=RM?tot/300:Math.max(tot/12000,WALK_PX*SET.speed);let seg=1,ni=1,s=0,last=null;
+ mk.style.transition='none';mk.classList.add('walk');if(rv)rv.addEventListener('pointerdown',hz);
+ if(!RM&&!window._hzHint){window._hzHint=1;toast('Dotknij mapy, by przyspieszyć marsz')}
+ const frame=now=>{if(!document.body.contains(mk)){done();return}const dt=last==null?0:Math.min(64,now-last);last=now;s=Math.min(tot,s+dt*v*(hurry?4:1));
+  while(seg<pts.length-1&&d[seg]<s)seg++;const a=pts[seg-1],b=pts[seg],f=d[seg]>d[seg-1]?(s-d[seg-1])/(d[seg]-d[seg-1]):1,x=a[0]+(b[0]-a[0])*f,y=a[1]+(b[1]-a[1])*f;
+  mk.style.left=x+'%';mk.style.top=y+'%';if(Math.abs(b[0]-a[0])>.05)mk.classList.toggle('fl',b[0]<a[0]);mvFollow(x,y);
+  /* mijane miejsca: odkryj sąsiadów, stuknij krokiem */
+  while(ni<path.length&&d[at[ni]]<=s+.01){reveal(path[ni],1);if(ni<path.length-1)typeof SND!=='undefined'&&SND.play('tap');ni++}
+  if(s>=tot){done();return}requestAnimationFrame(frame)};
+ requestAnimationFrame(frame)}
 let _then=null;
 function arrive(to,then,days){_trav=false;if(days>0&&Math.random()<roadChance()){S.pend={to};_then=then||null;save();roadEvent();return}finishTravel(to,then)}
 const roadChance=()=>window.ROAD_P!=null?window.ROAD_P:.3;

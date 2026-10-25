@@ -24,6 +24,8 @@ no dependencies. Code comments and all in-game text are in Polish; keep it that 
   and `css/assets.css.js`.
 - **Saves:** `localStorage` key `kompania_smialkow_v1`, version `SAVE_VER` with `migrate()` in
   `js/game/state.js`. When the save shape changes, bump `SAVE_VER` and add a migration; never break old saves.
+- **The Velesia map image is generated** by `tools/velesia_map.py` from `NODES`/`EDGES` (see README).
+  After moving or adding a place, rerun it so the drawing matches the pins.
 - Avoid `alert`/`confirm`/`prompt`: the game is also played inside a sandboxed frame where they don't work.
 
 ## Checking changes
