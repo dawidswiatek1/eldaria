@@ -70,7 +70,7 @@ uses it for every hero without a unique look (`heroSkin` in `js/game/state.js`: 
 keep their own sprite); a class without a folder would fall back to the old layered sprites. To add or replace a class: put its export in
 `tools/art/classes/<class>/` and run `python3 tools/class_sprites.py` (`--debug` for a preview in `tools/out/`).
 
-Unique companions (Ignacy, Tymek, Nela, Karolina and the hussar Jaromir) live in
+Unique companions (Ignacy, Tymek, Nela, Karolina, the hussar Jaromir and the whisperer Wila) live in
 `tools/art/companions/` – the tool also writes their dialog portraits to `assets/portraits/` – and the druid's
 bear form in `tools/art/forms/niedzwiedz/` (112 px frames; shown in battle while the `bear` status lasts).
 Townsfolk and court figures (king, banker, townsman, townswoman, herbalist) live in `tools/art/npc/`: for each the
