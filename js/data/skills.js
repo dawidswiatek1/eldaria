@@ -77,7 +77,7 @@ const SK={
   run:(u,t)=>{const n=3+(RK(u,'dru_regen')?1:0);(Array.isArray(t)?t:[t]).forEach(x=>regen(u,x,n,x.maxHp*.08+u.atk*.6))}},
  splatanie:{dt:'obuch',name:'Splątanie',icon:'🌱',cd:4,t:'enemy',fx:'poison',desc:'Pnącza: atak 70% (obuchowy) i unieruchomienie (ogłuszenie) na 1 turę.',ai:(u,c)=>aiCC(u,c,51),run:(u,t)=>{if(hit(u,t,.7)>0)stun(t)}},
  niedzwiedz:{name:'Forma niedźwiedzia',icon:'🐻',cd:5,t:'self',fx:'buff',desc:'Na 3 tury: +30% ataku, +60% obrony i prowokacja. Leczy 20% PŻ.',ai:(u,c)=>!(u.st.bear>0)&&(rat(u)<.6||c.al.length>1&&!c.al.some(a=>a.st.taunt>0))?[60+(rat(u)<.5?12:0),u]:null,
-  run:u=>{const r=RK(u,'dru_niedz'),n=3+(r?1:0);addSt(u,'bear',n);addSt(u,'taunt',n);healBy(u,u,u.maxHp*(.2+.1*r));flt(u,'Niedźwiedź!','info');log(`${u.name} przybiera formę niedźwiedzia!`,'y')}},
+  run:u=>{const r=RK(u,'dru_niedz'),n=3+(r?1:0)+(u.spec==='panzwierz'?2:0);addSt(u,'bear',n);addSt(u,'taunt',n);healBy(u,u,u.maxHp*(.2+.1*r));flt(u,'Niedźwiedź!','info');log(`${u.name} przybiera formę niedźwiedzia!`,'y')}},
  roj:{dt:'trucizna',name:'Rój owadów',icon:'🐝',cd:4,t:'allEnemies',fx:'poison',desc:'Atak 50% we wszystkich wrogów + trucizna na 2 tury.',run:(u,ts)=>ts.forEach(t=>{if(hit(u,t,.5)>0)bleed(u,t,2,u.atk*.3,'🧪')})},
  burza:{dt:'lod',name:'Burza gradowa',icon:'🌩️',cd:3,t:'allEnemies',fx:'ice',desc:'Atak 100% (lód) we wszystkich wrogów, 25% szansy na ogłuszenie.',ai:(u,c)=>aiAoe(u,c,50),run:(u,ts)=>ts.forEach(t=>{if(hit(u,t,1)>0)stunC(t,.25)})},
  /* --- Czarnoksiężnik --- */
@@ -92,12 +92,46 @@ const SK={
  smierc:{dt:'mrok',name:'Palec śmierci',icon:'👉',cd:4,t:'enemy',fx:'dark',pw:2.5,desc:'Atak 250% (mrok), ×1,6 jeśli cel ma <35% PŻ.',run:(u,t)=>hit(u,t,rat(t)<.35?4:2.5)},
  /* --- Bard --- */
  ballada:{name:'Ballada odwagi',icon:'🎵',cd:3,t:'allAllies',fx:'buff',desc:'Cała drużyna: +30% ataku na 2 tury.',ai:(u,c)=>aiBuffAll(u,c,'rally'),
-  run:(u,ts)=>{const v=.3+.1*RK(u,'bar_ballada'),n=2+(RK(u,'bar_epos')?1:0);ts.forEach(t=>{addSt(t,'rally',n,v);ring(t,'#ffb0e0')});log(`${u.name} gra balladę odwagi!`,'y')}},
+  run:(u,ts)=>{const v=.3+.1*RK(u,'bar_ballada'),n=2+(RK(u,'bar_epos')?1:0)+(u.spec==='skald'?1:0);ts.forEach(t=>{addSt(t,'rally',n,v);ring(t,'#ffb0e0')});log(`${u.name} gra balladę odwagi!`,'y')}},
  dysonans:{dt:'arkana',name:'Dysonans',icon:'🎸',cd:2,t:'enemy',fx:'magic',pw:1.1,desc:'Atak 110% (arkana) i osłabienie celu (−25% ataku) na 2 tury.',run:(u,t)=>{if(hit(u,t,1.1)>0||t.alive)addSt(t,'weak',RK(u,'bar_dys')>=2?3:2)}},
  wiatr:{name:'Pieśń wiatru',icon:'🌬️',cd:4,t:'allAllies',fx:'buff',desc:'Cała drużyna: +2 szybkości na 3 tury.',ai:(u,c)=>aiBuffAll(u,c,'haste'),run:(u,ts)=>{const w=RK(u,'bar_wiatr');ts.forEach(t=>{addSt(t,'haste',w?4:3,w?3:2);ring(t,'#9ae4f6')})}},
  kolysanka:{dt:'arkana',name:'Kołysanka',icon:'🌙',cd:5,t:'allEnemies',fx:'magic',desc:'Atak 30% we wszystkich wrogów, każdy z 50% szansą zasypia (ogłuszenie).',ai:(u,c)=>c.fo.filter(e=>!e.boss).length>1?[60,null]:null,run:(u,ts)=>{const ch=RK(u,'bar_kolys')?.8:.5;ts.forEach(t=>{hit(u,t,.3);stunC(t,ch)})}},
  hymn:{name:'Hymn odnowy',icon:'🎶',cd:3,t:'allAllies',fx:'heal',desc:'Leczy całą drużynę (10% max PŻ + 80% ataku), zdejmuje krwawienie i ogłuszenie.',ai:(u,c)=>aiHealAll(u,c,2),run:(u,ts)=>ts.forEach(t=>{healBy(u,t,t.maxHp*.1+u.atk*.8);delete t.st.bleed;delete t.st.stun;updUnit(t)})},
- crescendo:{dt:'arkana',name:'Crescendo',icon:'🎺',cd:3,t:'allEnemies',fx:'magic',desc:'Atak 110% (arkana) we wszystkich wrogów.',ai:(u,c)=>aiAoe(u,c,48),run:(u,ts)=>ts.forEach(t=>hit(u,t,1.1))}
+ crescendo:{dt:'arkana',name:'Crescendo',icon:'🎺',cd:3,t:'allEnemies',fx:'magic',desc:'Atak 110% (arkana) we wszystkich wrogów.',ai:(u,c)=>aiAoe(u,c,48),run:(u,ts)=>ts.forEach(t=>hit(u,t,1.1))},
+ /* ===== umiejętności specjalizacji (js/data/specs.js): spec:1, ikona z pola ico ===== */
+ taniec:{dt:'wep',name:'Taniec ostrzy',icon:'⚔️',ico:'miecz',spec:1,cd:3,t:'allEnemies',fx:'melee',desc:'3 cięcia po 75% w losowych wrogów w zasięgu.',ai:(u,c)=>[50+(c.fo.length===1?8:0),null],
+  run:(u,ts)=>{for(let i=0;i<3;i++){const f=ts.filter(t=>t.alive);if(!f.length)break;hit(u,pick(f),.75)}}},
+ mur:{name:'Mur tarcz',icon:'🛡️',ico:'st_shield',spec:1,cd:4,t:'allAllies',fx:'buff',desc:'Cała drużyna: +60% obrony na 2 tury. Ty prowokujesz wrogów przez 2 tury.',
+  ai:(u,c)=>c.al.length>1&&!c.al.some(a=>a.st.shield>0)?[56+(c.boss?12:0)+(c.al.some(a=>rat(a)<.5)?10:0),null]:null,
+  run:(u,ts)=>{ts.forEach(t=>{addSt(t,'shield',2);aura(t,'#c8d8ff')});addSt(u,'taunt',2);flt(u,'Prowokacja!','info');log(`${u.name} stawia mur tarcz!`,'g')}},
+ serce:{dt:'klute',name:'Strzał w serce',icon:'💘',ico:'crit',spec:1,cd:4,t:'enemy',fx:'arrow',pw:2.6,cb:.3,desc:'Atak 260% z +30% szansy na krytyk.',run:(u,t)=>hit(u,t,2.6)},
+ sidla:{dt:'klute',name:'Sidła',icon:'⛓️',ico:'trap',spec:1,cd:4,t:'enemy',fx:'arrow',desc:'Atak 60%. Cel na 2 tury: −50% obrony (rozbity pancerz) i −25% ataku.',ai:(u,c)=>aiDebuff(u,c,'sunder',56),
+  run:(u,t)=>{hit(u,t,.6);if(t.alive){addSt(t,'sunder',2);addSt(t,'weak',2);flt(t,'Sidła','info')}}},
+ slup:{dt:'ogien',name:'Słup ognia',icon:'🔥',ico:'st_burn',spec:1,cd:3,t:'enemy',fx:'fire',pw:2,desc:'Atak 200% (ogień) i silne podpalenie na 3 tury.',run:(u,t)=>{if(hit(u,t,2,'fire')>0)bleed(u,t,3,u.atk*.5,'🔥')}},
+ runy:{dt:'arkana',name:'Wybuch runów',icon:'🔯',ico:'b_zaklinacz',spec:1,cd:4,t:'allEnemies',fx:'magic',desc:'Atak 90% (arkana) we wszystkich wrogów i osłabienie (−25% ataku) na 2 tury.',ai:(u,c)=>aiAoe(u,c,52),
+  run:(u,ts)=>ts.forEach(t=>{hit(u,t,.9);addSt(t,'weak',2)})},
+ stos:{dt:'swiete',name:'Stos',icon:'🔥',ico:'torch',spec:1,cd:3,t:'enemy',fx:'holy',pw:1.6,desc:'Atak 160% (święte) i podpalenie na 3 tury.',run:(u,t)=>{if(hit(u,t,1.6)>0)bleed(u,t,3,u.atk*.45,'🔥')}},
+ cud:{name:'Cud',icon:'✨',ico:'diadem',spec:1,cd:5,t:'allAllies',fx:'heal',desc:'Leczy całą drużynę (20% max PŻ + 150% ataku) i zdejmuje złe stany: krwawienie, ogłuszenie, osłabienie, klątwę i rozbity pancerz.',
+  ai:(u,c)=>{const bad=c.al.filter(a=>a.st.bleed||a.st.stun>0||a.st.weak>0||a.st.curse>0||a.st.sunder>0).length,low=c.al.filter(a=>rat(a)<.6).length;return low+bad>=2?[74+low*4,null]:null},
+  run:(u,ts)=>{ts.forEach(t=>{healBy(u,t,t.maxHp*.2+u.atk*1.5);['bleed','stun','weak','weakV','curse','curseV','curseSrc','sunder','sunderV'].forEach(k=>delete t.st[k]);updUnit(t)});log(`✨ ${u.name} czyni cud!`,'g')}},
+ ostrze:{dt:'klute',name:'Ostrze w mroku',icon:'🌑',ico:'sztylety',spec:1,cd:3,t:'enemy',fx:'melee',pw:1.8,desc:'Atak 180%. Z cienia: 300% i pewny krytyk.',ai:(u,c)=>[u.st.hid?72:52,c.weak],run:(u,t)=>hit(u,t,u.st.hid?3:1.8)},
+ sztuczka:{dt:'obuch',name:'Brudna sztuczka',icon:'🎭',ico:'st_sunder',spec:1,cd:3,t:'enemy',fx:'melee',desc:'Piasek w oczy: atak 90% (obuchowy), cel na 2 tury −25% ataku i −50% obrony.',ai:(u,c)=>aiDebuff(u,c,'sunder',54),
+  run:(u,t)=>{hit(u,t,.9);addSt(t,'weak',2);addSt(t,'sunder',2)}},
+ sadboz:{dt:'swiete',name:'Sąd boży',icon:'⚜️',ico:'helm',spec:1,cd:4,t:'allEnemies',fx:'holy',desc:'Atak 90% (święte) we wszystkich wrogów. Przez 2 tury prowokujesz wrogów i masz +60% obrony.',
+  ai:(u,c)=>aiAoe(u,c,46+(c.al.length>1&&rat(u)>.5?8:0)),run:(u,ts)=>{ts.forEach(t=>hit(u,t,.9));addSt(u,'taunt',2);addSt(u,'shield',2);flt(u,'Prowokacja!','info')}},
+ wyrok:{dt:'swiete',name:'Wyrok',icon:'⚡',ico:'mlot',spec:1,cd:3,t:'enemy',fx:'holy',pw:1.7,desc:'Atak 170% (święte), przeciw bossom 255%.',run:(u,t)=>hit(u,t,t.boss?2.55:1.7)},
+ wilki:{dt:'ciete',name:'Wezwanie wilków',icon:'🐺',ico:'st_bear',spec:1,cd:3,t:'allEnemies',fx:'melee',desc:'Wilki z puszczy: 3 ugryzienia po 70% w losowych wrogów (dowolny rząd) i krwawienie na 2 tury.',ai:(u,c)=>[52,null],
+  run:(u,ts)=>{for(let i=0;i<3;i++){const f=ts.filter(t=>t.alive);if(!f.length)break;const t=pick(f);if(hit(u,t,.7)>0)bleed(u,t,2,u.atk*.3)}}},
+ krag:{name:'Krąg kamieni',icon:'🗿',ico:'st_regen',spec:1,cd:4,t:'allAllies',fx:'heal',desc:'Cała drużyna: regeneracja 6% max PŻ + 40% ataku co turę przez 3 tury i +60% obrony do następnej tury.',
+  ai:(u,c)=>c.al.filter(a=>rat(a)<.85&&!a.st.regen).length>=2?[60+(c.boss?6:0),null]:null,run:(u,ts)=>{ts.forEach(t=>{regen(u,t,3,t.maxHp*.06+u.atk*.4);addSt(t,'shield',1)});log(`🗿 ${u.name} wznosi krąg kamieni.`,'g')}},
+ dusze:{dt:'mrok',name:'Wyssanie dusz',icon:'👻',ico:'mind',spec:1,cd:4,t:'allEnemies',fx:'dark',desc:'Atak 60% (mrok) we wszystkich wrogów. Cała drużyna leczy się o 25% zadanych obrażeń.',
+  ai:(u,c)=>aiAoe(u,c,46+(c.al.some(a=>rat(a)<.6)?10:0)),run:(u,ts)=>{let s=0;ts.forEach(t=>s+=hit(u,t,.6));if(s>0)alive('h').forEach(a=>healBy(u,a,s*.25))}},
+ piekl:{dt:'ogien',name:'Ognie piekielne',icon:'😈',ico:'st_burn',spec:1,cd:4,t:'allEnemies',fx:'fire',desc:'Kosztuje 10% Twoich PŻ. Atak 120% (ogień) we wszystkich wrogów i podpalenie na 2 tury.',ai:(u,c)=>rat(u)>.3?aiAoe(u,c,52):null,
+  run:(u,ts)=>{const l=Math.min(u.hp-1,Math.round(u.maxHp*.1));if(l>0){u.hp-=l;flt(u,'-'+l,'dmg')}ts.forEach(t=>{if(hit(u,t,1.2)>0)bleed(u,t,2,u.atk*.3,'🔥')})}},
+ wojenna:{name:'Pieśń wojenna',icon:'🥁',ico:'st_rally',spec:1,cd:4,t:'allAllies',fx:'buff',desc:'Cała drużyna na 2 tury: +25% ataku i +2 szybkości.',ai:(u,c)=>c.al.some(a=>a.st.rally>0&&a.st.haste>0)?null:[56+(c.boss?10:0)+c.fo.length*2,null],
+  run:(u,ts)=>{ts.forEach(t=>{addSt(t,'rally',2,.25);addSt(t,'haste',2,2);ring(t,'#ff9a5a')});log(`🥁 ${u.name} gra pieśń wojenną!`,'y')}},
+ zwierciadlo:{dt:'arkana',name:'Zwierciadło',icon:'👁️',ico:'oko',spec:1,cd:4,t:'allEnemies',fx:'magic',desc:'Atak 50% (arkana) we wszystkich wrogów, osłabienie na 2 tury i 35% szansy na ogłuszenie każdego.',ai:(u,c)=>aiAoe(u,c,50),
+  run:(u,ts)=>ts.forEach(t=>{hit(u,t,.5);addSt(t,'weak',2);stunC(t,.35)})}
 };
 /* pula umiejętności: indeks = próg odblokowania wg SKL (0 = z talentu) */
 const SKL=[1,1,3,4,6,0];
@@ -160,15 +194,15 @@ function cdOf(x,k){const b=SK[k].cd;if(!b)return 0;if(b>=99)return b;let c=b;for
 const tOf=(u,k)=>k==='regen'&&RK(u,'dru_kwiat')?'allAllies':SK[k].t;
 /* ===== ZASIĘG: wręcz (tylko 1. rząd wroga, dopóki ktoś w nim stoi) / dystans (dowolny cel) ===== */
 const MELEE_CLS={wojownik:1,paladyn:1,lotr:1,druid:1};
-const RANGED_SK={ciernie:1,splatanie:1,roj:1,bomba:1,wachlarz:1};
+const RANGED_SK={ciernie:1,splatanie:1,roj:1,bomba:1,wachlarz:1,wilki:1};
 function reachOf(u,k){if(u.side==='e')return (u.fly||(u.fx&&u.fx!=='melee'&&u.fx!=='poison'))?'r':'m';
  if(k==='atak')return ((u.st&&u.st.bear>0)||MELEE_CLS[u.cls])?'m':'r';const s=SK[k];if(!s||RANGED_SK[k])return 'r';return s.fx==='melee'||s.fx==='poison'?'m':'r'}
 const isOff=(h,k)=>{const t=tOf(h,k);return t==='enemy'||t==='allEnemies'};
 const reachChip=r=>r==='m'?`<span class="rs rc m">${ic('miecz',12)}Wręcz</span>`:`<span class="rs rc r">${ic('luk',12)}Dystans</span>`;
 const skReachChip=(h,k)=>isOff(h,k)?reachChip(reachOf({cls:h.cls,st:{},side:'h',tal:h.tal},k)):'';
 
-function unlockedSk(h){const p=POOL[h.cls]||[];return p.filter((k,i)=>SKL[i]?h.lvl>=SKL[i]:Object.keys(h.tal||{}).some(id=>h.tal[id]>0&&TN[id]&&TN[id].un===k))}
-function skReq(h,k){const i=(POOL[h.cls]||[]).indexOf(k);if(i<0)return '';if(SKL[i])return 'od poziomu '+SKL[i];const n=Object.values(TN).find(x=>x.un===k&&x.cls===h.cls);return n?'talent „'+n.n+'” ('+TREE[h.cls].b[n.b]+')':''}
+function unlockedSk(h){const p=POOL[h.cls]||[],s=specOf(h);return p.filter((k,i)=>SKL[i]?h.lvl>=SKL[i]:Object.keys(h.tal||{}).some(id=>h.tal[id]>0&&TN[id]&&TN[id].un===k)).concat(s?[s.sk]:[])}
+function skReq(h,k){const sp=specOfSk(k);if(sp)return 'specjalizacja „'+specNm(h,sp)+'” (od poz. '+SPEC_LVL+')';const i=(POOL[h.cls]||[]).indexOf(k);if(i<0)return '';if(SKL[i])return 'od poziomu '+SKL[i];const n=Object.values(TN).find(x=>x.un===k&&x.cls===h.cls);return n?'talent „'+n.n+'” ('+TREE[h.cls].b[n.b]+')':''}
 /* zestaw (loadout): maks. 4 aktywne; nowe umiejętności dokładane automatycznie, jeśli jest miejsce */
 function syncLoad(h){const un=unlockedSk(h);h.seen=(h.seen||[]).filter(k=>un.includes(k));if(!Array.isArray(h.load))h.load=[];h.load=h.load.filter((k,i,a)=>un.includes(k)&&a.indexOf(k)===i).slice(0,LOAD_MAX);
  un.forEach(k=>{if(!h.seen.includes(k)){h.seen.push(k);if(h.load.length<LOAD_MAX&&!h.load.includes(k))h.load.push(k)}});return h.load}

@@ -23,7 +23,7 @@ const VIEW_B=v=>v==='szept'||v==='starszy'?v:BV[v];
 function renderSmallTown(){const k=S.loc,N=NODES[k];
  /* ciekawe miejsce: obóz w polu */
  if(N&&N.ty==='poi'){renderField();return}
- const T=TOWNS[k],app=document.getElementById('app'),nb=S.roster.some(h=>h.free||tFree(h));
+ const T=TOWNS[k],app=document.getElementById('app'),nb=S.roster.some(devPend);
  const svc=T.svc.map(b=>{const B=BUILD[b]||XB[b],v=B.v||b,al=BUILD[b]&&bldAlert(b);return `<button class="svc" data-act="town" data-v="${v}">${ic(B.ic,28)}<span><b>${bName(b)}</b><small>${b==='karczma'?`werbunek (${Math.min(T.off,S.offers.length)}) · nocleg`:B.t}</small></span>${al?'<em>!</em>':''}</button>`}).join('');
  app.innerHTML=`<div class="townv stown"><div class="ttop"><button class="btn-small" data-act="tab" data-t="team">${ic('nav_team',18)}<span class="lbl">Drużyna</span>${nb?'<span class="badge">!</span>':''}</button><button class="btn-small" data-act="tab" data-t="fallen" aria-label="Polegli">${ic('nav_fallen',18)}</button>
  <h2>${ic(N.ic,20)} ${N.n}</h2><button class="btn-small" data-act="journal">${ic('contract',18)}<span class="lbl"> Dziennik</span>${qBadge()}</button><span class="pill gold">${ic('gold',18)} ${S.gold}</span><button class="btn-small" data-act="menu" aria-label="Menu">${ic('gear',18)}</button><button class="btn-main tgo" data-act="map" ${S.team.length?'':'disabled'}>${ic(S.exp?'walk':'map',20)} Mapa</button></div>
