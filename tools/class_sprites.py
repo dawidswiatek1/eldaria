@@ -13,6 +13,8 @@ Wynik: js/data/sprites-classes.js (CSPR, base64 – gra czyta piksele sprite'ów
     python3 tools/class_sprites.py            # zapisuje dane
     python3 tools/class_sprites.py --debug    # dodatkowo podgląd tools/out/classes.png
 
+Młodzi towarzysze (YOUNG: Tymek, Nela, Ignacy) są niżsi – shorten() usuwa wiersze z tułowia i nóg.
+
 Wymaga: Python 3, numpy, Pillow. Nowa klasa = nowy folder w tools/art/classes/ (np. lotr, lotr_k) i ponowne uruchomienie.
 """
 import base64, glob, io, os, sys
@@ -24,6 +26,8 @@ SRC = os.path.join(ROOT, 'tools/art/classes')
 FW, FH, N = 80, 100, 7
 FOOT_Y = 95      # ostatni wiersz stóp (jak u pozostałych bohaterów)
 FOOT_X = 31      # środek stóp w klatce (rdzeń postaci: x 8..54)
+# młodzi towarzysze (giermek, uczeń, córka leśnika) – niżsi o ten ułamek wzrostu
+YOUNG = {'tymek': .15, 'nela': .13, 'ignacy': .13}
 
 
 def load(p):
@@ -75,6 +79,16 @@ def kneel(a):
     return o
 
 
+def shorten(a, frac):
+    """niższa postać bez przeskalowania: usuwa równomiernie rozłożone wiersze z tułowia i nóg
+    (głowa – górne 30% – zostaje, więc proporcje robią się dziecięce, a piksele ostre)"""
+    h = a.shape[0]
+    n = int(round(h * frac))
+    lo, hi = int(h * .30), int(h * .93)
+    rows = sorted(set(int(lo + (hi - lo) * (i + .5) / n) for i in range(n)))
+    return np.delete(a, rows, axis=0)
+
+
 def place(strip, f, a, dx=0, fx=None, fw=FW):
     h, w = a.shape[:2]
     # bohater: stopy w punkcie fx; forma (szersza klatka): środek obrazka w środku klatki
@@ -92,9 +106,13 @@ def place(strip, f, a, dx=0, fx=None, fw=FW):
 
 def build(d, fw=FW):
     """d = folder eksportu; fw = szerokość klatki (80 bohater, 112 forma niedźwiedzia)"""
+    young = YOUNG.get(os.path.basename(d.rstrip('/')))
     d = os.path.join(d, 'Idle')
     east = crop(load(os.path.join(d, 'rotations/east.png')))
     walk = [crop(load(p)) for p in sorted(glob.glob(os.path.join(d, 'animations/[Ww]alking/east/frame_*.png')))]
+    if young:
+        east = shorten(east, young)
+        walk = [shorten(w, young) for w in walk]
     sp = sorted(range(len(walk)), key=lambda i: -spread(walk[i]))
     wide = sorted(sp[:2])                       # dwie klatki w rozkroku
     mid = sp[-1]                                 # klatka „w przejściu”
