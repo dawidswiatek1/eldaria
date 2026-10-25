@@ -133,7 +133,7 @@ def stroke(pts, widths, wobble=0, seed=0):
 
 # ================================================================ GEOGRAFIA
 # (procenty mapy; układ według pergaminowej mapy Velesii)
-RIVER_MAIN = [(51, -3), (50.5, 5), (49.2, 11), (49.8, 18), (52, 24), (52.5, 30), (51, 36), (50, 42), (50.5, 48)]
+RIVER_MAIN = [(50.5, -3), (49.6, 5), (48.4, 11), (49.2, 18), (52, 24), (52.5, 30), (51, 36), (50, 42), (50.5, 48)]
 RIVER_WEST = [(48, 52), (43, 54), (38, 55.5), (34.5, 58.5), (32.5, 64), (31.5, 71), (32.5, 78), (35.5, 85), (39.5, 91), (42.5, 95), (43.5, 103)]
 RIVER_EAST = [(61.5, 55.5), (61.8, 62), (60.5, 69), (58.5, 76), (55, 83), (50, 88.5), (45.5, 92.5), (43, 95)]
 RIVER_TRIB = [(14, 35), (18.5, 39), (23, 42), (27, 45.5), (31.5, 50), (33.5, 54), (35.5, 57)]
@@ -185,7 +185,7 @@ def build_masks():
     for k, nd in NODES.items():
         if nd['ty'] in ('town', 'poi'):
             x, y = P(nd['x'], nd['y'])
-            mount &= ((XX - x) / 34) ** 2 + ((YY - y + 8) / 26) ** 2 > 1
+            mount &= ((XX - x) / 36) ** 2 + ((YY - y + 14) / 34) ** 2 > 1  # wyżej, bo rysunki (wieża) sięgają w górę
     m['mount'] = mount
     forest = blob(FOREST_W, 22, 14) | blob(FOREST_NE, 16, 15)
     for i, g in enumerate(GROVES):
@@ -552,52 +552,90 @@ MNT = pal('#211c22', '#352e34', '#4a4146', '#62575a', '#7c7070', '#988a86', '#b4
 SNOW = pal('#6c7894', '#a4b0c8', '#d2dcea', '#f2f6fc')
 
 
+MNT_PALS = [pal('#1f1a1e', '#332b30', '#463c40', '#5a4f50', '#726664', '#8c7f7a', '#a89a92', '#c4b7ac'),   # ciepła szarość
+            pal('#1a1c22', '#2a2e38', '#3c414c', '#515662', '#686d78', '#82878f', '#9ea2a8', '#bcc0c4'),   # chłodna
+            pal('#211b16', '#352c24', '#4a3e32', '#605142', '#786754', '#927f6a', '#ac9a84', '#c6b6a0')]   # brązowa
+SNOWP = pal('#5c6880', '#8492ac', '#aebad0', '#d4dde9', '#f4f7fc')
+GRN = pal('#16260e', '#223a14', '#30501a', '#406822', '#54802a', '#6c9a36', '#88b446', '#a4c858')
+
+
+def _ridged(rows, cols, seed, cell):
+    g = np.random.default_rng(seed).random((rows // cell + 3, cols // cell + 3))
+    n = ndimage.zoom(g, cell, order=3)[:rows, :cols]
+    n = (n - n.min()) / max(1e-6, n.max() - n.min())
+    return 1 - np.abs(2 * n - 1)
+
+
 def mountain(w, h, snow=0.0, seed=0, green=False):
+    """góra jako mała mapa wysokości oglądana z ukosa: grzbiety, żleby, światło z lewej-góry,
+    śnieg na szczytach (snow = jaka część wysokości), zielone podnóże (green)"""
     rr = np.random.default_rng(seed)
-    hh, ww = h + 3, w + 2
-    m = np.zeros((hh, ww), bool)
-    peak = ww / 2 + rr.normal(0, w * .1)
-    tops = np.zeros(ww)
-    sh = rr.uniform(1.0, 1.35)
-    for x in range(ww):
-        t = abs(x - peak) / (w / 2)
-        top = h * min(1.2, t ** sh) + rr.normal(0, .7) + (1.5 if rr.random() < .12 else 0)
-        tops[x] = top
-        if t < 1:
-            m[int(max(0, min(hh - 1, top))):, x] = True
-    m[-1, :] = m[-2, :]
-    yy, xx = np.mgrid[0:hh, 0:ww]
-    ridge = peak + (yy - 0) * rr.uniform(-.15, .25) + np.sin(yy * .8 + seed) * .9
-    lit = xx < ridge
-    nz = rr.random((hh, ww))
-    base = np.where(lit, 4.6 - (yy / hh) * 1.6, 2.4 - (yy / hh) * .9)
-    lv = base + (nz - .5) * 1.0
-    for gx in rr.uniform(peak - w * .4, peak + w * .4, 5):
-        slope = rr.uniform(-.35, .35)
-        gl = np.abs(xx - (gx + (yy - h * .25) * slope)) < .55
-        lv = np.where(gl & (yy > h * .3), lv - 1.4, lv)
-    idx = np.clip(lv.astype(int) + 1, 1, 6)
-    out = np.zeros((hh, ww, 4), np.uint8)
-    cols = MNT
-    out[m, :3] = cols[idx[m]]
-    out[m, 3] = 255
-    if green:  # zielone pogórze u dołu
-        gm = m & (yy > hh * .55 + np.sin(xx * .7 + seed) * 1.5)
-        gi = np.clip(np.where(lit, 4, 2) + (nz > .7) - (nz < .25), 1, 5)
-        out[gm, :3] = LEAF_C[0][gi[gm]]
-    if snow > 0:
-        sl = h * snow + np.sin(xx * 1.1 + seed) * 1.6 + (nz - .5) * 2.2
-        sm = m & (yy < sl)
-        sidx = np.where(lit, 3, 1) - ((yy > sl - 1.5) & lit)
-        sidx = np.clip(sidx + ((nz > .88) & ~lit), 0, 3)
-        out[sm, :3] = SNOW[sidx[sm]]
-    ol = ndimage.binary_dilation(m) & ~m
-    o2 = np.zeros((hh + 2, ww + 2, 4), np.uint8)
-    o2[1:-1, 1:-1] = out
-    olp = np.pad(ol, 1)
-    o2[olp, :3] = cols[0]
-    o2[olp, 3] = 255
-    return o2
+    D = max(8, int(w * .5))
+    vs = .45                                   # o ile piksel w głąb przesuwa się na ekranie
+    U, V = np.meshgrid(np.arange(w, dtype=float), np.arange(D, dtype=float))
+    peaks = [(w / 2 + rr.normal(0, w * .07), D * rr.uniform(.4, .55), h, w * .5)]
+    for _ in range((w > 36) + (w > 60) + (rr.random() < .5)):
+        side = rr.choice([-1, 1])
+        peaks.append((w / 2 + side * rr.uniform(w * .15, w * .32), D * rr.uniform(.45, .85), h * rr.uniform(.45, .72), w * rr.uniform(.22, .34)))
+    z = np.zeros((D, w))
+    for (pu, pv, ph, pr) in peaks:
+        d = np.sqrt((U - pu) ** 2 + ((V - pv) * 1.7) ** 2) / pr
+        z = np.maximum(z, ph * np.clip(1 - d, 0, 1) ** 1.15)
+    rid = .6 * _ridged(D, w, seed, 5) + .4 * _ridged(D, w, seed + 1, 3)
+    z = np.where(z > 0, z * (.78 + .38 * rid), 0)
+    # normalne i światło (u w prawo, v do widza, z w górę)
+    gz_v, gz_u = np.gradient(z)
+    nrm = np.sqrt(gz_u ** 2 + gz_v ** 2 + 1)
+    lam = (-gz_u * -.62 + -gz_v * .38 + .72) / nrm
+    P = MNT_PALS[int(rr.integers(0, len(MNT_PALS)))]
+    tex = np.random.default_rng(seed + 7).random((D, w))
+    Hs = int(np.ceil(z.max() + D * vs)) + 3
+    off = int(np.ceil(z.max())) + 1
+    col = np.zeros((Hs, w, 3), np.uint8)
+    fill = np.zeros((Hs, w), bool)
+    dep = np.full((Hs, w), -1)
+    snow_z = z.max() * (1 - snow) if snow > 0 else 1e9
+    for u in range(w):
+        ybuf = Hs
+        for v in range(D - 1, -1, -1):
+            zz = z[v, u]
+            if zz < max(.8, h * .07):  # bez płaskiej „spódnicy” u podstawy
+                continue
+            yt = int(round(off + v * vs - zz))
+            yb = min(ybuf, int(round(off + v * vs)) + 1)  # do podstawy w tym rzędzie, nie do dołu obrazka
+            if yt >= yb:
+                continue
+            l = lam[v, u] + (tex[v, u] - .5) * .18
+            slope = math.hypot(gz_u[v, u], gz_v[v, u])
+            if zz > snow_z + (tex[v, u] - .5) * h * .1 and slope < 3.6:
+                c = SNOWP[cl(int(l * 5.2 - .4), 0, 4)]
+            elif green and zz < h * .22 + tex[v, u] * h * .08:
+                c = GRN[cl(int(l * 7 - .6), 1, 7)]
+            else:
+                li = l * 8.2 - 1.6
+                if (v + int(zz)) % 5 == 0 and l > .55 and tex[v, u] > .55:
+                    li -= 1  # warstwy skalne
+                c = P[cl(int(li), 1, 7)]
+            col[max(0, yt):yb, u] = c
+            fill[max(0, yt):yb, u] = True
+            dep[max(0, yt):yb, u] = v
+            ybuf = min(ybuf, max(0, yt))
+    # linie przesłaniania: tam, gdzie bliższy grzbiet zasłania dalszy
+    jump = np.zeros_like(fill)
+    jump[:-1] |= fill[:-1] & fill[1:] & (dep[1:] - dep[:-1] > 3)
+    jump[:, 1:] |= fill[:, 1:] & fill[:, :-1] & (dep[:, :-1] - dep[:, 1:] > 4)
+    jump[:, :-1] |= fill[:, :-1] & fill[:, 1:] & (dep[:, 1:] - dep[:, :-1] > 4)
+    col[jump] = (col[jump] * .55).astype(np.uint8)
+    out = np.zeros((Hs + 2, w + 2, 4), np.uint8)
+    out[1:-1, 1:-1, :3] = col
+    out[1:-1, 1:-1, 3] = fill * 255
+    fp = np.pad(fill, 1)
+    # obrys z góry i z boków; od dołu góra wtapia się w teren
+    ol = ~fp & (np.roll(fp, -1, 0) | np.roll(fp, 1, 1) | np.roll(fp, -1, 1))
+    ol &= ~(np.roll(fp, 1, 0) & ~np.roll(fp, -1, 0) & ~np.roll(fp, 1, 1) & ~np.roll(fp, -1, 1))
+    out[ol, :3] = P[0]
+    out[ol, 3] = 255
+    return out
 
 
 def raise_mountains(M, keep):
@@ -835,12 +873,22 @@ def write_roads():
 
 # ================================================================ BUDYNKI
 class Cv:
+    """płótno sprite'a: rysujemy piksele, na końcu obrys i cień"""
+
     def __init__(s, w, h):
         s.w, s.h = w, h
         s.a = np.zeros((h, w, 4), np.uint8)
+        s.post = []  # piksele bez obrysu (dym), nakładane na końcu
+        s.gr = np.zeros((h, w, 4), np.uint8)  # warstwa ziemi (plac, ogródki) – pod spodem, bez obrysu
+
+    def g(s, x, y, c):
+        x, y = int(round(x)), int(round(y))
+        if 0 <= x < s.w and 0 <= y < s.h:
+            s.gr[y, x, :3] = hexc(c) if isinstance(c, str) else c
+            s.gr[y, x, 3] = 255
 
     def p(s, x, y, c):
-        x, y = int(x), int(y)
+        x, y = int(round(x)), int(round(y))
         if 0 <= x < s.w and 0 <= y < s.h:
             s.a[y, x, :3] = hexc(c) if isinstance(c, str) else c
             s.a[y, x, 3] = 255
@@ -850,6 +898,9 @@ class Cv:
             for xx in range(int(x), int(x + w)):
                 s.p(xx, yy, c)
 
+    def has(s, x, y):
+        return 0 <= x < s.w and 0 <= y < s.h and s.a[y, x, 3] == 255
+
     def done(s, ol='#1e1410', shadow=True):
         m = s.a[..., 3] == 255
         out = np.zeros((s.h + 2, s.w + 2, 4), np.uint8)
@@ -858,246 +909,521 @@ class Cv:
         o = ndimage.binary_dilation(mp) & ~mp
         out[o, :3] = hexc(ol)
         out[o, 3] = 255
+        gm = (s.gr[..., 3] == 255) & ~m & ~o[1:-1, 1:-1]
+        out[1:-1, 1:-1][gm] = s.gr[gm]
+        for (x, y, col) in s.post:
+            if 0 <= x < s.w and 0 <= y < s.h and not m[y, x]:
+                out[y + 1, x + 1, :3] = hexc(col)
+                out[y + 1, x + 1, 3] = 255
         return with_shadow(out, rx=(s.w + 2) * .5) if shadow else out
 
 
-PL = ['#9c8a6a', '#bcaa86', '#d6c6a0', '#e8dcb8']
-ROOF = {'red': ['#5e2016', '#82301f', '#a8442c', '#c6603c', '#dc7c50'],
-        'thatch': ['#5e4618', '#7e6024', '#9e7c2e', '#ba983c', '#d0b04c'],
-        'slate': ['#262c3e', '#343c52', '#465068', '#5c6882', '#76829c'],
-        'wood': ['#3e2814', '#5a3c20', '#76522a', '#946a36', '#ae8444'],
-        'grey': ['#3a3a3a', '#545250', '#6c6a66', '#86827c', '#9e9a92']}
-ST = ['#4a4640', '#625d55', '#7e786c', '#9a9384', '#b6ae9c', '#ccc4b0']
+def cl(v, a, b):
+    return max(a, min(b, v))
 
 
-def house(c, x, y, w, roof='red', walls=PL, door=True, rh=None):
-    """(x,y) = lewy górny róg dachu"""
-    R_ = ROOF[roof]
-    rh = rh or (4 if w < 9 else 5)
+# kamień: 0 obrys … 6 światło
+STN = ['#231d19', '#433e37', '#5f584d', '#7f7768', '#a09886', '#c2baa6', '#e0d9c6']
+# dachy: 0 obrys … 5 światło
+RF = {'red': ['#3a140c', '#662616', '#8a3820', '#ae4c2c', '#cc663c', '#e6885a'],
+      'slate': ['#161c2a', '#283448', '#3a4a66', '#4e6284', '#667ca0', '#879ebe'],
+      'thatch': ['#36260c', '#644a1e', '#8a682c', '#ae8a3c', '#cea854', '#e6c874'],
+      'wood': ['#26180c', '#432c18', '#614226', '#805834', '#9e7046', '#bc8c5c'],
+      'grey': ['#1c1c1e', '#363638', '#4e4c4a', '#666460', '#7e7a74', '#9a968e'],
+      'turf': ['#16260e', '#2a4218', '#3c5a20', '#527428', '#6a9032', '#86ac42']}
+# tynk: 0 cień … 4 światło
+PLS = ['#6a5842', '#9c8c6c', '#c0b08c', '#dacca8', '#efe4c6']
+PLS_W = ['#3e2c1a', '#5a4028', '#765634', '#8e6a42', '#a8804e']  # drewniane ściany
+PLS_S = ['#3e3a34', '#5e584e', '#7a7468', '#958e80', '#aea698']  # kamienne ściany
+PLS_G = ['#3a3836', '#55524e', '#6c6862', '#827d76', '#98928a']  # szare (Ustronie)
+TMB = '#4a2e18'
+
+
+def wall_cols(walls):
+    if walls is None:
+        return PLS
+    if len(walls) == 4:  # stary format [cień, środek, jasny, światło]
+        return [walls[0], walls[0], walls[1], walls[2], walls[3]]
+    return walls
+
+
+def house(c, x, y, w, roof='red', walls=None, door=True, rh=None, chimney=None, frame=None, lit=True):
+    """dom w widoku 3/4: dach dwuspadowy (kalenica równoległa do frontu) i ściana frontowa.
+    (x, y) = lewy górny róg dachu; zwraca y dolnej krawędzi"""
+    R = RF[roof]
+    P = wall_cols(walls)
+    rh = rh or max(4, int(w * .62))
+    frame = (roof != 'thatch' and walls is None) if frame is None else frame
+    # dach czterospadowy: u góry węższy, na dole z okapem
     for r in range(rh):
-        x0 = x - (1 if r >= 2 else 0)
-        x1 = x + w + (1 if r >= 2 else 0)
-        col = R_[4] if r == 0 else R_[3] if r < rh // 2 + 1 else R_[2] if r < rh - 1 else R_[1]
+        ins = int(round((1 - r / max(1, rh - 1)) * min(2.4, w / 3.5)))
+        ov = 0 if r < 2 else 1
+        x0, x1 = x - ov + ins, x + w + ov - ins
         for xx in range(x0, x1):
-            cc = col
-            if xx == x0:
-                cc = R_[min(4, R_.index(col) + 1)] if r > 0 else col
-            if xx == x1 - 1 and r > 0:
-                cc = R_[max(0, R_.index(col) - 1)]
-            c.p(xx, y + r, cc)
+            t = r / max(1, rh - 1)
+            v = 5 if r == 0 else 4 if t < .34 else 3 if t < .7 else 2
+            if roof in ('red', 'slate', 'grey', 'wood') and r > 0 and r % 2 == 0:
+                v -= 1  # rzędy dachówek
+                if (xx + r // 2 * 2) % 3 == 0:
+                    v += 1
+            if roof == 'thatch' and (xx * 7 + r * 3) % 5 == 0:
+                v -= 1  # źdźbła strzechy
+            if roof == 'turf' and (xx * 5 + r * 3) % 4 == 0:
+                v += 1
+            if xx == x0 and r > 0:
+                v += 1
+            if xx == x1 - 1:
+                v -= 1
+            if r == rh - 1:
+                v = min(v, 2) - (0 if roof == 'thatch' else 1)
+            c.p(xx, y + r, R[cl(v, 1, 5)])
+    # komin z dymem
+    if chimney is not None:
+        cx = x + chimney
+        for yy in range(y - 2, y + 2):
+            c.p(cx, yy, STN[4] if yy < y else STN[3])
+            c.p(cx + 1, yy, STN[2])
+        c.p(cx, y - 2, STN[5])
     wy = y + rh
-    for r in range(3):
+    wh = 4
+    for r in range(wh):
         for xx in range(x, x + w):
-            cc = walls[2] if xx > x else walls[3]
+            v = 3 if r > 0 else 1
+            if xx == x:
+                v += 1
             if xx == x + w - 1:
-                cc = walls[1]
-            if r == 0:
-                cc = walls[0]
-            c.p(xx, wy + r, cc)
+                v -= 1
+            c.p(xx, wy + r, P[cl(v, 0, 4)])
+    if frame:  # mur pruski
+        for xx in [x, x + w - 1] + ([x + w // 2] if w >= 9 else []):
+            for r in range(1, wh):
+                c.p(xx, wy + r, TMB)
+        for xx in range(x, x + w):
+            c.p(xx, wy + 1, TMB if (xx - x) % 4 != 2 else P[3])
+    # okna (świecą ciepło) i drzwi – niesymetrycznie, żeby dom nie miał „twarzy”
+    big = w >= 10
+    dx = x + w // 2 - 1 if big else x + w - 3
+    wins = [x + 2, x + w - 3] if big else [x + 1 + (1 if frame else 0)]
+    for wx in wins:
+        for k in range(2 if big else 1):
+            c.p(wx + k - (1 if big and wx > dx else 0), wy + 2, '#ffd870' if lit else '#2a2228')
+        c.p(wx, wy + 1, '#3a2a20')
     if door:
-        dx = x + w // 2
-        c.p(dx, wy + 1, '#4a301a')
-        c.p(dx, wy + 2, '#3a2412')
-    if w >= 6:
-        c.p(x + 1, wy + 1, '#3a3028')
-        c.p(x + w - 2, wy + 1, '#3a3028')
-    return wy + 3
+        for xx in range(dx, dx + (2 if big else 1)):
+            c.p(xx, wy + 1, '#3e2410')
+            c.p(xx, wy + 2, '#6a4220')
+            c.p(xx, wy + 3, '#4a2c14')
+    # podmurówka
+    for xx in range(x, x + w):
+        c.p(xx, wy + wh - 1, P[1] if (xx % 3) else P[0])
+    return wy + wh
 
 
-def tower(c, x, y, w, h, roof='red', crenel=False):
+def smoke(c, x, y):
+    """dym z komina: kłębki coraz wyżej i bledsze, znoszone w prawo"""
+    for i, (dx, dy, w) in enumerate([(0, 0, 1), (1, -2, 2), (2, -4, 2), (4, -6, 1)]):
+        for k in range(w):
+            c.post.append((x + dx + k, y + dy, '#eceae4' if i < 2 else '#c8c6c0'))
+
+
+def tower(c, x, y, w, h, roof='red', crenel=False, slits=True):
+    """okrągła wieża: cieniowanie walca, cegły, strzelnice; dach stożkowy albo blanki"""
+    cols = [STN[6], STN[5], STN[4], STN[4], STN[3], STN[3], STN[2]]
     for yy in range(y, y + h):
         for xx in range(x, x + w):
-            cc = ST[4] if xx == x else ST[3] if xx < x + w // 2 + 1 else ST[2]
-            if xx == x + w - 1:
-                cc = ST[1]
-            if (yy - y) % 5 == 4 and (xx + yy) % 2 == 0:
-                cc = ST[max(0, ST.index(cc) - 1)]
-            c.p(xx, yy, cc)
-    c.p(x + w // 2, y + h // 3, '#1e1a16')
-    c.p(x + w // 2, y + h // 3 + 1, '#1e1a16')
+            t = (xx - x + .5) / w
+            v = cols[cl(int(t * len(cols)), 0, len(cols) - 1)]
+            vi = STN.index(v)
+            if (yy - y) % 3 == 2 and ((xx + (yy // 3) * 2) % 4 != 0):
+                vi -= 1  # spoiny
+            if yy == y + h - 1:
+                vi -= 1
+            c.p(xx, yy, STN[cl(vi, 1, 6)])
+    if slits:
+        for sy in range(y + 3, y + h - 3, 6):
+            sx = x + w // 2 - (1 if w > 6 else 0)
+            c.p(sx, sy, '#1a1410')
+            c.p(sx, sy + 1, '#1a1410')
     if crenel:
         for xx in range(x - 1, x + w + 1):
-            c.p(xx, y, ST[3] if xx < x + w // 2 else ST[2])
+            t = (xx - x + 1) / (w + 2)
+            c.p(xx, y, STN[5] if t < .4 else STN[4] if t < .7 else STN[2])
+            c.p(xx, y + 1, STN[2])
             if (xx - x) % 2 == 0:
-                c.p(xx, y - 1, ST[4] if xx < x + w // 2 else ST[2])
+                c.p(xx, y - 1, STN[6] if t < .5 else STN[3])
+                c.p(xx, y - 2, STN[5] if t < .5 else STN[3])
     elif roof:
-        R_ = ROOF[roof]
-        rh = int(w * 1.3) + 1
+        R = RF[roof]
+        rh = int(w * 1.35) + 2
         cx = x + (w - 1) / 2
         for r in range(rh):
-            half = (r + 1) / rh * (w / 2 + 1)
+            half = (r + 1) / rh * (w / 2 + 1.2)
             for xx in range(int(math.floor(cx - half + .5)), int(math.ceil(cx + half - .5)) + 1):
-                cc = R_[4] if xx < cx - half * .3 else R_[3] if xx <= cx else R_[2]
+                t = (xx - (cx - half)) / max(1, 2 * half)
+                v = 5 if t < .25 else 4 if t < .5 else 3 if t < .75 else 2
+                if r % 3 == 2:
+                    v -= 1
                 if r == rh - 1:
-                    cc = R_[1]
-                c.p(xx, y - rh + r, cc)
+                    v = 1
+                c.p(xx, y - rh + r + 1, R[cl(v, 1, 5)])
+        c.p(cx, y - rh, STN[1])
+
+
+def keep(c, x, y, w, h, side=3, roof='red'):
+    """kwadratowa wieża/donżon w 3/4: front, ciemniejszy bok, blanki i dach namiotowy"""
+    for yy in range(y, y + h):
+        for xx in range(x, x + w + side):
+            if xx < x + w:
+                v = 5 if xx == x else 4
+            else:
+                v = 2 if xx < x + w + side - 1 else 1
+            if (yy - y) % 3 == 2 and ((xx + (yy // 3) * 2) % 4 != 0):
+                v -= 1
+            c.p(xx, yy, STN[cl(v, 1, 6)])
+    # okna: rzędy
+    for wy in range(y + 4, y + h - 4, 6):
+        for wx in range(x + 2, x + w - 1, 3):
+            c.p(wx, wy, '#ffd870' if (wx + wy) % 5 == 0 else '#1a1410')
+            c.p(wx, wy + 1, '#1a1410')
+    # blanki
+    for xx in range(x - 1, x + w + side + 1):
+        c.p(xx, y - 1, STN[3] if xx < x + w else STN[2])
+        if (xx - x) % 2 == 0:
+            c.p(xx, y - 2, STN[6] if xx < x + w else STN[3])
+    if roof:
+        R = RF[roof]
+        tw = w + side
+        rh = tw // 2 + 2
+        for r in range(rh):
+            inset = int(r * .0)
+            x0 = x + (tw // 2) - (r + 1) * tw // (2 * rh) - 0
+            x1 = x + (tw // 2) + (r + 1) * tw // (2 * rh)
+            for xx in range(x0, x1 + 1):
+                t = (xx - x0) / max(1, x1 - x0)
+                v = 5 if t < .3 else 4 if t < .55 else 2
+                if r % 3 == 2:
+                    v -= 1
+                c.p(xx, y - 2 - rh + r, R[cl(v, 1, 5)])
 
 
 def wall(c, x, y, w, h=4):
+    """mur kurtynowy: lico z cegłami, chodnik i blanki"""
     for yy in range(y, y + h):
         for xx in range(x, x + w):
-            cc = ST[3] if yy == y else ST[2] if yy < y + h - 1 else ST[1]
-            if (xx * 3 + yy) % 7 == 0 and yy > y:
-                cc = ST[1]
-            c.p(xx, yy, cc)
-    for xx in range(x, x + w, 2):
-        c.p(xx, y - 1, ST[4])
+            v = 4 if yy == y else 3
+            if yy == y + h - 1:
+                v = 2
+            if yy > y and (yy - y) % 3 == 0 and (xx + (yy // 3) * 2) % 4 != 0:
+                v -= 1
+            c.p(xx, yy, STN[cl(v, 1, 6)])
+    for xx in range(x, x + w):
+        if (xx - x) % 2 == 0:
+            c.p(xx, y - 1, STN[5])
+            c.p(xx, y - 2, STN[6])
+        else:
+            c.p(xx, y - 1, STN[3])
+
+
+def gatehouse(c, x, y, w=12, h=14, roof='red'):
+    """brama: dwie wieżyczki i łukowe przejście z kratą"""
+    tower(c, x, y, 4, h, roof)
+    tower(c, x + w - 4, y, 4, h, roof)
+    for yy in range(y + 3, y + h):
+        for xx in range(x + 4, x + w - 4):
+            c.p(xx, yy, STN[4] if yy > y + 3 else STN[5])
+    gx0, gx1, gy = x + 5, x + w - 5, y + h - 6
+    for yy in range(gy, y + h):
+        for xx in range(gx0, gx1):
+            arch = yy == gy and (xx == gx0 or xx == gx1 - 1)
+            if arch:
+                continue
+            c.p(xx, yy, '#120c08' if (xx - gx0) % 2 or yy == gy else '#3a2a1a')
 
 
 def palisade(c, x, y, w, h=4):
     for xx in range(x, x + w):
         top = y - (1 if xx % 2 == 0 else 0)
         for yy in range(top, y + h):
-            c.p(xx, yy, '#8a6232' if xx % 2 == 0 else '#6a4824')
-        c.p(xx, top, '#a87c44')
+            c.p(xx, yy, '#9a6e38' if xx % 2 == 0 else '#6e4c26')
+        c.p(xx, top, '#c49a5a' if xx % 2 == 0 else '#8a6232')
+        c.p(xx, y + 1, '#4a3018')  # wiązanie
 
 
-def rock_base(c, cx, cy, rx, ry, seed=0):
-    """skaliste wzgórze: trawiasty wierzch, urwiste ściany z pionowymi rysami"""
+def castle_hill(c, cx, top, rx, depth, seed=0, path=None, grass=True):
+    """wzgórze pod grodem: płaski wierzch, trawiaste stoki rozszerzające się ku dołowi,
+    skalne urwisko od frontu z pionowymi rysami, ścieżka do bramy"""
     rr = random.Random(seed)
-    top = cy - ry * .2
-    cols = [hexc(x) for x in ('#3a3530', '#544c44', '#6e655a', '#8a8072', '#a69c8a')]
+    G = [hexc(h) for h in ('#2e4a1c', '#3e6024', '#4e762c', '#5e8a34', '#72a03e')]
+    Rk = [hexc(h) for h in ('#2e2924', '#46403a', '#615a50', '#7d7568', '#9a9282')]
+    if not grass:
+        G = [hexc(h) for h in ('#3a3436', '#544c4e', '#6e6466', '#8a7f7e', '#a89c98')]
+    base = top + depth
+    streak = {}
     for xx in range(int(cx - rx), int(cx + rx) + 1):
         dx = (xx - cx) / rx
         if abs(dx) > 1:
             continue
-        bot = cy + ry * math.sqrt(max(0, 1 - dx * dx)) + rr.uniform(-.6, .6)
-        t0 = top + abs(dx) ** 3 * ry * .8
-        streak = rr.uniform(-.8, .8)
-        for yy in range(int(t0), int(bot) + 1):
-            f = (yy - t0) / max(1, bot - t0)
-            lv = 3.3 - dx * 1.3 - f * 1.6 + streak
-            col = cols[int(max(0, min(4, lv)))]
-            if yy <= t0 + 1:
-                col = LEAF_C[1][4] if yy <= t0 else LEAF_C[0][2]
-            c.p(xx, yy, col)
+        surf = top + depth * max(0, (abs(dx) - .55) / .45) ** 1.4 * .9  # płaski szczyt, stoki
+        cliff0 = surf + 2
+        cliff1 = base - 3 - (1 if rr.random() < .4 else 0)
+        st = streak.setdefault(xx // 2, rr.uniform(-.9, .9))
+        for yy in range(int(surf), int(base) + 1):
+            on_cliff = abs(dx) < .72 and cliff0 <= yy <= cliff1
+            if on_cliff:
+                f = (yy - cliff0) / max(1, cliff1 - cliff0)
+                v = 3.3 - dx * 1.3 - f * 1.4 + st
+                c.p(xx, yy, Rk[cl(int(v), 0, 4)])
+            else:
+                lv = 3.2 - dx * 1.4 - (.8 if yy > cliff1 else 0) + rr.uniform(-.5, .5)
+                if yy == int(surf):
+                    lv += 1
+                c.p(xx, yy, G[cl(int(lv), 0, 4)])
+    if path:  # ścieżka do bramy
+        (px0, py0), (px1, py1) = path
+        n = int(max(abs(px1 - px0), abs(py1 - py0))) + 1
+        for i in range(n):
+            t = i / max(1, n - 1)
+            px = px0 + (px1 - px0) * t + math.sin(t * 6) * 2
+            py = py0 + (py1 - py0) * t
+            c.p(px, py, '#c8aa6a')
+            c.p(px + 1, py, '#9c7c48')
 
 
-def flag(c, x, y, col='#c8282a', col2='#f0e8d8'):
-    for yy in range(y, y + 6):
+def flag(c, x, y, col='#c8282a', col2='#f0e8d8', h=6):
+    for yy in range(y, y + h):
         c.p(x, yy, '#3a2a1a')
-    for xx in range(1, 4):
+    for xx in range(1, 5):
         c.p(x + xx, y, col)
-        c.p(x + xx, y + 1, col2 if xx < 3 else col)
+        c.p(x + xx, y + 1, col if xx != 2 else col2)
+        if xx < 4:
+            c.p(x + xx, y + 2, col)
 
 
-# ---------------------------------------------------------------- miejsca
-def lm_castle():
-    c = Cv(66, 58)
-    rock_base(c, 33, 50, 31, 9, 1)
-    wall(c, 9, 31, 48, 9)
-    tower(c, 5, 22, 7, 18, 'red')
-    tower(c, 54, 22, 7, 18, 'red')
-    tower(c, 18, 26, 6, 10, 'red')
-    tower(c, 42, 26, 6, 10, 'red')
-    tower(c, 27, 14, 12, 24, 'red')
-    tower(c, 35, 10, 5, 10, 'red')
-    flag(c, 33, 1)
-    # brama
-    for yy in range(35, 40):
-        for xx in range(31, 35):
-            c.p(xx, yy, '#1e140e' if yy > 35 or 32 <= xx <= 33 else ST[1])
-    # domy podgrodzia
-    house(c, 2, 42, 7, 'red')
-    house(c, 55, 43, 8, 'red')
-    house(c, 12, 46, 6, 'thatch')
-    return c.done()
+def well(c, x, y):
+    for xx in range(x, x + 4):
+        c.p(xx, y, STN[4] if xx < x + 2 else STN[3])
+        c.p(xx, y + 1, STN[3] if xx < x + 2 else STN[2])
+    c.p(x + 1, y, '#1a2a3a')
+    c.p(x + 2, y, '#1a2a3a')
+    c.p(x, y - 1, TMB)
+    c.p(x + 3, y - 1, TMB)
+    for xx in range(x, x + 4):
+        c.p(xx, y - 2, RF['wood'][4])
 
 
-def lm_town_walled(seed, n=12, roof='red', church=True, w=58, h=34):
+def haystack(c, x, y):
+    for (dx, dy, v) in [(1, 0, 5), (2, 0, 4), (0, 1, 5), (1, 1, 4), (2, 1, 4), (3, 1, 3), (0, 2, 4), (1, 2, 3), (2, 2, 3), (3, 2, 2)]:
+        c.p(x + dx, y + dy, RF['thatch'][v])
+
+
+def fence(c, x, y, w):
+    for xx in range(x, x + w):
+        c.p(xx, y, '#8a6232')
+        if (xx - x) % 3 == 0:
+            c.p(xx, y - 1, '#a87c44')
+            c.p(xx, y + 1, '#4a3018')
+
+
+def garden(c, x, y, w, h):
+    for yy in range(y, y + h):
+        for xx in range(x, x + w):
+            c.g(xx, yy, '#6a4a28' if yy % 2 else ('#5e9a34' if (xx + yy) % 3 else '#8ac04a'))
+
+
+def windmill(c, x, y):
+    """wiatrak: drewniana wieża i cztery skrzydła"""
+    for yy in range(y + 8, y + 20):
+        hw = 2 + (yy - y - 8) // 4
+        for xx in range(x - hw, x + hw + 1):
+            c.p(xx, yy, RF['wood'][4] if xx < x else RF['wood'][3] if xx == x else RF['wood'][2])
+    for xx in range(x - 3, x + 4):
+        c.p(xx, y + 7, RF['thatch'][3])
+    hx, hy = x, y + 8
+    for (dx, dy) in [(1, -1), (-1, -1), (1, 1), (-1, 1)]:
+        for i in range(1, 8):
+            c.p(hx + dx * i, hy + dy * i, '#e8dcc0' if i % 2 else '#7a5a34')
+            c.p(hx + dx * i + (1 if dx > 0 else -1), hy + dy * i, '#c8bca0')
+    c.p(hx, hy, '#3a2614')
+
+
+def tree_c(c, x, y, r, cols=None, trunk=True, seed=0):
+    """liściaste drzewo wprost na płótnie (do kompozycji osad)"""
     rr = random.Random(seed)
-    c = Cv(w, h)
-    # mury
-    wall(c, 2, h - 7, w - 4, 6)
-    for tx in (0, w - 7, w // 2 - 3):
-        tower(c, tx, h - 15, 6, 12, 'red' if roof == 'red' else 'slate')
-    spots = []
-    for i in range(n):
-        for _ in range(40):
-            hw = rr.randint(6, 9)
-            x = rr.randint(3, w - hw - 3)
-            y = rr.randint(3, h - 16)
-            if all(abs(x - sx) > 6 or abs(y - sy) > 5 for sx, sy in spots):
-                spots.append((x, y))
-                break
-    for (x, y) in sorted(spots, key=lambda s: s[1]):
-        house(c, x, y, rr.randint(6, 9), roof if rr.random() < .85 else 'thatch')
-    if church:
-        tower(c, w // 2 - 3, 2, 6, 14, 'slate')
+    L = cols or [hexc(h) for h in ('#2a4618', '#3a5e20', '#4e782a', '#649434', '#7eae42')]
+    for yy in range(int(y - r), int(y + r) + 1):
+        for xx in range(int(x - r), int(x + r) + 1):
+            d = ((xx - x) / r) ** 2 + ((yy - y) / (r * .9)) ** 2
+            if d < 1 - rr.random() * .15:
+                v = 2.6 - (xx - x) / r * 1.2 - (yy - y) / r * 1.3 + rr.uniform(-.7, .7)
+                c.p(xx, yy, L[cl(int(v), 0, 4)])
+    if trunk:
+        for yy in range(int(y + r * .7), int(y + r + 3)):
+            c.p(x, yy, '#4a3018')
+
+
+def village_ground(c, x, y, w, h, col='#a08454'):
+    """ubita ziemia placu wiejskiego (rozmyta krawędź)"""
+    rr = random.Random(int(x * 7 + y))
+    for yy in range(y, y + h):
+        for xx in range(x, x + w):
+            dx, dy = (xx - x - w / 2) / (w / 2), (yy - y - h / 2) / (h / 2)
+            if dx * dx + dy * dy < 1 - rr.random() * .25:
+                c.g(xx, yy, col if rr.random() < .85 else '#8a6e44')
+
+
+# ---------------------------------------------------------------- miasta i gród
+def lm_castle():
+    """Weleszów: zamek królewski na skalistym wzgórzu nad Veleską, podgrodzie u stóp"""
+    c = Cv(96, 82)
+    castle_hill(c, 48, 50, 46, 26, 1, path=((45, 60), (34, 79)))
+    # zabudowa wewnątrz murów (za murem)
+    house(c, 14, 30, 11, 'slate', rh=5, walls=PLS_S)          # kaplica
+    tower(c, 16, 22, 5, 12, 'slate')                             # dzwonnica
+    keep(c, 34, 14, 20, 30, side=4, roof='red')                 # donżon
+    tower(c, 58, 6, 8, 38, 'red')                                # wysoka wieża
+    flag(c, 61, -2 + 0, '#c8282a', '#f0e8d8', 7)
+    house(c, 69, 32, 12, 'red', rh=5)                            # sala
+    flag(c, 44, 0, '#c8282a', '#f0e8d8', 5)
+    # mury z wieżami
+    wall(c, 8, 44, 80, 10)
+    for tx, th in [(4, 22), (24, 16), (64, 16), (86, 22)]:
+        tower(c, tx, 54 - th, 7 if th > 18 else 6, th, 'red')
+    gatehouse(c, 41, 40, 14, 15, 'red')
+    # podgrodzie u stóp wzgórza
+    house(c, 1, 64, 8, 'red', chimney=5)
+    house(c, 82, 66, 9, 'red', chimney=2)
+    house(c, 12, 70, 7, 'thatch')
+    house(c, 71, 72, 8, 'thatch', chimney=4)
+    smoke(c, 6, 61)
+    smoke(c, 85, 63)
     return c.done()
 
 
 def lm_sanow():
-    c = Cv(70, 40)
+    """Sanów: miasto kupców nad jeziorem – mury od wody, rzędy kamienic, kościół, rynek, spichlerz"""
     rr = random.Random(4)
-    spots = []
-    for i in range(16):
-        for _ in range(60):
-            hw = rr.randint(6, 9)
-            x = rr.randint(3, 62 - hw)
-            y = rr.randint(6, 22)
-            if all(abs(x - sx) > 7 or abs(y - sy) > 5 for sx, sy in spots):
-                spots.append((x, y))
+    c = Cv(86, 52)
+    village_ground(c, 30, 24, 28, 10, '#b8a888')
+    for ry in (1, 11, 21):
+        x = 1 + (ry // 8) % 2 * 3
+        while x < 80:
+            w = rr.randint(7, 9)
+            if ry < 18 and 31 <= x + w and x <= 52:
+                x = 53
+                continue
+            if x + w > 84:
                 break
-    tower(c, 30, 4, 7, 16, 'slate')
-    for (x, y) in sorted(spots, key=lambda s: s[1]):
-        house(c, x, y, rr.randint(6, 9), 'red' if rr.random() < .8 else 'thatch')
-    wall(c, 1, 31, 68, 5)
-    for tx in (0, 22, 44, 63):
-        tower(c, tx, 22, 6, 13, 'red')
-    return c.done()
-
-
-def lm_village(seed, n=4, roof='thatch', walls=PL, extra=None):
-    rr = random.Random(seed)
-    c = Cv(40, 24)
-    spots = [(3, 9), (14, 4), (24, 10), (9, 13), (28, 3), (19, 13)][:n]
-    for (x, y) in sorted(spots, key=lambda s: s[1]):
-        house(c, x, y, rr.randint(6, 8), roof if rr.random() < .8 else 'wood', walls)
-    if extra:
-        extra(c)
-    return c.done()
-
-
-def lm_dabrowa():
-    c = Cv(52, 36)
-    # święty dąb
-    for (x, y, r) in [(13, 9, 9), (8, 12, 6), (19, 11, 6), (13, 4, 6)]:
-        for yy in range(y - r, y + r):
-            for xx in range(x - r, x + r):
-                if (xx - x) ** 2 + ((yy - y) * 1.15) ** 2 < r * r:
-                    lv = 3 - (xx - x) / r - (yy - y) / r + R.uniform(-.7, .7)
-                    c.p(xx, yy, LEAF_C[0][int(max(1, min(5, lv)))])
-    for yy in range(18, 26):
-        c.p(13, yy, '#4a3018')
-        c.p(14, yy, '#3a2410')
-    c.p(12, 25, '#4a3018')
-    c.p(15, 25, '#3a2410')
-    for (x, y, w, rf) in [(26, 6, 8, 'thatch'), (38, 9, 7, 'wood'), (22, 15, 7, 'thatch'), (33, 16, 8, 'thatch'), (43, 18, 6, 'wood')]:
-        house(c, x, y, w, rf)
-    palisade(c, 1, 29, 50, 5)
+            ch = rr.randint(1, w - 2) if rr.random() < .35 else None
+            house(c, x, ry, w, 'red' if rr.random() < .75 else rr.choice(['thatch', 'wood', 'slate']), chimney=ch)
+            if ch is not None and rr.random() < .6:
+                smoke(c, x + ch, ry - 3)
+            x += w + rr.randint(1, 3)
+    tower(c, 40, 8, 6, 16, 'slate')                               # kościół
+    house(c, 33, 15, 18, 'slate', rh=5, walls=PLS_S)
+    house(c, 56, 23, 16, 'wood', rh=4, walls=PLS_W, frame=False)  # spichlerz
+    wall(c, 1, 40, 84, 8)
+    for tx in (0, 27, 54, 79):
+        tower(c, tx, 28, 7, 20, 'red')
+    gatehouse(c, 36, 35, 14, 13, 'red')
     return c.done()
 
 
 def lm_kregoszew():
-    c = Cv(50, 46)
-    rock_base(c, 25, 38, 23, 9, 7)
-    palisade(c, 3, 30, 44, 5)
-    tower(c, 18, 8, 12, 24, 'slate')
-    tower(c, 6, 18, 6, 13, 'slate')
-    tower(c, 38, 18, 6, 13, 'slate')
-    house(c, 30, 21, 7, 'wood')
-    flag(c, 24, 0, '#3a5aa8', '#f0e8d8')
+    """Kręgoszew: kamienna strażnica na skale, palisada, chaty u stóp"""
+    c = Cv(60, 58)
+    castle_hill(c, 30, 32, 28, 20, 7, path=((27, 41), (20, 57)))
+    keep(c, 20, 8, 14, 26, side=4, roof='slate')
+    tower(c, 10, 18, 6, 16, 'slate')
+    tower(c, 40, 16, 6, 18, 'slate')
+    flag(c, 27, -2, '#3a5aa8', '#f0e8d8', 6)
+    wall(c, 8, 32, 44, 6)
+    gatehouse(c, 23, 28, 12, 11, 'slate')
+    palisade(c, 1, 47, 14, 5)
+    palisade(c, 45, 47, 14, 5)
+    house(c, 2, 39, 8, 'wood', walls=PLS_W, chimney=2)
+    house(c, 49, 40, 8, 'thatch')
+    smoke(c, 4, 36)
+    return c.done()
+
+
+def lm_dabrowa():
+    """Dąbrowa: osada przy Świętym Dębie, palisada, chaty, ogródki zielarzy"""
+    c = Cv(64, 44)
+    village_ground(c, 20, 20, 40, 14)
+    # Święty Dąb
+    oak = [hexc(h) for h in ('#1e3612', '#2e4e1a', '#406a24', '#56862e', '#70a23a')]
+    for (x, y, r) in [(13, 13, 10), (6, 16, 7), (20, 15, 7), (13, 6, 7), (8, 9, 5), (18, 8, 5)]:
+        tree_c(c, x, y, r, oak, trunk=False, seed=x * 3 + y)
+    for yy in range(20, 31):
+        c.p(12, yy, '#5a3a1c')
+        c.p(13, yy, '#4a2e14')
+        c.p(14, yy, '#3a2410')
+    for (dx, dy) in [(-2, 0), (-1, 0), (3, 0), (4, 0)]:
+        c.p(13 + dx, 30 + dy, '#4a2e14')
+    for (x, y) in [(7, 30), (19, 31)]:  # kamienie ofiarne
+        c.p(x, y, STN[5])
+        c.p(x, y - 1, STN[4])
+    house(c, 26, 8, 9, 'thatch', walls=PLS_W, chimney=6)
+    house(c, 39, 6, 10, 'thatch', walls=PLS_W)
+    house(c, 51, 11, 8, 'wood', walls=PLS_W, chimney=2)
+    house(c, 30, 19, 8, 'thatch', walls=PLS_W)
+    house(c, 44, 19, 9, 'wood', walls=PLS_W)
+    garden(c, 22, 30, 7, 4)
+    garden(c, 55, 26, 6, 4)
+    well(c, 40, 32)
+    smoke(c, 32, 5)
+    smoke(c, 53, 8)
+    palisade(c, 1, 37, 26, 5)
+    palisade(c, 37, 37, 26, 5)
+    for xx in (27, 36):  # wieżyczki bramy
+        for yy in range(31, 42):
+            c.p(xx, yy, '#8a6232')
+            c.p(xx + 1, yy, '#6a4824')
+        for x2 in range(xx - 1, xx + 3):
+            c.p(x2, 30, RF['thatch'][4])
+            c.p(x2, 31, RF['thatch'][2])
     return c.done()
 
 
 def lm_kurhanow():
-    c = Cv(46, 28)
-    for (x, y, w) in [(4, 8, 7), (16, 4, 8), (28, 9, 7), (12, 15, 6), (36, 3, 6)]:
-        house(c, x, y, w, 'thatch' if x % 3 else 'wood')
-    for xx in (2, 8, 14, 20, 26, 32, 38, 44):
-        c.p(xx, 26, '#5a3c20')
-        c.p(xx, 25, '#7a5430')
+    """Kurhanów: drewniane chaty z darniowymi dachami, menhiry, płot"""
+    c = Cv(54, 34)
+    village_ground(c, 6, 14, 42, 12, '#9a8456')
+    for (x, y, w, rf) in [(4, 8, 9, 'turf'), (18, 4, 10, 'thatch'), (33, 7, 9, 'turf'), (12, 16, 8, 'wood'), (40, 15, 8, 'thatch')]:
+        house(c, x, y, w, rf, walls=PLS_W, chimney=3 if rf == 'thatch' else None)
+    for (x, h) in [(2, 5), (50, 6), (30, 4)]:  # menhiry
+        for yy in range(30 - h, 30):
+            c.p(x, yy, STN[5] if yy < 30 - h + 2 else STN[4])
+            c.p(x + 1, yy, STN[2])
+    fence(c, 6, 31, 40)
+    smoke(c, 22, 1)
+    smoke(c, 43, 12)
+    return c.done()
+
+
+def lm_village(seed, n=4, roof='thatch', walls=None, extra=None, props=('hay', 'well', 'garden'), lit=True, smoky=True):
+    """wieś: chaty wokół placu, studnia, stogi, ogródki, płotki, dym z kominów"""
+    rr = random.Random(seed)
+    c = Cv(48, 30)
+    village_ground(c, 6, 12, 34, 12)
+    spots = [(3, 8), (16, 3), (29, 7), (10, 15), (36, 1), (24, 16)][:n]
+    for (x, y) in sorted(spots, key=lambda s: s[1]):
+        w = rr.randint(7, 9)
+        ch = rr.randint(1, w - 2) if rr.random() < .6 else None
+        house(c, x, y, w, roof if rr.random() < .8 or not lit else 'wood', walls, chimney=ch, lit=lit)
+        if smoky and ch is not None and rr.random() < .7:
+            smoke(c, x + ch, y - 3)
+    if 'well' in props:
+        well(c, 22, 24)
+    if 'hay' in props:
+        haystack(c, 40, 22)
+        haystack(c, 44, 24)
+    if 'garden' in props:
+        garden(c, 1, 24, 7, 4)
+    fence(c, 0, 28, 14)
+    fence(c, 32, 28, 16)
+    if extra:
+        extra(c)
     return c.done()
 
 
@@ -1133,8 +1459,8 @@ def lm_circle(n=9, rx=11, ry=5, rune=False):
     for (x, y) in pts:
         hgt = 4 if y > ry + 5 else 3
         for yy in range(int(y) - hgt, int(y) + 1):
-            c.p(x, yy, ST[4] if yy == int(y) - hgt else ST[3])
-            c.p(x + 1, yy, ST[1])
+            c.p(x, yy, STN[6] if yy == int(y) - hgt else STN[5])
+            c.p(x + 1, yy, STN[2])
         if rune:
             c.p(x, int(y) - 2, '#7ae0ff')
     if rune:
@@ -1235,7 +1561,7 @@ def lm_hut(skulls=False, leg=False):
 
 def lm_cave():
     c = Cv(26, 18)
-    rock_base(c, 13, 16, 13, 14, 3)
+    castle_hill(c, 13, 3, 13, 14, 3, grass=False)
     for yy in range(6, 17):
         for xx in range(6, 21):
             d = ((xx - 13) / 7) ** 2 + ((yy - 17) / 10) ** 2
@@ -1392,15 +1718,16 @@ def wisps(x, y):
 
 def landmarks():
     L = {}
-    L['weleszow'] = (lm_castle(), -4)
+    L['weleszow'] = (lm_castle(), -4, 8)  # (sprite, przesunięcie w pionie, w poziomie)
     L['sanow'] = (lm_sanow(), -4)
     L['dabrowa'] = (lm_dabrowa(), -5)
     L['kregoszew'] = (lm_kregoszew(), -4)
     L['kurhanow'] = (lm_kurhanow(), -6)
-    L['brzezina'] = (lm_village(11, 4, 'thatch'), -6)
-    L['olszynow'] = (lm_village(12, 5, 'thatch'), -6)
-    L['wschodnia'] = (lm_village(13, 4, 'slate', ['#5a5650', '#7a746a', '#948d80', '#aaa294'], lambda c: tower(c, 30, 2, 6, 16, 'slate')), -6)
-    L['ustronie'] = (lm_village(14, 4, 'grey', ['#5a5650', '#7a746a', '#8a8478', '#9a9488']), -6)
+    birch = [hexc(h) for h in ('#3e5a24', '#567a2e', '#6e9638', '#88b046', '#a4c858')]
+    L['brzezina'] = (lm_village(11, 4, 'thatch', extra=lambda c: [tree_c(c, x, y, 4, birch, seed=x) for (x, y) in ((44, 8), (2, 3))]), -6)
+    L['olszynow'] = (lm_village(12, 4, 'thatch', props=('hay', 'well'), extra=lambda c: windmill(c, 43, 0)), -6)
+    L['wschodnia'] = (lm_village(13, 4, 'slate', PLS_S, extra=lambda c: tower(c, 41, 6, 6, 18, None, crenel=True), props=('well', 'garden')), -6)
+    L['ustronie'] = (lm_village(14, 4, 'grey', PLS_G, props=('garden',), lit=False, smoky=False), -6)
     L['mokradla'] = (lm_stilts(), -5)
     L['mlyn'] = (lm_mill(), -6)
     L['kapliczka'] = (lm_shrine(), -6)
@@ -1446,21 +1773,38 @@ def main():
     band = rw.copy()
     for dy in range(-2, 19):
         band |= np.roll(rw, dy, axis=0)
-    nofor = keep | M['water'] | busy | band
+    L = landmarks()
+    lmk = np.zeros((H, W), bool)  # prostokąty rysunków miejsc (+ zasięg koron drzew pod nimi)
+    for k, v in L.items():
+        if k in NODES:
+            spr, dy, dx = (v + (0,))[:3]
+            x, y = NP(k)
+            sh, sw = spr.shape[:2]
+            x0, x1 = int(x + dx - sw / 2) - 3, int(x + dx + sw / 2) + 3
+            y0, y1 = int(y + dy - sh * .8), int(y + dy + 18)
+            lmk[max(0, y0):max(0, y1), max(0, x0):max(0, x1)] = True
+    nofor = keep | M['water'] | busy | band | lmk
     # tam, gdzie w lesie nie wyrosną drzewa (przy drogach i miejscach), zamiast gołej ściółki – trawiasta przesieka
-    fr = M['forest'] & (band | keep) & ~rm & ~M['water']
+    fr = M['forest'] & (band | keep | lmk) & ~rm & ~M['water']
     gr = GRASS[np.clip(tone(N2 * .6 + N3 * .4, 6, .7) - 2, 0, 3)]
     img[fr] = gr[fr]
     plant_trees(M, nofor)
     in_mnt = [k for k, nd in NODES.items() if nd['ty'] == 'site' and M['mount'][int(NP(k)[1]), int(NP(k)[0])]]
-    raise_mountains(M, node_area(skip=in_mnt) | ndimage.binary_dilation(rm, iterations=2))  # drogi górskie i tak rysujemy na wierzchu
+    lmk_m = np.zeros((H, W), bool)  # góry nie zasłaniają rysunków miejsc u podnóża (wieża, wieś, kaplica)
+    for k, v in L.items():
+        if k in NODES and k not in in_mnt:
+            spr, dy, dx = (v + (0,))[:3]
+            x, y = NP(k)
+            sh, sw = spr.shape[:2]
+            lmk_m[max(0, int(y + dy - sh)):int(y + dy + 6), max(0, int(x + dx - sw / 2 - 2)):int(x + dx + sw / 2 + 2)] = True
+    raise_mountains(M, node_area(skip=in_mnt) | ndimage.binary_dilation(rm, iterations=2) | lmk_m)  # drogi górskie i tak rysujemy na wierzchu
     place_barrows(M, keep | busy)
-    L = landmarks()
-    for k, (spr, dy) in L.items():
+    for k, v in L.items():
         if k in NODES:
+            spr, dy, dx = (v + (0,))[:3]
             x, y = NP(k)
             top = 1000 if M['mount'][int(y), int(x)] else 0  # w górach: nad szczytami
-            add(y + dy + 1 + top, lambda s=spr, x=x, y=y + dy: blit(s, x, y))
+            add(y + dy + 1 + top, lambda s=spr, x=x + dx, y=y + dy: blit(s, x, y))
     if 'jary' in NODES:
         x, y = NP('jary')
         lm_gorge()(x, y - 4)

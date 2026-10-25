@@ -81,16 +81,18 @@ function qMark(k){return Object.keys(S.q).some(id=>{const q=S.q[id];if(q.done)re
 /* --- podróż: kompania idzie po narysowanych drogach, po drodze 30% szans na wydarzenie --- */
 /* kształt drogi a→b z mapy (ROADS w js/data/velesia-roads.js, punkty w % mapy); bez danych – prosto */
 function roadLine(a,b){const r=ROADS[a+'|'+b];if(r)return r;const q=ROADS[b+'|'+a];if(q)return q.slice().reverse();return [[NODES[a].x,NODES[a].y],[NODES[b].x,NODES[b].y]]}
-const WALK_PX=.11;/* piksele mapy na milisekundę (przy prędkości gry ×1) */
+const WALK_PX=.05;/* piksele mapy na milisekundę (przy prędkości gry ×1); dotknięcie mapy w marszu przyspiesza ×4 */
 function travel(to,then){if(_trav)return;const path=pathTo(hereNode(),to);if(!path||path.length<2){if(then)then();return}_trav=true;window._lp=path;const g=document.getElementById('ngo');if(g)g.remove();const mk=document.getElementById('pmark');
- const done=()=>{if(mk){mk.classList.remove('walk','fl');mk.style.transition=''}passDays(path.length-1);arrive(to,then,path.length-1)};
+ const rv=document.getElementById('rview');let hurry=false;const hz=()=>{hurry=true};
+ const done=()=>{if(rv)rv.removeEventListener('pointerdown',hz);if(mk){mk.classList.remove('walk','fl');mk.style.transition=''}passDays(path.length-1);arrive(to,then,path.length-1)};
  if(!mk){done();return}
  /* jedna linia przez wszystkie odcinki; at[n] = indeks punktu, w którym kompania mija n-te miejsce */
  const pts=[],at=[0];path.slice(1).forEach((k,i)=>{roadLine(path[i],k).forEach((p,j)=>{if(i&&!j)return;pts.push(p)});at.push(pts.length-1)});
  const d=[0];for(let i=1;i<pts.length;i++)d.push(d[i-1]+Math.hypot((pts[i][0]-pts[i-1][0])*MAPW/100,(pts[i][1]-pts[i-1][1])*MAPH/100));
- const tot=d[d.length-1]||1,dur=RM?300:Math.max(400,Math.min(8000,T(tot/WALK_PX)));let seg=1,ni=1,t0=null;
- mk.style.transition='none';mk.classList.add('walk');
- const frame=now=>{if(!document.body.contains(mk)){done();return}if(t0==null)t0=now;const s=Math.min(tot,(now-t0)/dur*tot);
+ const tot=d[d.length-1]||1,v=RM?tot/300:Math.max(tot/12000,WALK_PX*SET.speed);let seg=1,ni=1,s=0,last=null;
+ mk.style.transition='none';mk.classList.add('walk');if(rv)rv.addEventListener('pointerdown',hz);
+ if(!RM&&!window._hzHint){window._hzHint=1;toast('Dotknij mapy, by przyspieszyć marsz')}
+ const frame=now=>{if(!document.body.contains(mk)){done();return}const dt=last==null?0:Math.min(64,now-last);last=now;s=Math.min(tot,s+dt*v*(hurry?4:1));
   while(seg<pts.length-1&&d[seg]<s)seg++;const a=pts[seg-1],b=pts[seg],f=d[seg]>d[seg-1]?(s-d[seg-1])/(d[seg]-d[seg-1]):1,x=a[0]+(b[0]-a[0])*f,y=a[1]+(b[1]-a[1])*f;
   mk.style.left=x+'%';mk.style.top=y+'%';if(Math.abs(b[0]-a[0])>.05)mk.classList.toggle('fl',b[0]<a[0]);mvFollow(x,y);
   /* mijane miejsca: odkryj sąsiadów, stuknij krokiem */

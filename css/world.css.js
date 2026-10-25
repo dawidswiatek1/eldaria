@@ -33,7 +33,7 @@ css`
 .party .pfig{display:block;width:28px;height:58px}
 .party .pflag{position:absolute;right:-10px;top:-2px}
 .party.fl .pfig{transform:scaleX(-1)}
-.party.walk .pfig{animation:pwalk .36s steps(2) infinite}
+.party.walk .pfig{animation:pwalk .5s steps(2) infinite}
 .party.fl.walk .pfig{animation-name:pwalkfl}
 @keyframes pwalk{50%{transform:translateY(-2px)}}
 @keyframes pwalkfl{0%,100%{transform:scaleX(-1)}50%{transform:scaleX(-1) translateY(-2px)}}
