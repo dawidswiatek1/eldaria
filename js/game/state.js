@@ -1,5 +1,5 @@
 /* ===== STAN I ZAPIS ===== */
-let S=null,B=null,screen='title',tab='team',teamView='heroes',AF={s:'',r:0,c:'',o:'r'},armSel=null,armConfirm=false,townView=null,curHero=null,htab='eq',selSlot=null,loadMsg='';
+let S=null,B=null,screen='title',tab='team',teamView='heroes',AF={s:'',r:0,c:'',o:'r',w:''},armSel=null,armConfirm=false,townView=null,curHero=null,htab='eq',selSlot=null,loadMsg='';
 function save(){try{syncForm();S.v=SAVE_VER;localStorage.setItem(SAVE_KEY,JSON.stringify(S))}catch(e){}}
 function saveSet(){try{localStorage.setItem(SET_KEY,JSON.stringify(SET))}catch(e){}}
 function upHero(h){if(!h.base){h.base={hp:h.maxHp||100,atk:h.atk||10,def:h.def||3,spd:h.spd||5};h.free=Math.max(0,(h.lvl||1)-1)*2;['maxHp','atk','def','spd'].forEach(k=>delete h[k])}

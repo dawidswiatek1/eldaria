@@ -2,15 +2,16 @@
 function allItems(){return S.inv.map(it=>({it,h:null})).concat(...S.roster.map(h=>Object.values(h.eq).filter(Boolean).map(it=>({it,h}))))}
 function findItem(id){return allItems().find(x=>x.it.id===id)}
 function armoryHtml(){const all=allItems(),SO=Object.keys(SLOTS);
- let L=all.filter(({it})=>(!AF.s||it.s===AF.s)&&it.r>=AF.r&&(!AF.c||!it.cls||it.cls.includes(AF.c)));
+ let L=all.filter(({it,h})=>(!AF.s||it.s===AF.s)&&it.r>=AF.r&&(!AF.c||!it.cls||it.cls.includes(AF.c))&&(!AF.w||(AF.w==='h')===!!h));
  const so={r:(a,b)=>b.it.r-a.it.r||b.it.price-a.it.price,s:(a,b)=>SO.indexOf(a.it.s)-SO.indexOf(b.it.s)||b.it.r-a.it.r,v:(a,b)=>b.it.price-a.it.price,h:(a,b)=>(a.h?a.h.name:'~').localeCompare(b.h?b.h.name:'~')||b.it.r-a.it.r}[AF.o];L.sort(so);
  const chip=(k,v,lab)=>`<button class="chip ${AF[k]===v?'on':''}" data-act="af" data-k="${k}" data-v="${v}">${lab}</button>`;
  const worn=all.filter(x=>x.h).length,val=S.inv.reduce((a,it)=>a+sellPrice(it),0);
  let o=`<div class="sub" style="margin:2px 0 6px">${ic('bag',14)} Plecak ${S.inv.length}/${INV_MAX} · założone ${worn} · plecak wart ${val} ${ic('gold',12)}</div>`;
  o+=`<div class="filters"><div>${chip('s','','Wszystko')}${SO.map(k=>chip('s',k,ic(SLOT_IC[k],14)+SLOTS[k])).join('')}</div>
  <div>${chip('r',0,'Każda')}${[1,2,3].map(r=>chip('r',r,`<i style="color:${RAR[r].c}">◆</i>${['','Rzadkie+','Epickie+','Legend.'][r]}`)).join('')}</div>
+ <div>${chip('w','','Wszędzie')}${chip('w','h',ic('nav_team',14)+'Założone')}${chip('w','b',ic('bag',14)+'W plecaku')}</div>
  <div><button class="chip ${AF.c?'on':''}" data-act="af" data-k="c">Klasa: ${AF.c?CLASSES[AF.c].name:'każda'} ▸</button><button class="chip" data-act="af" data-k="o">Sortuj: ${{r:'rzadkość',s:'miejsce',v:'wartość',h:'właściciel'}[AF.o]} ▸</button></div></div>`;
- o+=L.length?'<div class="cols">'+L.map(({it,h})=>`<div class="armit" data-act="armitem" data-id="${it.id}">${itemHtml(it,h?`<span class="owner">${bust(heroSprite(h),h.cls,30,1,-6)}<small>${esc(h.name.split(' ')[0])}</small></span>`:`<span class="owner bag">${ic('bag',18)}<small>Plecak</small></span>`)}</div>`).join('')+'</div>':`<div class="empty">Brak przedmiotów pasujących do filtrów.</div>`;
+ o+=L.length?'<div class="cols">'+L.map(({it,h})=>`<div class="armit" data-act="armitem" data-id="${it.id}">${itemHtml(it,h?`<span class="owner">${bust(heroSprite(h),h.cls,30,1,-6)}<small>${esc(h.name.split(' ')[0])}</small></span>`:`<span class="owner bag">${ic('bag',18)}<small>Plecak</small></span>`,'',h?{t:'Założone · '+esc(h.name.split(' ')[0])}:{t:'W plecaku',bag:1})}</div>`).join('')+'</div>':`<div class="empty">Brak przedmiotów pasujących do filtrów.</div>`;
  return o}
 function armDetail(id){const x=findItem(id);if(!x){closeModal();return}const {it,h}=x,R=RAR[it.r];armSel=id;
  let o=`<div class="armdet r${it.r}" style="--rc:${R.c}"><div class="ii big">${itIc(it,48)}</div><div><div class="inm" style="color:${R.c};font-size:1.15rem">${esc(it.n)}</div><div class="sub">${R.n} · ${SLOTS[it.s]} · poziom ${it.L||1}</div></div></div>
