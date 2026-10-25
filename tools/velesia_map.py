@@ -781,7 +781,7 @@ ROAD_VIA = {('weleszow', 'sanow'): [(54.5, 26), (55.5, 36)], ('sanow', 'wschodni
             ('weleszow', 'doliny'): [(45, 15)], ('olszynow', 'wschodnia'): [(71, 36)], ('wschodnia', 'jama'): [(80.5, 39), (84, 36.5), (82.5, 31), (86.5, 27), (85, 21.5), (89, 18)],
             ('wschodnia', 'grzbiet'): [(80.5, 41), (83.5, 40), (85, 36.5)], ('wschodnia', 'straznica'): [(80, 54), (83, 61)], ('ruiny', 'poludnie'): [(66, 86)],
             ('straznica', 'martwe'): [(91, 76)], ('kurhanow', 'ruiny'): [(52, 77)], ('sanow', 'pola'): [(51.5, 46.5), (47.5, 47.8), (45.2, 51.5), (46, 56)],
-            ('brzezina', 'sanow'): [(46, 40)], ('mlyn', 'rozlewiska'): [(29.5, 57)]}
+            ('brzezina', 'most'): [(46, 40)], ('wschodnia', 'kuznia'): [(74, 47)], ('mlyn', 'rozlewiska'): [(29.5, 57)]}
 
 
 def road_pts(a, b):
@@ -1696,6 +1696,31 @@ def lm_altar():
     return c.done()
 
 
+def lm_forge():
+    """zatopiona kuźnia: kamienne ściany bez dachu, komin, kowadło, woda u stóp"""
+    c = Cv(30, 24)
+    for (x, h) in [(3, 9), (24, 7)]:
+        for yy in range(20 - h, 20):
+            for xx in range(x, x + 4):
+                c.p(xx, yy, STN[4] if xx == x else STN[3] if xx < x + 3 else STN[2])
+    for xx in range(3, 28):
+        for yy in range(16, 20):
+            c.p(xx, yy, STN[3] if yy == 16 else STN[2])
+    for yy in range(4, 16):  # komin
+        c.p(13, yy, STN[4])
+        c.p(14, yy, STN[3])
+        c.p(15, yy, STN[2])
+    c.p(13, 3, STN[5])
+    c.p(15, 3, STN[1])
+    for (dx, dy) in [(0, 0), (1, 0), (2, 0), (3, 0), (1, 1), (2, 1)]:  # kowadło
+        c.p(19 + dx, 14 + dy, '#3a3a40' if dy else '#6a6a74')
+    for xx in range(0, 30):  # woda
+        for yy in range(20, 24):
+            if (xx + yy) % 5 or yy > 21:
+                c.p(xx, yy, '#2f68b0' if yy > 21 else '#4a8cd0')
+    return c.done(shadow=False)
+
+
 def boats():
     c = Cv(9, 5)
     for xx in range(1, 8):
@@ -1741,6 +1766,7 @@ def landmarks():
     L['chata'] = (lm_hut(True, True), -5)
     L['puszcza'] = (lm_ancient_oak(), -6)
     L['czarnybor'] = (lm_altar(), -6)
+    L['kuznia'] = (lm_forge(), -4)
     L['trakt'] = (lm_wagon(), -6)
     L['kurhany'] = (lm_big_barrow(), -6)
     L['kurhan'] = (lm_big_barrow(False), -6)

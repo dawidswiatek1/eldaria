@@ -2,7 +2,7 @@
 const nodeVis=k=>nodeOk(k)||(S.found&&S.found[k]);
 /* mgła: odkryj sąsiadów miejsca (oprócz sekretnych) */
 /* sekretne miejsca: odsłania je dopiero rozmowa albo zadanie */
-const SECRET=['polana','chata','wyrab','kaplica','jagna','kurhan','czarnybor'];
+const SECRET=['polana','chata','wyrab','kaplica','jagna','kurhan','czarnybor','kuznia'];
 function reveal(k,quiet){const nw=[];EDGES.forEach(([a,b])=>{const o=a===k?b:b===k?a:null;if(o&&!SECRET.includes(o)&&NODES[o].hidden&&!S.found[o]){S.found[o]=1;nw.push(NODES[o].n)}});if(nw.length&&!quiet)toast('Odkryto na mapie: '+nw.join(', '));return nw}
 const fogN=k=>NODES[k].hidden&&!S.found[k]&&!SECRET.includes(k)&&EDGES.some(([a,b])=>(a===k&&nodeOk(b))||(b===k&&nodeOk(a)));
 /* znane miejsce bez znanej drogi: odsłoń najkrótszy szlak */
@@ -69,7 +69,7 @@ function renderRegion(){regOk();wOk();const here=hereNode();if(!rSel||!(nodeVis(
  if(!S.intro){S.intro=1;save();setTimeout(()=>{if(screen==='region')modal(loreHtml('velesia',true))},60)}}
 function nodePanel(k){const N=NODES[k];
  if(fogN(k))return `<div class="pano fogp"></div><h2>${ic('event',18)} Nieodkryte</h2><p class="nd">Mgła i dzikie ostępy. Dotrzyj do sąsiedniego miejsca, by zobaczyć, co tu jest.</p>`;
- if(N.ty==='poi'){const here=hereNode(),path=pathTo(here,k),d=path?path.length-1:0;let b=`<div class="pano" style="background-image:url(${VART['p_'+({mlyn:'dabrowa',kapliczka:'dabrowa',krag:'mglista',straznica:'kregoszew',ruiny:'kurhanow',doliny:'mglista',rozlewiska:'mglista',wyrab:'dabrowa',kaplica:'mglista',jagna:'dabrowa'}[k]||'mglista')]})"></div><h2>${ic(N.ic,18)} ${N.n}</h2><div class="sub">${N.t}${d?` · ${d} ${d>1?'dni':'dzień'} drogi`:''}${S.poi[k]?' · zbadane':''}</div><p class="nd">${N.d}</p>`;
+ if(N.ty==='poi'){const here=hereNode(),path=pathTo(here,k),d=path?path.length-1:0;let b=`<div class="pano" style="background-image:url(${VART['p_'+({mlyn:'dabrowa',kapliczka:'dabrowa',krag:'mglista',straznica:'kregoszew',ruiny:'kurhanow',doliny:'mglista',rozlewiska:'mglista',wyrab:'dabrowa',kaplica:'mglista',jagna:'dabrowa',most:'sanow',kuznia:'mglista'}[k]||'mglista')]})"></div><h2>${ic(N.ic,18)} ${N.n}</h2><div class="sub">${N.t}${d?` · ${d} ${d>1?'dni':'dzień'} drogi`:''}${S.poi[k]?' · zbadane':''}</div><p class="nd">${N.d}</p>`;
   if(S.exp)return b;if(k===here)return b+`<div class="here">${ic('flag',14)} Tu obozuje kompania</div>${S.poi[k]?'':`<button class="btn-main" data-act="poigo" data-k="${k}">${ic('event',20)} Zbadaj</button>`}`;
   return b+`<button class="btn-main" data-act="travel" data-k="${k}" ${path?'':'disabled'}>${ic('walk',20)} Podróżuj (${d} d.)</button>`}
  /* miasto, wieś, wyjście z mapy, miejsce wyprawy */
@@ -120,6 +120,11 @@ const POI={
   {t:'Idź za głosem',r:()=>({fight:['strzyga','nietoperz'],lbl:'Strzyga we mgle'})},
   {t:'Zapal pochodnię i trzymaj się ścieżki',req:()=>(S.sup.pochodnia||0)>0,r:()=>{S.sup.pochodnia--;S.found.jary=1;return {txt:'Ogień rozrywa mgłę. Ścieżka wyprowadza was nad głębokie Wilcze Jary w północnej puszczy. (−1 pochodnia)'}}},
   {t:'Zawróć',r:()=>({txt:'Głosy cichną dopiero pod murami Weleszowa.'})}]},
+ most:{p:'straznik',n:'Kamienny most',t:'Strażnik w budce przy moście podnosi głowę znad miski z kaszą. „Przechodzicie? To przechodźcie szybko. Za dnia. I nie patrzcie w wodę.”',o:[
+  {t:'Zapytaj, czemu tak się boi',r:()=>{qSet('koscimost','wybor');return {dlg:'km_wybor'}}}]},
+ kuznia:{ic:'event',n:'Zatopiona kuźnia',t:'Woda stoi tu po kolana. Spod mułu wystają obręcze, kleszcze i stary miech.',o:[
+  {t:'Wyłówcie z wody, co się da',r:()=>({txt:'Kilka kawałków dobrego żelaza i zardzewiała sakiewka. '+reward(20+S.stage*3)})},
+  {t:'Odpocznijcie w suchym kącie',r:()=>{S.roster.forEach(h=>h.hp=Math.min(stats(h).maxHp,h.hp+Math.round(stats(h).maxHp*.15)));return {txt:'Szum jeziora usypia. (+15% zdrowia)'}}}]},
  wyrab:{p:'leszy',n:'Opuszczony wyrąb',t:'Pnie, porzucone siekiery i wygasłe ognisko. Las wokół szumi już zwyczajnie – ale nikt z Dąbrowy nie chce tu wracać.',o:[
   {t:'Zabierz porzucone siekiery i piły',r:()=>({txt:'Dobre żelazo. Kowal w Dąbrowie da za nie trochę grosza. '+reward(20+S.stage*3)})},
   {t:'Odpocznij przy ognisku',r:()=>{S.roster.forEach(h=>h.hp=Math.min(stats(h).maxHp,h.hp+Math.round(stats(h).maxHp*.15)));return {txt:'Ciepło ognia i cisza lasu. (+15% zdrowia)'}}}]},
@@ -137,6 +142,7 @@ let curPoi=null;
 function poiEvent(k){const E=POI[k];if(!E)return;curPoi=k;
  modal(`<div class="dlg">${E.p?`<div class="dpor"><img class="px" src="${VART['n_'+E.p]}" alt=""></div>`:`<div class="dpor ic">${ic(E.ic,40)}</div>`}<div class="dtx"><h2>${E.n}</h2><p>${typeof E.t==='function'?E.t():E.t}</p></div></div><div class="actions dopts">${E.o.map((o,i)=>{if(o.c&&!RCLS(o.c))return '';const ok=!o.req||o.req();return `<button data-act="poiopt" data-i="${i}" ${ok?'':'disabled'}>${o.c?clsTag(o.c)+' ':''}${o.t}</button>`}).join('')}</div>`)}
 function poiResolve(i){const k=curPoi,E=POI[k],o=E&&E.o[i];if(!o||(o.c&&!RCLS(o.c))||(o.req&&!o.req()))return;S.poi[k]=1;const r=o.r();save();
+ if(r.dlg){showDlg(r.dlg);return}
  if(r.fight){closeModal();roadFight(r.fight,r.lbl);return}modal(`<h2>${E.n}</h2><p>${r.txt}</p><button class="btn-main" data-act="region">${ic('map',20)} Mapa</button>`)}
 /* obóz poza miastem */
 function renderField(){const k=S.loc,N=NODES[k],nb=S.roster.some(h=>h.free||tFree(h));
