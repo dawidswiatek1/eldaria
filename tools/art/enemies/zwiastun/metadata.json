@@ -1,0 +1,88 @@
+{
+  "group_id": "ceb94b83-95df-49d7-8ea1-29e1c1624dc6",
+  "states": [
+    {
+      "character": {
+        "id": "9bb737cf-2f40-472d-be26-6b2ee8d48122",
+        "name": "Idle",
+        "prompt": "Large eyeless creature from another world: pale fish-like body on long spider legs, black stone plates growing from its back, wide toothy maw, teal-green glow leaking through cracks between the plates. Unsettling, alien.",
+        "size": {
+          "width": 128,
+          "height": 128
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "side",
+        "created_at": "2026-10-26T15:34:30.880260+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {
+          "Idle": {
+            "west": [
+              "Idle/animations/Idle/west/frame_000.png",
+              "Idle/animations/Idle/west/frame_001.png",
+              "Idle/animations/Idle/west/frame_002.png",
+              "Idle/animations/Idle/west/frame_003.png",
+              "Idle/animations/Idle/west/frame_004.png",
+              "Idle/animations/Idle/west/frame_005.png",
+              "Idle/animations/Idle/west/frame_006.png",
+              "Idle/animations/Idle/west/frame_007.png"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "character": {
+        "id": "a24a3497-715e-4b1c-b5e6-1115f84e1fe9",
+        "name": "Idle (copy)",
+        "prompt": "Large eyeless creature from another world: pale fish-like body on long spider legs, black stone plates growing from its back, wide toothy maw, teal-green glow leaking through cracks between the plates. Unsettling, alien.",
+        "size": {
+          "width": 128,
+          "height": 128
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "side",
+        "created_at": "2026-10-26T15:56:48.567093+00:00"
+      },
+      "folder": "Idle_copy",
+      "frames": {
+        "rotations": {
+          "south": "Idle_copy/rotations/south.png",
+          "south-east": "Idle_copy/rotations/south-east.png",
+          "east": "Idle_copy/rotations/east.png",
+          "north-east": "Idle_copy/rotations/north-east.png",
+          "north": "Idle_copy/rotations/north.png",
+          "north-west": "Idle_copy/rotations/north-west.png",
+          "west": "Idle_copy/rotations/west.png",
+          "south-west": "Idle_copy/rotations/south-west.png"
+        },
+        "animations": {
+          "Falling_Back_Death": {
+            "west": [
+              "Idle_copy/animations/Falling_Back_Death/west/frame_000.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_001.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_002.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_003.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_004.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_005.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_006.png"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

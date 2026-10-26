@@ -51,10 +51,12 @@ function heroAnim(cls,eq,skin,g){eq=eq||{};const sk=skin&&typeof SKIN!=='undefin
 function heroLook(cls,eq,skin,g){return heroAnim(cls,eq,skin,g).f0}
 /* v20: kierunek – FACE[k] mówi, gdzie patrzy sprite natywnie; faceL=true -> wróg ma patrzeć w LEWO (na drużynę) */
 function faceOf(k){k=sprBase(k);return (typeof FACE!=='undefined'&&FACE[k])||(typeof BSPR!=='undefined'&&BSPR[k]&&BSPR[k].face)||'R'}
+/* wrogowie z eksportów PixelLab (BSPR, tools/boss_sprites.py): za 7 klatkami gry pętla bezczynności (il klatek)
+   i animacja śmierci (dn klatek) – odtwarza je sprDiv (js/game/state.js) i css/battle.css.js */
 function enemyAnim(k,faceL){const flip=faceL?faceOf(k)==='R':faceOf(k)==='L';const ck='E|'+k+'|'+(flip?1:0);if(_sprCache[ck])return _sprCache[ck];const o=sprObj(k),hu=typeof ENEMIES!=='undefined'&&ENEMIES[k]&&ENEMIES[k].hue;
  if(o.n<2){const id=composeData([[o,null]],o.w,o.h,flip?o.w:0);if(hu)hueData(id.data,hu);shadeData(id.data,o.w,o.h);const u=dataURL(id,0,0,o.w,o.h);return _sprCache[ck]={url:u,f0:u,fw:o.w,fh:o.h,n:1,pl:0,pt:0,cw:o.w,ch:o.h}}
  const id=composeData([[o,null]],o.w,o.h,flip?o.fw:0),pl=flip?o.pr:o.pl;if(hu)hueData(id.data,hu);shadeData(id.data,o.w,o.h);
- return _sprCache[ck]={url:dataURL(id,0,0,o.w,o.h),f0:dataURL(id,pl,o.pt,o.cw,o.ch),fw:o.fw,fh:o.h,n:o.n,pl,pt:o.pt,cw:o.cw,ch:o.ch}}
+ return _sprCache[ck]={url:dataURL(id,0,0,o.w,o.h),f0:dataURL(id,pl,o.pt,o.cw,o.ch),fw:o.fw,fh:o.h,n:o.n,pl,pt:o.pt,cw:o.cw,ch:o.ch,il:o.il||0,dn:o.dn||0}}
 function sprite(key,tint,flip){if(HERO_CLS.includes(key))return heroLook(key,{});return enemyAnim(key,flip).f0}
 function fxStrip(k){const ck='F|'+k;if(_sprCache[ck])return _sprCache[ck];const o=GFX.F[k];const id=composeData([[o,null]],o.w,o.h,0);return _sprCache[ck]={url:dataURL(id,0,0,o.w,o.h),fw:o.fw,n:o.n}}
 let _icAt=null;

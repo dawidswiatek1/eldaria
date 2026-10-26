@@ -1,0 +1,130 @@
+{
+  "group_id": "5f6edf17-0f50-4515-8549-a77d2192d4ee",
+  "states": [
+    {
+      "character": {
+        "id": "26425d57-5c36-4743-9e05-3ca21df4810d",
+        "name": "Idle",
+        "prompt": "Tall, gaunt cult high priest in layered black and deep violet robes, shaved head, short grey beard. On his chest a silver sigil: an empty circle with eight rays. Holds a tall staff topped with a floating black stone that glows violet; faint violet light around his hands. Slavic dark fantasy.",
+        "size": {
+          "width": 128,
+          "height": 128
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "side",
+        "created_at": "2026-10-26T15:32:34.989767+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {
+          "idle_breathing": {
+            "west": [
+              "Idle/animations/idle_breathing/west/frame_000.png",
+              "Idle/animations/idle_breathing/west/frame_001.png",
+              "Idle/animations/idle_breathing/west/frame_002.png",
+              "Idle/animations/idle_breathing/west/frame_003.png",
+              "Idle/animations/idle_breathing/west/frame_004.png",
+              "Idle/animations/idle_breathing/west/frame_005.png",
+              "Idle/animations/idle_breathing/west/frame_006.png",
+              "Idle/animations/idle_breathing/west/frame_007.png"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "character": {
+        "id": "046601ba-0a66-47b2-8c25-e6183d3972d3",
+        "name": "fighting pose",
+        "prompt": "Tall, gaunt cult high priest in layered black and deep violet robes, shaved head, short grey beard. On his chest a silver sigil: an empty circle with eight rays. Holds a tall staff topped with a floating black stone that glows violet; faint violet light around his hands. Slavic dark fantasy.",
+        "size": {
+          "width": 128,
+          "height": 128
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "side",
+        "created_at": "2026-10-26T15:36:07.305164+00:00"
+      },
+      "folder": "fighting_pose",
+      "frames": {
+        "rotations": {
+          "south": "fighting_pose/rotations/south.png",
+          "south-east": "fighting_pose/rotations/south-east.png",
+          "east": "fighting_pose/rotations/east.png",
+          "north-east": "fighting_pose/rotations/north-east.png",
+          "north": "fighting_pose/rotations/north.png",
+          "north-west": "fighting_pose/rotations/north-west.png",
+          "west": "fighting_pose/rotations/west.png",
+          "south-west": "fighting_pose/rotations/south-west.png"
+        },
+        "animations": {
+          "idle_breathing": {
+            "west": [
+              "fighting_pose/animations/idle_breathing/west/frame_000.png",
+              "fighting_pose/animations/idle_breathing/west/frame_001.png",
+              "fighting_pose/animations/idle_breathing/west/frame_002.png",
+              "fighting_pose/animations/idle_breathing/west/frame_003.png",
+              "fighting_pose/animations/idle_breathing/west/frame_004.png",
+              "fighting_pose/animations/idle_breathing/west/frame_005.png",
+              "fighting_pose/animations/idle_breathing/west/frame_006.png",
+              "fighting_pose/animations/idle_breathing/west/frame_007.png"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "character": {
+        "id": "618d65cd-22af-46d6-b5d3-cb3c117af0da",
+        "name": "Idle (copy)",
+        "prompt": "Tall, gaunt cult high priest in layered black and deep violet robes, shaved head, short grey beard. On his chest a silver sigil: an empty circle with eight rays. Holds a tall staff topped with a floating black stone that glows violet; faint violet light around his hands. Slavic dark fantasy.",
+        "size": {
+          "width": 128,
+          "height": 128
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "side",
+        "created_at": "2026-10-26T15:52:09.417983+00:00"
+      },
+      "folder": "Idle_copy",
+      "frames": {
+        "rotations": {
+          "south": "Idle_copy/rotations/south.png",
+          "south-east": "Idle_copy/rotations/south-east.png",
+          "east": "Idle_copy/rotations/east.png",
+          "north-east": "Idle_copy/rotations/north-east.png",
+          "north": "Idle_copy/rotations/north.png",
+          "north-west": "Idle_copy/rotations/north-west.png",
+          "west": "Idle_copy/rotations/west.png",
+          "south-west": "Idle_copy/rotations/south-west.png"
+        },
+        "animations": {
+          "Falling_Back_Death": {
+            "west": [
+              "Idle_copy/animations/Falling_Back_Death/west/frame_000.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_001.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_002.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_003.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_004.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_005.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_006.png"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

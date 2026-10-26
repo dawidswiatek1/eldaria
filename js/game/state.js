@@ -84,7 +84,7 @@ const heroA=h=>heroAnim(h.cls,h.eq,heroSkin(h),h.g);
 function heroPortrait(h){const big=LH()>=520,bw=big?124:92,bh=big?196:150,d=DPR(),s=Math.max(1,Math.floor(Math.min(2.5,(bh-8)/88,bw/58)*d*2))/(2*d);
  return `<div class="big c-${h.cls}" style="width:${bw}px;height:${bh}px">${animBox(heroA(h),s,'',`position:absolute;left:${Math.round(bw/2-28*s)}px;bottom:4px`)}</div>`}
 /* animowany sprite (pasek klatek jako tło) w kontenerze o rozmiarze rdzenia */
-function sprDiv(A,sc,extra){return `<div class="spr" style="width:${A.fw*sc}px;height:${A.fh*sc}px;background-image:url(${A.url});background-size:${A.fw*A.n*sc}px ${A.fh*sc}px;--fw:${A.fw*sc}px;left:${-A.pl*sc}px;top:${-A.pt*sc}px;animation-delay:-${(Math.random()*1.3).toFixed(2)}s;${A.n<2?'animation:none;':''}${extra||''}"></div>`}
+function sprDiv(A,sc,extra){return `<div class="spr${A.il?' il':''}${A.dn>1?' dn':''}" style="${A.il?`--il:${A.il};--dn:${A.dn||0};`:''}width:${A.fw*sc}px;height:${A.fh*sc}px;background-image:url(${A.url});background-size:${A.fw*A.n*sc}px ${A.fh*sc}px;--fw:${A.fw*sc}px;left:${-A.pl*sc}px;top:${-A.pt*sc}px;animation-delay:-${(Math.random()*1.3).toFixed(2)}s;${A.n<2?'animation:none;':''}${extra||''}"></div>`}
 function animBox(A,sc,cls,style){return `<div class="${cls||''}" style="position:relative;width:${A.cw*sc}px;height:${A.ch*sc}px;${style||''}">${sprDiv(A,sc)}</div>`}
 const itIc=(it,s)=>ic(it.b,s||32);
 const rcol=it=>RAR[it.r].c;

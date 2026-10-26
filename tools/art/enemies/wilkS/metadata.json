@@ -1,0 +1,88 @@
+{
+  "group_id": "c8058607-3c86-405d-b927-ec7ec37bfe39",
+  "states": [
+    {
+      "character": {
+        "id": "5a40ae20-252e-4e90-93c7-ce7cd22909c4",
+        "name": "Idle",
+        "prompt": "Grey wolf with three glowing violet eyes, patches of violet moss and small black crystals growing from its fur.",
+        "size": {
+          "width": 80,
+          "height": 80
+        },
+        "template_id": "bear",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-26T16:01:54.274717+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {
+          "Idle": {
+            "west": [
+              "Idle/animations/Idle/west/frame_000.png",
+              "Idle/animations/Idle/west/frame_001.png",
+              "Idle/animations/Idle/west/frame_002.png",
+              "Idle/animations/Idle/west/frame_003.png",
+              "Idle/animations/Idle/west/frame_004.png",
+              "Idle/animations/Idle/west/frame_005.png",
+              "Idle/animations/Idle/west/frame_006.png",
+              "Idle/animations/Idle/west/frame_007.png"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "character": {
+        "id": "21c2956b-e516-452f-9dea-74c018544d68",
+        "name": "Idle (copy)",
+        "prompt": "Grey wolf with three glowing violet eyes, patches of violet moss and small black crystals growing from its fur.",
+        "size": {
+          "width": 80,
+          "height": 80
+        },
+        "template_id": "bear",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-26T16:04:58.163644+00:00"
+      },
+      "folder": "Idle_copy",
+      "frames": {
+        "rotations": {
+          "south": "Idle_copy/rotations/south.png",
+          "south-east": "Idle_copy/rotations/south-east.png",
+          "east": "Idle_copy/rotations/east.png",
+          "north-east": "Idle_copy/rotations/north-east.png",
+          "north": "Idle_copy/rotations/north.png",
+          "north-west": "Idle_copy/rotations/north-west.png",
+          "west": "Idle_copy/rotations/west.png",
+          "south-west": "Idle_copy/rotations/south-west.png"
+        },
+        "animations": {
+          "Attack_Right": {
+            "west": [
+              "Idle_copy/animations/Attack_Right/west/frame_000.png",
+              "Idle_copy/animations/Attack_Right/west/frame_001.png",
+              "Idle_copy/animations/Attack_Right/west/frame_002.png",
+              "Idle_copy/animations/Attack_Right/west/frame_003.png",
+              "Idle_copy/animations/Attack_Right/west/frame_004.png",
+              "Idle_copy/animations/Attack_Right/west/frame_005.png",
+              "Idle_copy/animations/Attack_Right/west/frame_006.png"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
