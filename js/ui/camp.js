@@ -68,19 +68,34 @@ function saveSum(){try{const s=JSON.parse(localStorage.getItem(SAVE_KEY)||'null'
  const m=s.roster.find(h=>h.main)||s.roster[0],ak=(s.fl&&s.fl.akt)||1,A=ACTS[Math.min(ak,ACTS.length)-1].n.split(':')[0];
  const E=s.exp,where=E?'wyprawa: '+((E.site&&NODES[E.site]&&NODES[E.site].n)||(BIOMES[E.r]&&BIOMES[E.r].n)||''):(NODES[s.loc]&&NODES[s.loc].n)||'';
  return [m?`${m.name.split(' ')[0]}, poz. ${m.lvl}`:'',ak>ACTS.length?A+' ukończony':A,where].filter(Boolean).join(' · ')}catch(e){return ''}}
-/* ekran tytułowy: obóz kompanii o zmierzchu nad Velesią – drużyna przy ognisku, sztandar, oczy w lesie, spadająca gwiazda */
-function titleHtml(){const has=hasSave(),ps=LH()<360?1.4:LH()<520?1.7:2,sum=has?saveSum():'';
+/* ekran tytułowy: obóz kompanii o zmierzchu nad Velesią – drużyna przy ognisku, sztandar, oczy za sztandarem, spadająca gwiazda.
+   Tło ma background-size:cover i background-position: 8% 55% (css/title.css.js – na ekranach węższych niż 16:9 obrazek
+   jest przycinany głównie z prawej, żeby polana została widoczna), więc liczymy, gdzie obrazek leży na ekranie, i stawiamy
+   obóz na polanie (punkty w ułamkach obrazka: polana x 3–50%, y 79–90%; cały obóz zajmuje ok. 45% szerokości obrazka).
+   Skala postaci rośnie z obrazkiem (k – szerokość obrazka, przy której skala = 1; najmniej 1, żeby piksele zostały ostre);
+   zaokrąglona tak, by klatka bohatera (HM.fw) miała całą liczbę pikseli ekranu – płynnie i bez prześwitów sąsiednich klatek. */
+const TBG={a:1672/941,px:.08,py:.55,fire:[.31,.875],k:760};
+function titleCamp(){const W=LW(),H=LH(),sw=Math.max(W,H*TBG.a),sh=sw/TBG.a,ox=(W-sw)*TBG.px,oy=(H-sh)*TBG.py,q=HM.fw*DPR(),ps=Math.max(1,Math.round(sw/TBG.k*q)/q);
  const hero=(k,g,fl,i)=>animBox(heroAnim(k,{},null,g),ps,'tu'+(fl?' fl':'')+(i%2?' bk':''),'');
  const L=[['lucznik','k'],['mag','m'],['wojownik','m']].map(([k,g],i)=>hero(k,g,0,i)).join(''),R=[['paladyn','k'],['kaplan','k'],['lotr','m']].map(([k,g],i)=>hero(k,g,1,i+1)).join('');
- const P=k=>GFX.P[k]||{w:0,h:0},F=P('ognisko'),B=P('sztandar_k'),O=P('oczy');
+ const P=k=>GFX.P[k]||{w:0,h:0},sz=k=>[Math.round(P(k).w*ps),Math.round(P(k).h*ps)],[fw,fh]=sz('ognisko'),[bw,bh]=sz('sztandar_k'),[ew,eh]=sz('oczy');
+ const fx=Math.round(ox+TBG.fire[0]*sw),fy=Math.round(oy+TBG.fire[1]*sh),gap=Math.round(fw/2+3*ps);
  const sparks=Array.from({length:9},(_,i)=>`<i style="left:${(i*37)%60-30}%;--dx:${((i*53)%41)-20}px;animation-delay:-${(i*0.37).toFixed(2)}s"></i>`).join('');
+ /* oczy wyglądają zza sztandaru: zza lewej krawędzi płachty w połowie wysokości (krawędź ok. 23% szerokości sztandaru),
+    prawy bok cienia schowany za płachtą (z-index niżej niż sztandar) */
+ const eyes=propEl('oczy',ew,eh,'teyes',`left:${Math.round(bw*.23-ew*.75)}px;top:${Math.round(bh*.47-eh*.5)}px`);
+ return `<div class="tcamp" style="left:${fx}px;top:${fy}px;--ps:${ps}"><div class="tgrp l" style="right:${gap}px"><div class="tbw">${eyes}${propEl('sztandar_k',bw,bh,'tban')}</div>${L}</div>
+ <div class="tfire"><i class="tglow"></i>${propEl('ognisko',fw,fh,'')}<div class="tsp">${sparks}</div></div><div class="tgrp r" style="left:${gap}px">${R}</div></div>`}
+function titleHtml(){const has=hasSave(),sum=has?saveSum():'';
  const stars=Array.from({length:12},(_,i)=>`<i style="left:${(i*23+7)%96}%;top:${(i*17+3)%38}%;animation-delay:-${(i*0.53).toFixed(2)}s;animation-duration:${(2.4+(i%4)*0.7).toFixed(1)}s"></i>`).join('');
  return `<div class="title"><div class="tscene bg-title">${sceneLayers('trakt')}<div class="tstars">${stars}<b class="shoot"></b></div>
  <div class="logo"><img class="px plq" src="${VART.ui_plaque}" alt=""><div class="lgt"><b>Eldaria</b><small>Kronika wędrownej kompanii</small></div></div>
- <div class="tcamp">${propEl('sztandar_k',Math.round(B.w*ps),Math.round(B.h*ps),'tban')}<div class="tgrp">${L}</div><div class="tfire"><i class="tglow"></i>${propEl('ognisko',Math.round(F.w*ps),Math.round(F.h*ps),'')}<div class="tsp">${sparks}</div></div><div class="tgrp">${R}</div>${propEl('oczy',Math.round(O.w*ps),Math.round(O.h*ps),'teyes')}</div></div>
+ ${titleCamp()}</div>
  <div class="tmenu">${loadMsg?`<div class="note">${esc(loadMsg)}</div>`:''}${has?`<button class="btn-main tcont" data-act="continue">${ic('auto',22)}<span class="tc"><b>Kontynuuj</b>${sum?`<small>${esc(sum)}</small>`:''}</span></button>`:''}<button class="${has?'':'btn-main'}" data-act="new">${ic('xp',20)} Nowa gra</button>
  <div class="trow"><button data-act="howto">${ic('map',18)}<small>Jak grać?</small></button><button data-act="xfer" title="Przenieś zapis (telefon ↔ komputer)">${ic('contract',18)}<small>Zapis</small></button><button data-act="snd">${ic('sk_ballada',18)}<small>Dźwięk</small></button>${canFs()?`<button data-act="fs" id="b-fs">${ic('speed',18)}<small>Ekran</small></button>`:''}</div>
  ${best()?`<div class="rec">${ic('boss',14)} Rekord: etap ${best()}</div>`:''}</div></div>`}
+/* zmiana rozmiaru okna / obrót telefonu: obóz liczony od nowa, żeby stał na polanie */
+let _ttT=null;addEventListener('resize',()=>{clearTimeout(_ttT);_ttT=setTimeout(()=>{if(screen==='title'){const c=document.querySelector('.title .tcamp');if(c)c.outerHTML=titleCamp()}},150)});
 function render(){const m=document.querySelector('.main'),st=m?m.scrollTop:0,k=_view;_render();const n=document.querySelector('.main');if(n&&_view===k&&st)n.scrollTop=st}
 function _render(){applySpeed();if(S){syncForm();townOk()}const app=document.getElementById('app');if(!GFX_READY)return;
  if(screen==='title'){enterAnim('title');app.innerHTML=titleHtml();return}
