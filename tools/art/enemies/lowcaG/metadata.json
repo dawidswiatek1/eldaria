@@ -1,0 +1,130 @@
+{
+  "group_id": "89006b02-e013-4439-82ad-8c1c517d06d0",
+  "states": [
+    {
+      "character": {
+        "id": "4ebf0d47-51b7-4092-bbe1-d55c6fafb90a",
+        "name": "Idle",
+        "prompt": "Cult hunter captain in a black fur-lined cloak over chainmail, empty-star sigil (circle with eight rays) on the shoulder, long hunting spear, coiled iron chains on his belt, a small glowing golden shard hanging on his neck. Snowy mountain hunter.",
+        "size": {
+          "width": 128,
+          "height": 128
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "side",
+        "created_at": "2026-10-26T15:34:06.200411+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {
+          "Idle": {
+            "west": [
+              "Idle/animations/Idle/west/frame_000.png",
+              "Idle/animations/Idle/west/frame_001.png",
+              "Idle/animations/Idle/west/frame_002.png",
+              "Idle/animations/Idle/west/frame_003.png",
+              "Idle/animations/Idle/west/frame_004.png",
+              "Idle/animations/Idle/west/frame_005.png",
+              "Idle/animations/Idle/west/frame_006.png",
+              "Idle/animations/Idle/west/frame_007.png"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "character": {
+        "id": "083d3c2a-43de-4fa8-89f6-a61eadaa9de1",
+        "name": "fighting pose",
+        "prompt": "Cult hunter captain in a black fur-lined cloak over chainmail, empty-star sigil (circle with eight rays) on the shoulder, long hunting spear, coiled iron chains on his belt, a small glowing golden shard hanging on his neck. Snowy mountain hunter.",
+        "size": {
+          "width": 128,
+          "height": 128
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "side",
+        "created_at": "2026-10-26T15:47:09.993482+00:00"
+      },
+      "folder": "fighting_pose",
+      "frames": {
+        "rotations": {
+          "south": "fighting_pose/rotations/south.png",
+          "south-east": "fighting_pose/rotations/south-east.png",
+          "east": "fighting_pose/rotations/east.png",
+          "north-east": "fighting_pose/rotations/north-east.png",
+          "north": "fighting_pose/rotations/north.png",
+          "north-west": "fighting_pose/rotations/north-west.png",
+          "west": "fighting_pose/rotations/west.png",
+          "south-west": "fighting_pose/rotations/south-west.png"
+        },
+        "animations": {
+          "Idle": {
+            "west": [
+              "fighting_pose/animations/Idle/west/frame_000.png",
+              "fighting_pose/animations/Idle/west/frame_001.png",
+              "fighting_pose/animations/Idle/west/frame_002.png",
+              "fighting_pose/animations/Idle/west/frame_003.png",
+              "fighting_pose/animations/Idle/west/frame_004.png",
+              "fighting_pose/animations/Idle/west/frame_005.png",
+              "fighting_pose/animations/Idle/west/frame_006.png",
+              "fighting_pose/animations/Idle/west/frame_007.png"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "character": {
+        "id": "0a771850-d3f2-4465-b12d-a19d6e092537",
+        "name": "Idle (copy)",
+        "prompt": "Cult hunter captain in a black fur-lined cloak over chainmail, empty-star sigil (circle with eight rays) on the shoulder, long hunting spear, coiled iron chains on his belt, a small glowing golden shard hanging on his neck. Snowy mountain hunter.",
+        "size": {
+          "width": 128,
+          "height": 128
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "side",
+        "created_at": "2026-10-26T15:54:21.581462+00:00"
+      },
+      "folder": "Idle_copy",
+      "frames": {
+        "rotations": {
+          "south": "Idle_copy/rotations/south.png",
+          "south-east": "Idle_copy/rotations/south-east.png",
+          "east": "Idle_copy/rotations/east.png",
+          "north-east": "Idle_copy/rotations/north-east.png",
+          "north": "Idle_copy/rotations/north.png",
+          "north-west": "Idle_copy/rotations/north-west.png",
+          "west": "Idle_copy/rotations/west.png",
+          "south-west": "Idle_copy/rotations/south-west.png"
+        },
+        "animations": {
+          "Falling_Back_Death": {
+            "west": [
+              "Idle_copy/animations/Falling_Back_Death/west/frame_000.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_001.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_002.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_003.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_004.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_005.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_006.png"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

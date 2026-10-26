@@ -44,7 +44,7 @@ js/
   audio/sound.js      sound effects and music
   main.js             starts the game – must stay LAST
 tools/
-  boss_sprites.py     objects in boss fights from tools/art/boss/ (js/data/sprites-boss.js)
+  boss_sprites.py     enemies and boss-fight objects from tools/art/enemies/ and tools/art/boss/ (js/data/sprites-boss.js)
   fx_sprites.py       boss attack effects from tools/art/fx/ (assets/fx/, js/data/fx-boss.js)
   props.py            expedition room objects and scenery from tools/art/props/ (assets/objects/, js/data/props.js)
   velesia_map.py      draws the Velesia map (assets/maps/velesia-big.png) – see "Velesia map" below
@@ -105,9 +105,10 @@ Fallen heroes get a headstone (`graveImg` in `js/ui/camp.js`).
 the boss bar at the top right shows it). The party can interrupt it by dealing 12% of the boss's HP before its next
 turn or by stunning it (bosses are otherwise immune to stun); an interrupted boss takes +25% damage for a while.
 Leszy, the bandit chief, the necromancer and the golem also bring things to destroy (sacred roots, war banner, soul
-urn, rune crystals – `ENEMIES` entries with `obj:1`). Their pictures are PixelLab exports in `tools/art/boss/<key>/`
-(idle animation loops in battle); `tools/boss_sprites.py` turns them into `js/data/sprites-boss.js` (base64, like
-other enemies) and falls back to simple code drawings when a folder is missing. Each big attack plays an effect on its
+urn, rune crystals – `ENEMIES` entries with `obj:1`; Act II adds core sparks, a star shard, cocoons and seal stones).
+Their pictures are PixelLab exports in `tools/art/boss/<key>/` (idle animation loops in battle); `tools/boss_sprites.py`
+turns them into `js/data/sprites-boss.js` (base64, like other enemies) and falls back to simple code drawings when a
+folder is missing. Each big attack plays an effect on its
 targets (`bfx`): PixelLab exports in `tools/art/fx/<key>/`, packed by `tools/fx_sprites.py` into frame strips in
 `assets/fx/` and the list `js/data/fx-boss.js` (`BFX`: anchor at the feet or the middle, scale, duration).
 The first win over each boss gives a named legendary trophy (`S.bk`).
@@ -134,8 +135,13 @@ Styles: `css/specs.css.js`.
   (Szczelina) and the finale Noc Upadłych Gwiazd on Mglista Polana. Choices from both acts change the finale: the
   number of seal stones (`arcyStones` in `js/battle/bosses.js`), summoned creatures, a phase that a stabilised core
   blocks and royal crossbowmen. A site can serve several quests (`QSITE.polana` is a list, read with `qsite`).
-- Act II enemies use stand-in pictures: `ENEMIES[..].spr` borrows another enemy's sprite and `.hue` recolours it
-  (`js/gfx/sprites.js`). New PixelLab art for them goes through `tools/boss_sprites.py`; then drop `spr`/`hue`.
+- Act II enemies and bosses are PixelLab exports facing west in `tools/art/enemies/<key>/` (key = `ENEMIES` key).
+  `tools/boss_sprites.py` builds the game's 7-frame strip from them (stand, breathe, wind-up, strike, cast, hit, down:
+  attack and death frames come from the export's attack and death animations, otherwise from the idle pose) and appends
+  the whole idle loop (`il` frames) and the death animation (`dn` frames). `sprDiv` (`js/game/state.js`) gives such
+  sprites the classes `il`/`dn`, and `css/battle.css.js` loops the idle and plays the death once. `OPT` in the tool picks
+  other frames where the defaults look wrong. A new enemy without art can still borrow a picture: `ENEMIES[..].spr` names
+  another enemy's sprite and `.hue` recolours it (`js/gfx/sprites.js`).
 - `js/world/world-map.js`: `ROADEV` – random events while travelling (an event can limit where it happens with `ok`).
 - `js/world/velesia-map.js`: `POI` – one-time events at interesting places (an option can open a dialog: `{dlg:…}`).
 

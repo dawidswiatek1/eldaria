@@ -34,8 +34,15 @@ css`
 .unit .fxw{position:absolute;inset:0}
 .spr{position:absolute;background-repeat:no-repeat;image-rendering:pixelated;animation:idle calc(1.3s * var(--sp)) infinite steps(1)}
 @keyframes idle{0%{background-position-x:0}50%{background-position-x:calc(var(--fw) * -1)}}
+/* wrogowie z eksportów PixelLab: cała pętla bezczynności za 7 klatkami gry (--il klatek), potem animacja śmierci (--dn) */
+.spr.il{animation:idleL calc(1.1s * var(--sp)) infinite steps(var(--il))}
+@keyframes idleL{from{background-position-x:calc(var(--fw) * -7)}to{background-position-x:calc(var(--fw) * (-7 - var(--il)))}}
 .spr[data-f]{animation:none}
 .spr[data-f="1"]{background-position-x:calc(var(--fw) * -1)}.spr[data-f="2"]{background-position-x:calc(var(--fw) * -2)}.spr[data-f="3"]{background-position-x:calc(var(--fw) * -3)}.spr[data-f="4"]{background-position-x:calc(var(--fw) * -4)}.spr[data-f="5"]{background-position-x:calc(var(--fw) * -5)}.spr[data-f="6"]{background-position-x:calc(var(--fw) * -6)}
+.spr.dn[data-f="6"]{animation:dieL calc(.8s * var(--sp)) steps(var(--dn),jump-none) forwards;animation-delay:0s!important}
+@keyframes dieL{from{background-position-x:calc(var(--fw) * (-7 - var(--il)))}to{background-position-x:calc(var(--fw) * (-6 - var(--il) - var(--dn)))}}
+/* klatka sprite'a bywa szersza od postaci (wypad, upadek) – klika się w postać (.mv), nie w przezroczysty brzeg */
+.unit .spr{pointer-events:none}
 .unit .un{font-size:.68rem;margin-top:1px;font-weight:600;text-shadow:1px 1px 0 #000,-1px 0 0 #000,0 -1px 0 #000,1px 0 0 #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.1}
 .unit .bar{height:6px;width:78%;margin:2px auto 0;box-shadow:0 0 0 1px #140d12}
 .unit .bar>i{background:linear-gradient(#b8ff9a 0 1px,#4fcf5a 1px 4px,#2e8a3a 4px)}

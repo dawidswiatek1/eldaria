@@ -1,0 +1,128 @@
+{
+  "group_id": "ae9d786b-7d3a-4455-9d79-c0d1338cd036",
+  "states": [
+    {
+      "character": {
+        "id": "fdbf947f-f6a0-4585-b4c0-2148073d949a",
+        "name": "Idle",
+        "prompt": "Large forest spider with a web pattern of glowing violet runes on its back and small black crystals on its legs.",
+        "size": {
+          "width": 80,
+          "height": 80
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "side",
+        "created_at": "2026-10-26T16:02:40.166416+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {
+          "Idle": {
+            "west": [
+              "Idle/animations/Idle/west/frame_000.png",
+              "Idle/animations/Idle/west/frame_001.png",
+              "Idle/animations/Idle/west/frame_002.png",
+              "Idle/animations/Idle/west/frame_003.png",
+              "Idle/animations/Idle/west/frame_004.png",
+              "Idle/animations/Idle/west/frame_005.png",
+              "Idle/animations/Idle/west/frame_006.png",
+              "Idle/animations/Idle/west/frame_007.png"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "character": {
+        "id": "fae66dad-f693-4477-94b7-f6ff70a048ed",
+        "name": "Idle (copy)",
+        "prompt": "Large forest spider with a web pattern of glowing violet runes on its back and small black crystals on its legs.",
+        "size": {
+          "width": 80,
+          "height": 80
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "side",
+        "created_at": "2026-10-26T16:10:43.570089+00:00"
+      },
+      "folder": "Idle_copy",
+      "frames": {
+        "rotations": {
+          "south": "Idle_copy/rotations/south.png",
+          "south-east": "Idle_copy/rotations/south-east.png",
+          "east": "Idle_copy/rotations/east.png",
+          "north-east": "Idle_copy/rotations/north-east.png",
+          "north": "Idle_copy/rotations/north.png",
+          "north-west": "Idle_copy/rotations/north-west.png",
+          "west": "Idle_copy/rotations/west.png",
+          "south-west": "Idle_copy/rotations/south-west.png"
+        },
+        "animations": {
+          "Falling_Back_Death": {
+            "west": [
+              "Idle_copy/animations/Falling_Back_Death/west/frame_000.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_001.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_002.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_003.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_004.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_005.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_006.png"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "character": {
+        "id": "fb85e21e-9534-4616-ac3c-5cc5fe0c9bbe",
+        "name": "Idle (copy 2)",
+        "prompt": "Large forest spider with a web pattern of glowing violet runes on its back and small black crystals on its legs.",
+        "size": {
+          "width": 80,
+          "height": 80
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "side",
+        "created_at": "2026-10-26T16:11:03.284334+00:00"
+      },
+      "folder": "Idle_copy_2",
+      "frames": {
+        "rotations": {
+          "south": "Idle_copy_2/rotations/south.png",
+          "south-east": "Idle_copy_2/rotations/south-east.png",
+          "east": "Idle_copy_2/rotations/east.png",
+          "north-east": "Idle_copy_2/rotations/north-east.png",
+          "north": "Idle_copy_2/rotations/north.png",
+          "north-west": "Idle_copy_2/rotations/north-west.png",
+          "west": "Idle_copy_2/rotations/west.png",
+          "south-west": "Idle_copy_2/rotations/south-west.png"
+        },
+        "animations": {
+          "Cross_Punch": {
+            "west": [
+              "Idle_copy_2/animations/Cross_Punch/west/frame_000.png",
+              "Idle_copy_2/animations/Cross_Punch/west/frame_001.png",
+              "Idle_copy_2/animations/Cross_Punch/west/frame_002.png",
+              "Idle_copy_2/animations/Cross_Punch/west/frame_003.png",
+              "Idle_copy_2/animations/Cross_Punch/west/frame_004.png",
+              "Idle_copy_2/animations/Cross_Punch/west/frame_005.png"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

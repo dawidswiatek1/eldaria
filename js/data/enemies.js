@@ -38,32 +38,33 @@ const ENEMIES={
  bazyliszek:{dt:'trucizna',res:{trucizna:75,klute:20,lod:-30},name:'Bazyliszek',hp:86,atk:13,def:5,spd:6,sp:'gaze',d:'Spojrzenie zamienia w kamień (ogłuszenie i −50% obrony). Jadowite ukąszenie.'},
  zmij:{dt:'ciete',res:{ogien:75,trucizna:30,lod:-35},name:'Żmij',hp:390,atk:19,def:8,spd:6,sp:'zmij',boss:true,fly:0,d:'Smok z Wielkiego Grzbietu. Trzy fazy: kły i ogon, lot z ognistym oddechem, wściekłość.'},
  babajaga:{res:{mrok:40,trucizna:40,ogien:-25,swiete:-25},name:'Baba Jaga',hp:370,atk:17,def:5,spd:7,sp:'jaga',fx:'dark',boss:true,d:'Chata na kurzej stopce przyzywa sługi. Ranna Jaga wzlatuje w moździerzu: nieuchwytna, ciska klątwy.'},
- /* Akt II (Zakon Pustej Gwiazdy): spr – czyj rysunek (zastępczy), hue – przebarwienie (js/gfx/sprites.js) */
+ /* Akt II (Zakon Pustej Gwiazdy). Rysunki: eksporty PixelLab w tools/art/enemies/ i tools/art/boss/ (js/data/sprites-boss.js).
+    Wróg bez własnego rysunku może pożyczyć cudzy: spr – czyj, hue – przebarwienie {c:kolor,m:siła} (js/gfx/sprites.js). */
  /* skażone bestie ze Starego Grodziska */
- wilkS:{spr:'wilk',hue:{c:'#b070ff',m:.55},dt:'ciete',res:{lod:25,mrok:25,ogien:-20},name:'Skażony wilk',hp:52,atk:13,def:2,spd:9,sp:'bleed',d:'Wilk przemieniony światłem rdzenia. Szybszy i silniejszy, a jego rany ropieją fioletem.'},
- dzikS:{spr:'dzik',hue:{c:'#b070ff',m:.55},dt:'obuch',res:{ciete:15,trucizna:15,mrok:20,ogien:-20},name:'Skażony dzik',hp:84,atk:15,def:5,spd:6,sp:'charge',d:'Trzyoki dzik z grodziska. Szarżuje z siłą tarana.'},
- pajakS:{spr:'pajak',hue:{c:'#9a7aff',m:.5},dt:'klute',res:{trucizna:50,mrok:20,ogien:-30},name:'Skażona pajęczyca',hp:48,atk:11,def:2,spd:8,sp:'stun',d:'Jej sieć jarzy się runami. Oplata i ogłusza.'},
+ wilkS:{dt:'ciete',res:{lod:25,mrok:25,ogien:-20},name:'Skażony wilk',hp:52,atk:13,def:2,spd:9,sp:'bleed',d:'Wilk przemieniony światłem rdzenia. Szybszy i silniejszy, a jego rany ropieją fioletem.'},
+ dzikS:{dt:'obuch',res:{ciete:15,trucizna:15,mrok:20,ogien:-20},name:'Skażony dzik',hp:84,atk:15,def:5,spd:6,sp:'charge',d:'Trzyoki dzik z grodziska. Szarżuje z siłą tarana.'},
+ pajakS:{dt:'klute',res:{trucizna:50,mrok:20,ogien:-30},name:'Skażona pajęczyca',hp:48,atk:11,def:2,spd:8,sp:'stun',d:'Jej sieć jarzy się runami. Oplata i ogłusza.'},
  /* Zakon Pustej Gwiazdy */
- brat:{spr:'mroczny',hue:{c:'#8a6ad0',m:.45},g:'m',dt:'ciete',res:{ciete:20,klute:20,mrok:35,swiete:-25},name:'Brat Pustej Gwiazdy',hp:74,atk:13,def:6,spd:5,sp:'guard',d:'Zbrojny zakonnik w czarnym płaszczu. Unosi gardę i osłania kapłanów Zakonu.'},
- gwiezdnik:{spr:'szeptun',hue:{c:'#7ab0ff',m:.5},g:'m',dt:'arkana',res:{arkana:30,mrok:30,swiete:-30},name:'Gwiezdny wróżbita',hp:58,atk:13,def:2,spd:7,sp:'gwiazda',fx:'magic',d:'Ściąga na wrogów iskry z nieba – arkana w dwa cele.'},
+ brat:{g:'m',dt:'ciete',res:{ciete:20,klute:20,mrok:35,swiete:-25},name:'Brat Pustej Gwiazdy',hp:74,atk:13,def:6,spd:5,sp:'guard',d:'Zbrojny zakonnik w czarnym płaszczu. Unosi gardę i osłania kapłanów Zakonu.'},
+ gwiezdnik:{g:'m',dt:'arkana',res:{arkana:30,mrok:30,swiete:-30},name:'Gwiezdny wróżbita',hp:58,atk:13,def:2,spd:7,sp:'gwiazda',fx:'magic',d:'Ściąga na wrogów iskry z nieba – arkana w dwa cele.'},
  /* stwory zza szczeliny */
- pomiot:{spr:'szlam',hue:{c:'#5ae0d0',m:.6},dt:'trucizna',nb:1,res:{arkana:40,trucizna:50,mrok:25,ogien:-30,swiete:-20},name:'Pomiot szczeliny',hp:50,atk:11,def:4,spd:5,sp:'acid',d:'Ryba, pająk i kamień naraz. Bez oczu. Kwas kruszy pancerz.'},
- pustak:{spr:'upior',hue:{c:'#40e0c0',m:.65},dt:'arkana',nb:1,eth:1,res:{ciete:40,klute:40,trucizna:100,arkana:-20,swiete:-40},name:'Pustak',hp:52,atk:12,def:2,spd:8,sp:'drain',fx:'magic',d:'Pusta skorupa z innego świata. Przenika ciosy (25% uniku) i wysysa życie.'},
- rojG:{spr:'nietoperz',hue:{c:'#60f0d0',m:.6},dt:'ciete',res:{arkana:25,klute:-25},name:'Rój odłamków',hp:30,atk:9,def:1,spd:11,sp:'multi',fly:1,d:'Chmara okruchów ostrych jak szkło. Tnie dwa cele naraz.'},
+ pomiot:{dt:'trucizna',nb:1,res:{arkana:40,trucizna:50,mrok:25,ogien:-30,swiete:-20},name:'Pomiot szczeliny',hp:50,atk:11,def:4,spd:5,sp:'acid',d:'Ryba, pająk i kamień naraz. Bez oczu. Kwas kruszy pancerz.'},
+ pustak:{dt:'arkana',nb:1,eth:1,res:{ciete:40,klute:40,trucizna:100,arkana:-20,swiete:-40},name:'Pustak',hp:52,atk:12,def:2,spd:8,sp:'drain',fx:'magic',d:'Pusta skorupa z innego świata. Przenika ciosy (25% uniku) i wysysa życie.'},
+ rojG:{dt:'ciete',res:{arkana:25,klute:-25},name:'Rój odłamków',hp:30,atk:9,def:1,spd:11,sp:'multi',fly:1,d:'Chmara okruchów ostrych jak szkło. Tnie dwa cele naraz.'},
  /* bossowie Aktu II (mechaniki: js/battle/bosses.js) */
- straznikR:{spr:'golem',hue:{c:'#9a6aff',m:.5},dt:'obuch',nb:1,res:{ciete:30,klute:40,trucizna:100,arkana:30,obuch:-30,swiete:-15},name:'Strażnik rdzenia',hp:360,atk:17,def:9,spd:3,sp:'golem',boss:true,d:'Kamienny wartownik Asterionu. Iskry rdzenia go osłaniają, a wyładowanie razi całą drużynę.'},
- lowcaG:{spr:'mroczny',hue:{c:'#e0b050',m:.4},g:'m',dt:'ciete',res:{ciete:20,klute:20,mrok:30,ogien:30,swiete:-25},name:'Łowczy Gwiazd',hp:380,atk:18,def:7,spd:6,sp:'guard',boss:true,d:'Dowódca łowców Zakonu. Czerpie siłę z odłamka gwiazdy i ściąga na wrogów deszcz gwiazd.'},
- zwiastun:{spr:'bazyliszek',hue:{c:'#50e8c8',m:.55},g:'m',dt:'trucizna',res:{trucizna:75,arkana:40,lod:-20,swiete:-30},name:'Zwiastun z otchłani',hp:400,atk:18,def:6,spd:6,sp:'zwiastun',boss:true,d:'Matka stworów zza szczeliny. Z kokonów wykluwają się pomioty, a jej krzyk ogłusza.'},
- arcykaplan:{spr:'nekromanta',hue:{c:'#c09aff',m:.5},g:'m',dt:'arkana',fx:'magic',res:{arkana:40,mrok:40,swiete:-30},name:'Arcykapłan Światomir',hp:460,atk:19,def:6,spd:6,sp:'arcy',boss:true,d:'Przywódca Zakonu Pustej Gwiazdy. Kamienie pieczęci go chronią, a szczelina odpowiada na jego wołanie.'},
+ straznikR:{dt:'obuch',nb:1,res:{ciete:30,klute:40,trucizna:100,arkana:30,obuch:-30,swiete:-15},name:'Strażnik rdzenia',hp:360,atk:17,def:9,spd:3,sp:'golem',boss:true,d:'Kamienny wartownik Asterionu. Iskry rdzenia go osłaniają, a wyładowanie razi całą drużynę.'},
+ lowcaG:{g:'m',dt:'ciete',res:{ciete:20,klute:20,mrok:30,ogien:30,swiete:-25},name:'Łowczy Gwiazd',hp:380,atk:18,def:7,spd:6,sp:'guard',boss:true,d:'Dowódca łowców Zakonu. Czerpie siłę z odłamka gwiazdy i ściąga na wrogów deszcz gwiazd.'},
+ zwiastun:{g:'m',dt:'trucizna',res:{trucizna:75,arkana:40,lod:-20,swiete:-30},name:'Zwiastun z otchłani',hp:400,atk:18,def:6,spd:6,sp:'zwiastun',boss:true,d:'Matka stworów zza szczeliny. Z kokonów wykluwają się pomioty, a jej krzyk ogłusza.'},
+ arcykaplan:{g:'m',dt:'arkana',fx:'magic',res:{arkana:40,mrok:40,swiete:-30},name:'Arcykapłan Światomir',hp:460,atk:19,def:6,spd:6,sp:'arcy',boss:true,d:'Przywódca Zakonu Pustej Gwiazdy. Kamienie pieczęci go chronią, a szczelina odpowiada na jego wołanie.'},
  /* elementy walk z bossami (obj: nie atakują, każdy może je trafić; mechaniki: js/battle/bosses.js) */
  korzen:{obj:1,nb:1,dt:'obuch',res:{trucizna:60,ogien:-50,ciete:-20},name:'Święty korzeń',hp:55,atk:0,def:3,spd:0,d:'Leczy Leszego, dopóki stoi. Słaby na ogień i ostrza.'},
  sztandar:{obj:1,nb:1,dt:'obuch',res:{trucizna:100,ogien:-30},name:'Sztandar zbójów',hp:60,atk:0,def:2,spd:0,d:'Dodaje zbójom odwagi (+25% ataku) i ściąga posiłki.'},
  urna:{obj:1,nb:1,g:'k',dt:'obuch',res:{mrok:80,trucizna:100,swiete:-50,obuch:-25},name:'Urna dusz',hp:65,atk:0,def:4,spd:0,d:'Bariera dusz: nekromanta otrzymuje o połowę mniej obrażeń.'},
  krysztal:{obj:1,nb:1,dt:'obuch',res:{ciete:30,klute:40,trucizna:100,obuch:-50,arkana:-25},name:'Kryształ runiczny',hp:50,atk:0,def:6,spd:0,d:'Daje golemowi kamienną skórę i regenerację.'},
- iskra:{obj:1,nb:1,g:'k',spr:'krysztal',hue:{c:'#b080ff',m:.6},dt:'obuch',res:{ciete:30,klute:40,trucizna:100,obuch:-50,arkana:30},name:'Iskra rdzenia',hp:55,atk:0,def:6,spd:0,d:'Osłania Strażnika rdzenia (−40% obrażeń) i ładuje jego wyładowanie.'},
- odlamekG:{obj:1,nb:1,spr:'krysztal',hue:{c:'#ffd070',m:.6},dt:'obuch',res:{ciete:30,klute:40,trucizna:100,obuch:-40,ogien:50},name:'Odłamek gwiazdy',hp:70,atk:0,def:7,spd:0,d:'Łowczy Gwiazd czerpie z niego siłę: leczy się i jest twardszy (−30% obrażeń).'},
- kokon:{obj:1,nb:1,spr:'urna',hue:{c:'#60e0b0',m:.7},dt:'obuch',res:{trucizna:100,arkana:30,ogien:-40,ciete:-20},name:'Kokon',hp:45,atk:0,def:3,spd:0,d:'Co kilka tur wykluwa się z niego pomiot szczeliny.'},
- kamienP:{obj:1,nb:1,spr:'krysztal',hue:{c:'#5a2a8a',m:.7},dt:'obuch',res:{ciete:30,klute:40,trucizna:100,mrok:60,obuch:-40,swiete:-40},name:'Kamień pieczęci',hp:65,atk:0,def:6,spd:0,d:'Jeden z kamieni, którymi Zakon otwiera pieczęć. Każdy chroni Arcykapłana (−15% obrażeń).'}
+ iskra:{obj:1,nb:1,g:'k',dt:'obuch',res:{ciete:30,klute:40,trucizna:100,obuch:-50,arkana:30},name:'Iskra rdzenia',hp:55,atk:0,def:6,spd:0,d:'Osłania Strażnika rdzenia (−40% obrażeń) i ładuje jego wyładowanie.'},
+ odlamekG:{obj:1,nb:1,dt:'obuch',res:{ciete:30,klute:40,trucizna:100,obuch:-40,ogien:50},name:'Odłamek gwiazdy',hp:70,atk:0,def:7,spd:0,d:'Łowczy Gwiazd czerpie z niego siłę: leczy się i jest twardszy (−30% obrażeń).'},
+ kokon:{obj:1,nb:1,dt:'obuch',res:{trucizna:100,arkana:30,ogien:-40,ciete:-20},name:'Kokon',hp:45,atk:0,def:3,spd:0,d:'Co kilka tur wykluwa się z niego pomiot szczeliny.'},
+ kamienP:{obj:1,nb:1,dt:'obuch',res:{ciete:30,klute:40,trucizna:100,mrok:60,obuch:-40,swiete:-40},name:'Kamień pieczęci',hp:65,atk:0,def:6,spd:0,d:'Jeden z kamieni, którymi Zakon otwiera pieczęć. Każdy chroni Arcykapłana (−15% obrażeń).'}
 };
 const BIOMES=[
  {k:'las',n:'Mroczna Puszcza',pool:[[1,'goblin'],[1,'wilk'],[1,'szlam'],[1,'dzik'],[2,'pajak'],[3,'szaman'],[3,'borowy']],boss:'leszy'},

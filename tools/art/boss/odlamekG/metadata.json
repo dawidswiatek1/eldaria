@@ -1,0 +1,57 @@
+{
+  "group_id": "9daf6f40-aef6-4030-a5ac-8bee13c1e873",
+  "states": [
+    {
+      "character": {
+        "id": "76460b58-a6ea-48e7-9cb7-dbfa269ced1d",
+        "name": "Idle",
+        "prompt": "Black meteorite chunk with a glowing golden core showing through its cracks, wrapped in heavy iron chains, sitting in melted snow with wisps of steam.",
+        "size": {
+          "width": 96,
+          "height": 96
+        },
+        "template_id": "custom",
+        "directions": 8,
+        "view": "side",
+        "created_at": "2026-10-26T16:09:52.738027+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {
+          "idle_breathing": {
+            "south-west": [
+              "Idle/animations/idle_breathing/south-west/frame_000.png",
+              "Idle/animations/idle_breathing/south-west/frame_001.png",
+              "Idle/animations/idle_breathing/south-west/frame_002.png",
+              "Idle/animations/idle_breathing/south-west/frame_003.png",
+              "Idle/animations/idle_breathing/south-west/frame_004.png",
+              "Idle/animations/idle_breathing/south-west/frame_005.png",
+              "Idle/animations/idle_breathing/south-west/frame_006.png",
+              "Idle/animations/idle_breathing/south-west/frame_007.png"
+            ],
+            "west": [
+              "Idle/animations/idle_breathing/west/frame_000.png",
+              "Idle/animations/idle_breathing/west/frame_001.png",
+              "Idle/animations/idle_breathing/west/frame_002.png",
+              "Idle/animations/idle_breathing/west/frame_003.png",
+              "Idle/animations/idle_breathing/west/frame_004.png",
+              "Idle/animations/idle_breathing/west/frame_005.png",
+              "Idle/animations/idle_breathing/west/frame_006.png",
+              "Idle/animations/idle_breathing/west/frame_007.png"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

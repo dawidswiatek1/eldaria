@@ -1,18 +1,32 @@
 #!/usr/bin/env python3
-"""Sprite'y elementów walk z bossami (rzeczy do zniszczenia na polu bitwy):
+"""Sprite'y wrogów z eksportów PixelLab (js/data/sprites-boss.js, BSPR – base64, bo gra czyta piksele).
+
+1. Rzeczy do zniszczenia w walkach z bossami – tools/art/boss/<klucz>/:
 
   korzen   – Święty korzeń (Leszy: leczy go, dopóki stoi)
   sztandar – Sztandar zbójów (Herszt: odwaga i posiłki)
   urna     – Urna dusz (Nekromanta: bariera dusz)
   krysztal – Kryształ runiczny (Golem: kamienna skóra i regeneracja)
+  iskra, odlamekG, kokon, kamienP – Akt II (Strażnik rdzenia, Łowczy Gwiazd, Zwiastun, Arcykapłan)
 
-Źródło: eksport PixelLab w tools/art/boss/<klucz>/ – animacja „Idle” (wszystkie klatki, pętla) albo,
-gdy jej nie ma, widok z przodu (rotations/south.png). Bez folderu – zapasowy rysunek z kodu poniżej.
-Wynik: js/data/sprites-boss.js (BSPR, base64 – gra czyta piksele, jak u innych wrogów):
-pasek klatek jak u wrogów (n, fw, pl/pr/pt/cw/ch = ramka treści), face:'L' – patrzy w lewo (na drużynę).
+  Animacja bezczynności (wszystkie klatki, pętla; kierunek z ukosa south-west, inaczej pierwszy) albo,
+  gdy jej nie ma, widok z przodu (rotations/south.png). Bez folderu – zapasowy rysunek z kodu poniżej.
+
+2. Wrogowie i bossowie – tools/art/enemies/<klucz>/ (klucz = klucz w ENEMIES, js/data/enemies.js).
+  Eksport postaci w kierunku west (patrzy w lewo, na drużynę). Stany w folderze:
+    fighting_pose albo Idle – animacja bezczynności (Idle / idle_breathing),
+    animacja z „Death” w nazwie – śmierć (np. Falling_Back_Death), inna – atak (np. Jump_Attack).
+  Z nich pasek klatek w układzie gry (FRAME w js/gfx/sprites.js):
+    0 stoi, 1 oddech, 2 zamach, 3 cios, 4 czar, 5 trafiony, 6 powalony,
+  a za nimi cała pętla bezczynności (il klatek) i animacja śmierci (dn klatek) – gra je odtwarza
+  (js/game/state.js sprDiv, css/battle.css.js). Bez animacji ataku/śmierci klatki 2–6 powstają
+  z bezczynności (przechył, odrzut, osunięcie). Wybór klatek, gdy domyślny nie pasuje – OPT niżej.
+  Klatki różnych animacji wyrównuje środek płótna (PixelLab trzyma postać w tym samym miejscu).
+
+Wynik: pasek klatek jak u wrogów (n, fw, pl/pr/pt/cw/ch = ramka treści), face:'L' – patrzy w lewo.
 
     python3 tools/boss_sprites.py            # zapisuje dane
-    python3 tools/boss_sprites.py --debug    # dodatkowo podgląd tools/out/boss.png (pierwsze klatki)
+    python3 tools/boss_sprites.py --debug    # dodatkowo podgląd tools/out/boss.png i tools/out/enemies.png
 
 Wymaga: Python 3, numpy, Pillow.
 """
@@ -190,8 +204,9 @@ def urna():
 
 
 def pack_frames(d):
-    """klatki z eksportu PixelLab: animacja Idle (dowolny kierunek), inaczej widok z przodu"""
-    an = sorted(glob.glob(os.path.join(d, 'Idle/animations/Idle/*')))
+    """klatki z eksportu PixelLab: animacja bezczynności (z ukosa south-west, inaczej pierwszy kierunek),
+    bez niej widok z przodu"""
+    an = sorted(glob.glob(os.path.join(d, 'Idle/animations/*/*')), key=lambda p: (os.path.basename(p) != 'south-west', p))
     if an:
         return [Image.open(p).convert('RGBA') for p in sorted(glob.glob(os.path.join(an[0], 'frame_*.png')))]
     for r in ('south', 'south-west'):
@@ -219,37 +234,180 @@ def strip(frames):
     return out, fw
 
 
-def row(key, im, n=1, fw=None):
+def png64(im):
+    """PNG jako base64. Gra i tak bierze piksel albo w całości, albo wcale (alfa < 128 = pusto,
+    js/gfx/sprites.js composeData), więc zapisujemy tak samo: przy ≤255 kolorach z paletą (kilka razy mniej danych)."""
+    a = np.array(im.convert('RGBA'))
+    on = a[..., 3] >= 128
+    cols = np.unique(a[on][:, :3], axis=0)
     b = io.BytesIO()
-    im.save(b, 'PNG', optimize=True)
+    if len(cols) <= 255:
+        key = (a[..., 0].astype(np.int32) << 16) | (a[..., 1].astype(np.int32) << 8) | a[..., 2]
+        ck = (cols[:, 0].astype(np.int32) << 16) | (cols[:, 1].astype(np.int32) << 8) | cols[:, 2]
+        p = Image.fromarray(np.where(on, np.searchsorted(ck, key) + 1, 0).astype(np.uint8), 'P')
+        p.putpalette([0, 0, 0] + cols.flatten().tolist())
+        p.save(b, 'PNG', optimize=True, transparency=0)
+    else:
+        a[~on] = 0
+        a[on, 3] = 255
+        Image.fromarray(a).save(b, 'PNG', optimize=True)
+    return base64.b64encode(b.getvalue()).decode()
+
+
+def row(key, im, n=1, fw=None):
     fw = fw or im.width
     meta = '"n":%d,"fw":%d,"pl":0,"pr":0,"pt":0,"cw":%d,"ch":%d,"face":"L",' % (n, fw, fw, im.height) if n > 1 else '"n":1,"face":"L",'
-    return ' "%s":{"w":%d,"h":%d,%s"u":"data:image/png;base64,%s"}' % (key, im.width, im.height, meta, base64.b64encode(b.getvalue()).decode())
+    return ' "%s":{"w":%d,"h":%d,%s"u":"data:image/png;base64,%s"}' % (key, im.width, im.height, meta, png64(im))
 
 
 DRAWN = {'korzen': korzen, 'sztandar': sztandar, 'urna': urna, 'krysztal': krysztal}
+# rzeczy do zniszczenia: z eksportu, a gdy go brak – rysunek z kodu (tylko pierwsze cztery)
+OBJ = list(DRAWN) + ['iskra', 'odlamekG', 'kokon', 'kamienP']
+
+
+# ---------- wrogowie i bossowie (tools/art/enemies/) ----------
+EN = os.path.join(ROOT, 'tools/art/enemies')
+IDLE = ('Idle', 'idle_breathing')
+# wybór klatek, gdy domyślny nie pasuje:
+#   hit – numer klatki animacji śmierci jako „trafiony” (domyślnie odrzut liczony z bezczynności;
+#         u części postaci pierwsze klatki śmierci wyglądają inaczej niż poza bojowa),
+#   die – ostatnia użyta klatka animacji śmierci (domyślnie ostatnia; u stworów zza szczeliny i pająka
+#         końcówka animacji wstaje albo się przewraca dziwnie),
+#   wind / strike – numery klatek animacji ataku (domyślnie 1 i klatka najbardziej wysunięta do przodu),
+#   cien – kolor narysowanego cienia pod stopami w animacji śmierci (gra rysuje własny cień) – usuwany z dolnej części klatek
+OPT = {
+    'straznikR': {'hit': 1},
+    'brat': {'hit': 1},
+    'gwiezdnik': {'hit': 1},
+    'pomiot': {'hit': 1, 'die': 2, 'cien': (103, 103, 103)},
+    'pajakS': {'die': 5},
+    'dzikS': {'strike': 5},      # skok w powietrzu (najdalej do przodu jest klatka z pochyloną głową)
+    'zwiastun': {'die': 3},
+}
+
+
+def load_anims(d):
+    """animacje w kierunku west: lista (stan, nazwa, [klatki RGBA])"""
+    out = []
+    for p in sorted(glob.glob(os.path.join(d, '*', 'animations', '*', 'west'))):
+        parts = p.split(os.sep)
+        fr = [np.array(Image.open(f).convert('RGBA')) for f in sorted(glob.glob(os.path.join(p, 'frame_*.png')))]
+        if fr:
+            out.append((parts[-4], parts[-2], fr))
+    return out
+
+
+def cut(a, dx=0):
+    """klatka: obraz przycięty do treści + lewy górny róg względem środka płótna (przesunięty o dx)"""
+    ys, xs = np.where(a[..., 3] > 0)
+    return a[ys.min():ys.max() + 1, xs.min():xs.max() + 1], int(xs.min() - a.shape[1] // 2 + dx), int(ys.min() - a.shape[0] // 2)
+
+
+def lean(f, d, dx=0):
+    """przechył: górny wiersz przesunięty o d pikseli (d<0 – do przodu, czyli w lewo), stopy na miejscu"""
+    a, ox, oy = f
+    h, w = a.shape[:2]
+    m = abs(d)
+    o = np.zeros((h, w + m, 4), np.uint8)
+    for y in range(h):
+        x0 = int(round((1 - y / max(1, h - 1)) * d)) + (m if d < 0 else 0)
+        o[y, x0:x0 + w] = a[y]
+    return o, ox - (m if d < 0 else 0) + dx, oy
+
+
+def slump(f):
+    """powalony bez animacji śmierci: postać osunięta (spłaszczona do 55% wysokości, dół na miejscu)"""
+    a, ox, oy = f
+    h, w = a.shape[:2]
+    nh = max(4, int(h * .55))
+    return np.array(Image.fromarray(a).resize((w, nh), Image.NEAREST)), ox, oy + h - nh
+
+
+def no_shadow(a, c):
+    """usuwa piksele koloru c z dolnych 35% treści klatki (narysowany cień)"""
+    a = a.copy()
+    ys = np.where(a[..., 3] > 0)[0]
+    y0 = int(ys.max() - (ys.max() - ys.min()) * .35)
+    m = (a[..., 0] == c[0]) & (a[..., 1] == c[1]) & (a[..., 2] == c[2])
+    m[:y0] = False
+    a[m] = 0
+    return a
+
+
+def build_enemy(k, d):
+    an = load_anims(d)
+    o = OPT.get(k, {})
+    if o.get('cien'):
+        an = [(s, n, [no_shadow(a, o['cien']) for a in fr] if 'Death' in n else fr) for s, n, fr in an]
+    # bezczynność: najpierw poza bojowa (fighting_pose), potem zwykła
+    idle = sorted((x for x in an if x[1] in IDLE), key=lambda x: (x[0] != 'fighting_pose', x[0] != 'Idle'))
+    loop = [cut(a) for a in idle[0][2]]
+    death = next(([cut(a) for a in x[2]] for x in an if 'Death' in x[1]), None)
+    atk = next(([cut(a) for a in x[2]] for x in an if x[1] not in IDLE and 'Death' not in x[1]), None)
+    st, br = loop[0], loop[len(loop) // 2]
+    if atk:
+        wind = atk[o.get('wind', 1)]
+        strike = atk[o.get('strike', min(range(len(atk)), key=lambda i: atk[i][1]))]
+    else:
+        wind = lean(st, 3, 2)        # zamach: odchylony do tyłu
+        strike = lean(st, -4, -5)    # cios: wypad do przodu
+    cast = lean(loop[len(loop) // 4], -2)                                            # czar: pochylony ku drużynie
+    hit = death[o['hit']] if death and o.get('hit') is not None else lean(st, 2, 4)  # trafiony: odrzut
+    dl = death[:o.get('die', len(death) - 1) + 1] if death else []
+    frames = [st, br, wind, strike, cast, hit, dl[-1] if dl else slump(st)] + loop + dl
+    # ramka treści = sylwetka w bezczynności (stopy = dół ramki); klatka mieści wszystkie klatki
+    cx0 = min(f[1] for f in loop)
+    cx1 = max(f[1] + f[0].shape[1] for f in loop)
+    cy0 = min(f[2] for f in loop)
+    cy1 = max(f[2] + f[0].shape[0] for f in loop)
+    X0 = min(f[1] for f in frames) - 1
+    X1 = max(f[1] + f[0].shape[1] for f in frames) + 1
+    Y0 = min(f[2] for f in frames) - 1
+    Y1 = max(cy1, max(f[2] + f[0].shape[0] for f in frames))
+    fw = X1 - X0
+    im = Image.new('RGBA', (fw * len(frames), Y1 - Y0))
+    for i, (a, ox, oy) in enumerate(frames):
+        im.alpha_composite(Image.fromarray(a), (i * fw + ox - X0, oy - Y0))
+    return im, dict(n=len(frames), fw=fw, pl=cx0 - X0, pr=X1 - cx1, pt=cy0 - Y0, cw=cx1 - cx0, ch=cy1 - cy0,
+                    il=len(loop), dn=len(dl))
+
+
+def erow(key, im, m):
+    meta = ''.join('"%s":%d,' % (k, v) for k, v in m.items())
+    return ' "%s":{"w":%d,"h":%d,%s"face":"L","u":"data:image/png;base64,%s"}' % (key, im.width, im.height, meta, png64(im))
 
 
 def main():
-    items, rows = [], []
-    for k, draw in DRAWN.items():
+    items, rows, strips = [], [], []
+    for k in OBJ:
         fr = pack_frames(os.path.join(ROOT, 'tools/art/boss', k))
         if fr:
             im, fw = strip(fr)
             rows.append(row(k, im, len(fr), fw))
             items.append((k, im.crop((0, 0, fw, im.height))))
             print(k, '– z eksportu:', len(fr), 'klatek', fw, 'x', im.height)
-        else:
-            im = draw()
+        elif k in DRAWN:
+            im = DRAWN[k]()
             rows.append(row(k, im))
             items.append((k, im))
             print(k, '– rysunek z kodu')
-    src = ('/* ===== ELEMENTY WALK Z BOSSAMI: rzeczy do zniszczenia (pasek klatek animacji albo jedna klatka) =====\n'
+        else:
+            print(k, '– brak eksportu w tools/art/boss/' + k)
+    for k in sorted(os.listdir(EN)) if os.path.isdir(EN) else []:
+        d = os.path.join(EN, k)
+        if not os.path.isdir(d):
+            continue
+        im, m = build_enemy(k, d)
+        rows.append(erow(k, im, m))
+        strips.append((k, im, m))
+        print(k, '– postać:', m['n'], 'klatek', m['fw'], 'x', im.height, '(treść %dx%d, pętla %d, śmierć %d)' % (m['cw'], m['ch'], m['il'], m['dn']))
+    src = ('/* ===== WROGOWIE Z EKSPORTÓW PIXELLAB: rzeczy do zniszczenia w walkach z bossami (pasek klatek animacji\n'
+           '   albo jedna klatka) i postacie (pasek 7 klatek gry + pętla bezczynności il + śmierć dn) =====\n'
            '   Wygenerowane przez tools/boss_sprites.py – nie edytuj ręcznie. Base64, bo gra czyta piksele. */\n'
            'const BSPR={\n' + ',\n'.join(rows) + '};\n')
     out = os.path.join(ROOT, 'js/data/sprites-boss.js')
     open(out, 'w', encoding='utf-8').write(src)
-    print('zapisano', out, len(src) // 1024, 'KB:', ', '.join(k for k, _ in items))
+    print('zapisano', out, len(src) // 1024, 'KB')
     if '--debug' in sys.argv:
         os.makedirs(os.path.join(ROOT, 'tools/out'), exist_ok=True)
         W = sum(im.width + 8 for _, im in items)
@@ -260,6 +418,17 @@ def main():
             sheet.alpha_composite(im, (x, H - im.height))
             x += im.width + 8
         sheet.resize((W * 4, H * 4), Image.NEAREST).save(os.path.join(ROOT, 'tools/out/boss.png'))
+        # wrogowie: 7 klatek gry (zielona linia = dół ramki treści, czyli stopy)
+        W = max(m['fw'] * 7 for _, _, m in strips)
+        H = sum(im.height + 6 for _, im, _ in strips)
+        sheet = Image.new('RGBA', (W, H), (70, 96, 60, 255))
+        dr = ImageDraw.Draw(sheet)
+        y = 0
+        for _, im, m in strips:
+            sheet.alpha_composite(im.crop((0, 0, m['fw'] * 7, im.height)), (0, y))
+            dr.line([(0, y + m['pt'] + m['ch']), (W, y + m['pt'] + m['ch'])], fill=(120, 255, 120, 255))
+            y += im.height + 6
+        sheet.resize((W * 2, H * 2), Image.NEAREST).save(os.path.join(ROOT, 'tools/out/enemies.png'))
 
 
 if __name__ == '__main__':

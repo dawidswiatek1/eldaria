@@ -1,0 +1,88 @@
+{
+  "group_id": "7a897f92-0192-4327-bc01-d1ba878d0c81",
+  "states": [
+    {
+      "character": {
+        "id": "1e6b661b-d0c8-4271-a47b-93b28b5af3d1",
+        "name": "Idle",
+        "prompt": "Armoured cult warrior in a black tabard over dark plate armour, hood up, empty-star sigil (circle with eight rays) on the chest, round shield and a flanged mace.",
+        "size": {
+          "width": 80,
+          "height": 80
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "side",
+        "created_at": "2026-10-26T15:55:45.309853+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {
+          "Idle": {
+            "west": [
+              "Idle/animations/Idle/west/frame_000.png",
+              "Idle/animations/Idle/west/frame_001.png",
+              "Idle/animations/Idle/west/frame_002.png",
+              "Idle/animations/Idle/west/frame_003.png",
+              "Idle/animations/Idle/west/frame_004.png",
+              "Idle/animations/Idle/west/frame_005.png",
+              "Idle/animations/Idle/west/frame_006.png",
+              "Idle/animations/Idle/west/frame_007.png"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "character": {
+        "id": "40558a8b-91f5-4c74-a54f-9b863af48ac2",
+        "name": "Idle (copy)",
+        "prompt": "Armoured cult warrior in a black tabard over dark plate armour, hood up, empty-star sigil (circle with eight rays) on the chest, round shield and a flanged mace.",
+        "size": {
+          "width": 80,
+          "height": 80
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "side",
+        "created_at": "2026-10-26T15:59:17.689145+00:00"
+      },
+      "folder": "Idle_copy",
+      "frames": {
+        "rotations": {
+          "south": "Idle_copy/rotations/south.png",
+          "south-east": "Idle_copy/rotations/south-east.png",
+          "east": "Idle_copy/rotations/east.png",
+          "north-east": "Idle_copy/rotations/north-east.png",
+          "north": "Idle_copy/rotations/north.png",
+          "north-west": "Idle_copy/rotations/north-west.png",
+          "west": "Idle_copy/rotations/west.png",
+          "south-west": "Idle_copy/rotations/south-west.png"
+        },
+        "animations": {
+          "Falling_Back_Death": {
+            "west": [
+              "Idle_copy/animations/Falling_Back_Death/west/frame_000.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_001.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_002.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_003.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_004.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_005.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_006.png"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

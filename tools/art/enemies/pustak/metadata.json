@@ -1,0 +1,88 @@
+{
+  "group_id": "5e94c09b-8d5e-4049-bcfa-67d9dc798b7b",
+  "states": [
+    {
+      "character": {
+        "id": "1aae75cc-d545-4904-aaf1-5eef39fb6155",
+        "name": "Idle",
+        "prompt": "Hollow humanoid husk with a translucent teal shell like cracked glass and nothing inside, faint glow along the cracks, floating a little above the ground.",
+        "size": {
+          "width": 80,
+          "height": 80
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "side",
+        "created_at": "2026-10-26T16:00:29.410436+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {
+          "Idle": {
+            "west": [
+              "Idle/animations/Idle/west/frame_000.png",
+              "Idle/animations/Idle/west/frame_001.png",
+              "Idle/animations/Idle/west/frame_002.png",
+              "Idle/animations/Idle/west/frame_003.png",
+              "Idle/animations/Idle/west/frame_004.png",
+              "Idle/animations/Idle/west/frame_005.png",
+              "Idle/animations/Idle/west/frame_006.png",
+              "Idle/animations/Idle/west/frame_007.png"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "character": {
+        "id": "5c903939-74c5-460c-83f1-470458eae40a",
+        "name": "Idle (copy)",
+        "prompt": "Hollow humanoid husk with a translucent teal shell like cracked glass and nothing inside, faint glow along the cracks, floating a little above the ground.",
+        "size": {
+          "width": 80,
+          "height": 80
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "side",
+        "created_at": "2026-10-26T16:03:01.213282+00:00"
+      },
+      "folder": "Idle_copy",
+      "frames": {
+        "rotations": {
+          "south": "Idle_copy/rotations/south.png",
+          "south-east": "Idle_copy/rotations/south-east.png",
+          "east": "Idle_copy/rotations/east.png",
+          "north-east": "Idle_copy/rotations/north-east.png",
+          "north": "Idle_copy/rotations/north.png",
+          "north-west": "Idle_copy/rotations/north-west.png",
+          "west": "Idle_copy/rotations/west.png",
+          "south-west": "Idle_copy/rotations/south-west.png"
+        },
+        "animations": {
+          "Falling_Back_Death": {
+            "west": [
+              "Idle_copy/animations/Falling_Back_Death/west/frame_000.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_001.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_002.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_003.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_004.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_005.png",
+              "Idle_copy/animations/Falling_Back_Death/west/frame_006.png"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
