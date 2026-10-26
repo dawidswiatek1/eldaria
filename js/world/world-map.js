@@ -45,6 +45,10 @@ const NODES={
  pola:{n:'Pola Południcy',t:'Wyprawa · pola',ty:'site',r:6,x:47,y:61,home:'sanow',hidden:1,d:'Złote łany, gdzie w samo południe nikt nie odważy się pracować.'},
  chata:{n:'Chata na kurzej stopce',t:'Sekretna wyprawa',ty:'site',r:7,x:4,y:74,home:'mokradla',hidden:1,d:'Płot z czaszek, a za nim chata, która obraca się na kurzej nodze. Dom Baby Jagi.'},
  jary:{n:'Wilcze Jary',t:'Łowisko',ty:'site',r:8,x:10,y:17,home:'dabrowa',hidden:1,d:'Głębokie jary w północnej puszczy. Wataha wilkołaka Alfy poluje tu każdej pełni.'},
+ /* Akt II (Zakon Pustej Gwiazdy): miejsca wypraw z zadań, odkrywane w rozmowach */
+ grodzisko:{n:'Stare Grodzisko',t:'Wyprawa · Akt II',ty:'site',x:41,y:46,ic:'event',hidden:1,home:'brzezina',d:'Porośnięte lasem wały pradawnego grodu. Pod nimi kryje się komora Asterionu, a zwierzęta wokół zmieniają się w potwory.'},
+ krater:{n:'Krater na Grzbiecie',t:'Wyprawa · Akt II',ty:'site',x:83,y:25,ic:'boss',hidden:1,home:'wschodnia',d:'Świeży krater na zboczu Wielkiego Grzbietu, tam gdzie spadła gwiazda. Śnieg wokół stopniał, a skały wciąż są ciepłe.'},
+ szczelina:{n:'Szczelina',t:'Wyprawa · Akt II',ty:'site',x:29,y:89,ic:'skull',hidden:1,home:'mokradla',d:'Rozdarcie w ziemi za Czarną Olszyną. Woda wokół świeci nocą, a z głębi wypełzają stwory, jakich nie zna żaden bestiariusz.'},
  poludnie:{n:'Równiny Południowe',t:'ku Avarii',ty:'exit',x:72,y:92,ic:'lock',hidden:1,d:'Szeroki trakt na południe, ku stepom Avarii. Granica zamknięta – wkrótce.'},
  martwe:{n:'Martwe Ziemie',t:'granica',ty:'exit',x:96,y:85,ic:'skull',hidden:1,d:'Spękana, wymarła ziemia za wschodnią granicą. Stąd przychodzi zło – wkrótce.'}};
 const EDGES=[['weleszow','dabrowa'],['weleszow','brzezina'],['weleszow','olszynow'],['weleszow','doliny'],['weleszow','sanow'],
@@ -53,7 +57,8 @@ const EDGES=[['weleszow','dabrowa'],['weleszow','brzezina'],['weleszow','olszyno
  ['kregoszew','jagna'],['kregoszew','mokradla'],['kregoszew','rozlewiska'],['kregoszew','kurhanow'],['mlyn','rozlewiska'],['rozlewiska','pola'],['rozlewiska','mokradla'],
  ['mokradla','bagno'],['mokradla','chata'],['sanow','pola'],['pola','kurhanow'],['kurhanow','kurhany'],['kurhanow','ruiny'],['ruiny','poludnie'],
  ['sanow','wschodnia'],['olszynow','kurhan'],['olszynow','ustronie'],['olszynow','wschodnia'],['wschodnia','kuznia'],['ustronie','kaplica'],
- ['wschodnia','grzbiet'],['wschodnia','jama'],['wschodnia','straznica'],['straznica','martwe']];
+ ['wschodnia','grzbiet'],['wschodnia','jama'],['wschodnia','straznica'],['straznica','martwe'],
+ ['brzezina','grodzisko'],['wschodnia','krater'],['mokradla','szczelina']];
 const SITE_OF_R=['puszcza','trakt','kurhany','grzbiet','jama','bagno','pola','chata','jary'];
 const nodeOk=k=>NODES[k]&&(!NODES[k].hidden||(S.found&&S.found[k]));
 const nbrs=k=>EDGES.filter(e=>e.includes(k)).map(e=>e[0]===k?e[1]:e[0]).filter(nodeOk);

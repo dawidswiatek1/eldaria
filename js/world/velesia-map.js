@@ -2,7 +2,7 @@
 const nodeVis=k=>nodeOk(k)||(S.found&&S.found[k]);
 /* mgła: odkryj sąsiadów miejsca (oprócz sekretnych) */
 /* sekretne miejsca: odsłania je dopiero rozmowa albo zadanie */
-const SECRET=['polana','chata','wyrab','kaplica','jagna','kurhan','czarnybor','kuznia'];
+const SECRET=['polana','chata','wyrab','kaplica','jagna','kurhan','czarnybor','kuznia','grodzisko','krater','szczelina'];
 function reveal(k,quiet){const nw=[];EDGES.forEach(([a,b])=>{const o=a===k?b:b===k?a:null;if(o&&!SECRET.includes(o)&&NODES[o].hidden&&!S.found[o]){S.found[o]=1;nw.push(NODES[o].n)}});if(nw.length&&!quiet)toast('Odkryto na mapie: '+nw.join(', '));return nw}
 const fogN=k=>NODES[k].hidden&&!S.found[k]&&!SECRET.includes(k)&&EDGES.some(([a,b])=>(a===k&&nodeOk(b))||(b===k&&nodeOk(a)));
 /* znane miejsce bez znanej drogi: odsłoń najkrótszy szlak */
@@ -73,13 +73,13 @@ function nodePanel(k){const N=NODES[k];
   if(S.exp)return b;if(k===here)return b+`<div class="here">${ic('flag',14)} Tu obozuje kompania</div>${S.poi[k]?'':`<button class="btn-main" data-act="poigo" data-k="${k}">${ic('event',20)} Zbadaj</button>`}`;
   return b+`<button class="btn-main" data-act="travel" data-k="${k}" ${path?'':'disabled'}>${ic('walk',20)} Podróżuj (${d} d.)</button>`}
  /* miasto, wieś, wyjście z mapy, miejsce wyprawy */
- const here=hereNode(),path=pathTo(here,k),d=path?path.length-1:0;const sr=N.r!=null?N.r:QSITE[k]?QSITE[k].r:null;let b=(N.ty==='site'&&sr!=null?`<div class="pano scene bg-${BIOMES[sr].k}">${sceneLayers(BIOMES[sr].k,false)}</div>`:`<div class="pano" style="background-image:url(${N.ty==='town'&&N.vil?VART.p_dabrowa:VART['p_'+k]||VART['p_mglista']})"></div>`)+`<h2>${N.ty==='site'?ic('fight',18):N.ty==='exit'?ic('lock',16):ic('nav_town',18)} ${N.n}</h2><div class="sub">${N.t}${d&&N.ty!=='exit'?` · ${d} ${d>1?'dni':'dzień'} drogi`:''}</div><p class="nd">${N.d}</p>`;
+ const here=hereNode(),path=pathTo(here,k),d=path?path.length-1:0;const sr=N.r!=null?N.r:QSITE[k]?qsite(k).r:null;let b=(N.ty==='site'&&sr!=null?`<div class="pano scene bg-${BIOMES[sr].k}">${sceneLayers(BIOMES[sr].k,false)}</div>`:`<div class="pano" style="background-image:url(${N.ty==='town'&&N.vil?VART.p_dabrowa:VART['p_'+k]||VART['p_mglista']})"></div>`)+`<h2>${N.ty==='site'?ic('fight',18):N.ty==='exit'?ic('lock',16):ic('nav_town',18)} ${N.n}</h2><div class="sub">${N.t}${d&&N.ty!=='exit'?` · ${d} ${d>1?'dni':'dzień'} drogi`:''}</div><p class="nd">${N.d}</p>`;
  if(N.ty==='exit')return b+`<div class="soon">${ic('lock',16)} Wkrótce</div>`;
  if(S.exp)return b+`<button class="btn-main" data-act="map">${ic('walk',20)} Wróć na wyprawę</button>`;
  if(N.ty==='town'){if(k===S.loc)return b+`<div class="here">${ic('flag',14)} Tu jest kompania</div><button class="btn-main" data-act="intown">${ic('nav_town',20)} Wejdź do miasta</button>`;
   return b+`<button class="btn-main" data-act="travel" data-k="${k}" ${path?'':'disabled'}>${ic('walk',20)} Podróżuj (${d} d.)</button><div class="sub">Po drodze może się coś wydarzyć.</div>`}
  /* miejsce wyprawy */
- if(QSITE[k]){const Q=QSITE[k];return b+(qsiteOpen(k)?`<div class="sub">Zalecany poziom bohaterów: ${Q.lv}${Q.boss?` · boss: ${ENEMIES[Q.boss].name}`:''}</div><button class="btn-main" data-act="qsgo" data-k="${k}">${ic('walk',20)} ${k===hereNode()?'Wyrusz':'Podróżuj i wyrusz'}</button>`:`<div class="sub">${qS(Q.q)==='done'?'Tu już wszystko się wydarzyło.':Q.idle}</div>`)}
+ if(QSITE[k]){const Q=qsite(k);return b+(qsiteOpen(k)?`<div class="sub">Zalecany poziom bohaterów: ${Q.lv}${Q.boss?` · boss: ${ENEMIES[Q.boss].name}`:''}</div><button class="btn-main" data-act="qsgo" data-k="${k}">${ic('walk',20)} ${k===hereNode()?'Wyrusz':'Podróżuj i wyrusz'}</button>`:`<div class="sub">${qS(Q.q)==='done'?'Tu już wszystko się wydarzyło.':Q.idle}</div>`)}
  const r=N.r,R=S.reg;if(!R.lv[r])return b+`<div class="soon">${ic('lock',16)} Zamknięte</div><div class="sub">Pokonaj bossa poprzedniej krainy, aby tu dotrzeć.</div>`;
  if(!mapSel||mapSel.r!==r||R.lv[r]<mapSel.L)mapSel={r,L:R.lv[r]};const L=mapSel.L,st=expStage(r,L),ph=partyHeroes(),hurt=ph.filter(h=>h.hp<mh(h)*.6).length;
  b+=`<div class="rlv">${[1,2,3,4].map(l=>{const op=R.lv[r]>=l,cl=l<4?R.lv[r]>l||R.done[r]:R.done[r];return `<button class="${L===l?'on':''} ${l===4?'bl':''}" data-act="rlv" data-r="${r}" data-l="${l}" ${op?'':'disabled'}>${op?(l===4?ic('boss',14):''):ic('lock',12)}${l<4?['','I','II','III'][l]:'Boss'}${cl?'<i class="ck">✓</i>':''}</button>`}).join('')}</div>`;

@@ -103,11 +103,12 @@ function xMapModal(){const E=S.exp;if(!E)return;const last=E.rooms.length-1,cur=
  const b=document.querySelector('#modal .box');if(b)b.classList.add('wide')}
 /* Naprzód: jedna droga – idź, rozstaje – pokaż mapę */
 function expForward(){const E=S.exp;if(!E||_walking)return;const cur=E.rooms[E.i];if(cur&&!cur.done)return;const nx=expNext(E);if(nx.length>1)xMapModal();else if(nx.length)expWalk()}
-function roomFoes(E,k){const bio=BIOMES[E.r],Q=E.site&&QSITE[E.site],loc=Math.min(E.L,3)+1,pool=((Q&&Q.pool)||bio.pool).filter(p=>loc>=p[0]).map(p=>p[1]);
+function roomFoes(E,k){const bio=BIOMES[E.r],Q=E.site&&qsite(E.site),loc=Math.min(E.L,3)+1,pool=((Q&&Q.pool)||bio.pool).filter(p=>loc>=p[0]).map(p=>p[1]);
  if(k==='boss')return [(Q&&Q.boss)||bio.boss,...Array.from({length:Math.min(3,1+E.r)},()=>pick(pool))];
  let n=2+Math.floor(E.L/2)+(Math.random()<.5?1:0)+(k==='elite'?1:0)+(E.r>=2?1:0);n=Math.max(2,Math.min(5,n));return Array.from({length:n},()=>pick(pool))}
 function expFight(k){const E=S.exp,room=E.rooms[E.i],bio=BIOMES[E.r];k=k||room.k;
- const st=k==='boss'?E.r*5+5:E.st,est=k==='elite'?E.st+1:st;
+ /* boss: krainy I–V na stałym etapie (5, 10…25); krainy Velesii i miejsca z zadań – etap wyprawy +1 */
+ const st=k==='boss'?(E.r<=4&&!E.site?E.r*5+5:E.st+1):E.st,est=k==='elite'?E.st+1:st;
  startBattle({st,est,bio,list:roomFoes(E,k),exp:true,elite:k==='elite',lbl:`${E.nm||bio.n.split(' ').pop()} ${LV_N[E.L].replace('Poziom ','')} · ${expCol(E,E.i)+1}/${expSteps(E)}`,wl:k==='elite'?'Elitarni wrogowie!':k==='boss'?'Boss!':'Zasadzka!'})}
 /* --- koniec walki na wyprawie --- */
 function finishExpBattle(){const E=S.exp,win=alive('e').length===0&&alive('h').length>0,lines=[],lv=[],got=[];
@@ -138,7 +139,7 @@ function bankLoot(E){let sold=0;E.loot.forEach(it=>{if(S.inv.length<INV_MAX||it.
 function expComplete(){const E=S&&S.exp;if(!E)return;
  /* walka w drodze i wyprawy z zadań (QSITE: Mglista Polana, Kurhan bez imienia, Czarny Bór) kończą się inaczej niż zwykła wyprawa */
  if(E.road){roadDone();return}
- if(E.site&&QSITE[E.site]){const Q=QSITE[E.site],bonus=60+E.st*8;S.gold+=E.gold+bonus;bankLoot(E);partyHeroes().forEach(h=>h.exps=(h.exps||0)+1);const tw=expEndTown(E,false,true);questExp(E);S.exp=null;save();
+ if(E.site&&QSITE[E.site]){const Q=qsite(E.site),bonus=60+E.st*8;S.gold+=E.gold+bonus;bankLoot(E);partyHeroes().forEach(h=>h.exps=(h.exps||0)+1);const tw=expEndTown(E,false,true);questExp(E);S.exp=null;save();
   modal(`<div class="banner"><div class="rays"></div><h1>${ic('flag',24)} ${NODES[E.site].n}</h1></div><div class="res"><p>${ic('gold',18)} Łupy: ${E.gold} + premia ${bonus} zł</p><p>${Q.end}</p>${tw.map(t=>`<p>${t}</p>`).join('')}</div><button class="btn-main" data-act="tocamp">${ic('walk',22)} ${Q.go}</button>`);return}
  const qn=questExp(E);
  const bio=BIOMES[E.r],boss=E.L>=4,bonus=20+E.st*10+(boss?100+E.st*8:0);S.gold+=E.gold+bonus;const sold=bankLoot(E);regOk();const R=S.reg;let un='';

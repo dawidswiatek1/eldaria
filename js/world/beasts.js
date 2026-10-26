@@ -42,3 +42,13 @@ MAI.jaga=async(u,c)=>{
  u.hut=(u.hut||0)+1;if(u.hut%3===1&&c.allies.length<3&&summon(u,pick(u.fly2?['strzyga','bies']:['nietoperz','bies','wilk']))){u.cd.sp=2;setF(u,'cast',600);flt(u,'Chatko, obróć się!','info');log('🏚️ Chata na kurzej stopce wypuszcza sługę!','r');await sleep(500);return 1}
  if(u.fly2&&Math.random()<.55){c.sp('Tłuczek z nieba!',2);await anim(u,c.hs,'dark');shake(true);c.hs.forEach(t=>{if(hit(u,t,.6,'dark')>0&&t.alive&&Math.random()<.35)weaken(t,2)});return 1}
  if(Math.random()<.5){c.sp('Klątwa starej wiedźmy!',2);const t=c.tgt();await anim(u,[t],'dark');const d=hit(u,t,1.2,'dark');if(d>0){weaken(t,3);setTimeout(()=>heal(u,Math.round(d*.4)),T(250))}return 1}};
+/* --- Akt II: Zakon Pustej Gwiazdy i stwory zza szczeliny (dane: js/data/enemies.js, bossowie: js/battle/bosses.js) --- */
+/* gwiezdny wróżbita: iskry z nieba w dwa cele (arkana, z dystansu) */
+MAI.gwiazda=async(u,c)=>{if(Math.random()<.5){c.sp('Spadające iskry!',3);const ts=c.hs.slice().sort(()=>Math.random()-.5).slice(0,2);await anim(u,ts,'magic');ts.forEach(t=>hit(u,t,.8,'magic'));return 1}};
+/* Zwiastun z otchłani: kokony wykluwają pomioty co drugą turę; między wykluciami jadowite ukąszenie */
+MAI.zwiastun=async(u,c)=>{u.egg=(u.egg||0)+1;const k=objN('kokon');
+ if(k&&u.egg%2===0&&c.allies.filter(a=>!a.obj).length<3&&summon(u,'pomiot')){u.cd.sp=1;setF(u,'cast',600);flt(u,'Kokon pęka!','info');log('🥚 Z kokonu wykluwa się pomiot szczeliny!','r');await sleep(500);return 1}
+ if(Math.random()<.5){c.sp('Jadowite żądło!',2);const t=c.tgt();await anim(u,[t],'poison');if(hit(u,t,1.1,'poison')>0&&t.alive)bleed(u,t,3,u.atk*.3,'🧪');return 1}};
+/* Arcykapłan Światomir: przyzywa braci Zakonu, rzuca Znak Pustej Gwiazdy (cel otrzymuje +25% obrażeń) */
+MAI.arcy=async(u,c)=>{if(c.allies.filter(a=>!a.obj).length<2&&summon(u,pick(['kultysta','brat','gwiezdnik']))){u.cd.sp=3;setF(u,'cast',600);flt(u,'Bracia, do mnie!','info');log(`🌑 ${u.name} wzywa braci Zakonu!`,'r');await sleep(500);return 1}
+ if(Math.random()<.45){c.sp('Znak Pustej Gwiazdy!',3);const t=c.tgt();await anim(u,[t],'dark');if(hit(u,t,.9,'dark')>0&&t.alive){t.st.curse=Math.max(t.st.curse||0,3);t.st.curseV=.25;flt(t,'Naznaczony','info');updUnit(t)}return 1}};

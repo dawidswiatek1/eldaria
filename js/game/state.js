@@ -27,6 +27,8 @@ function migrate(s){if(!s||!Array.isArray(s.roster))return null;
   loadMsg=(loadMsg?loadMsg+' ':'')+'Nowość: bossowie walczą inaczej! Zapowiadają wielkie ciosy turę wcześniej – przerwiesz je obrażeniami albo ogłuszeniem. Leszy, herszt, nekromanta i golem mają na polu bitwy rzeczy do zniszczenia (korzenie, sztandar, urnę, kryształy), a pasek bossa podpowiada, co robić. Za pierwsze zwycięstwo nad każdym bossem – legendarne trofeum.'}
  if(s.v===14){S=s;s.v=15;const n=s.roster.filter(h=>h.lvl>=SPEC_LVL).length;
   loadMsg=(loadMsg?loadMsg+' ':'')+'Nowość: specjalizacje! Od 10. poziomu każdy bohater wybiera jedną z dwóch ścieżek swojej klasy (zakładka Talenty) – wojownik zostaje mistrzem miecza albo strażnikiem, mag piromantą albo mistrzem runów… Specjalizacja daje nową umiejętność, cechę i premie.'+(n?` ${n>1?'Już '+n+' bohaterów może':'Jeden bohater już może'} wybrać swoją.`:'')}
+ if(s.v===15){S=s;s.v=16;const a2=(s.fl&&s.fl.akt)>=2;
+  loadMsg=(loadMsg?loadMsg+' ':'')+'Nowość: Akt II „Zakon Pustej Gwiazdy”! Cztery nowe zadania (Brzezina, Wschodnia, Kręgoszew, Dąbrowa), nowe miejsca na mapie – Stare Grodzisko, Krater na Grzbiecie i Szczelina – skażone bestie, stwory zza szczeliny i czterech nowych bossów. '+(a2?'Pan Dobiesław w Dąbrowie ma dla was wieści.':'Akt II zacznie się po finale Aktu I (Pan Czarnego Boru).')+' Bossowie krain Velesii (Bagno, Pola, Chata, Wilcze Jary) mają teraz rozsądną siłę.'}
  if(s.v===SAVE_VER)return s;
  return null}
 function load(){const raw=localStorage.getItem(SAVE_KEY);if(!raw)return null;try{const s=migrate(JSON.parse(raw));if(s){s.roster.forEach(upHero);return s}}catch(e){console.warn('zapis',e)}

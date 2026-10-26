@@ -40,7 +40,7 @@ js/
   expedition/         expeditions (branching map with fog, rooms, events)
   town/               town, buildings and services (phase 1 and 2); court.js – royal court and the bank
   world/              world map, Velesia map, towns, travel, new beasts
-  story/              reputation, quests (incl. the Act I campaign), dialogs, journal, unique companions
+  story/              reputation, quests (incl. the Act I and II campaign), dialogs, journal, unique companions
   audio/sound.js      sound effects and music
   main.js             starts the game – must stay LAST
 tools/
@@ -125,8 +125,17 @@ Styles: `css/specs.css.js`.
 ## Quests and events
 
 - `js/story/quests.js`: `QD` (quests and their steps), `DLG` (dialogs with choices), `TALK` (who you can talk to in each
-  town). The Act I campaign, companion quests and side quests 5–10 from the design doc (Żelazo pamięta, Ostatnie
-  polowanie, Zboże dla głodnych, Most z kości, Noc ognia, Ostatni sygnał) all live there.
+  town). The campaign (Acts I and II), companion quests and side quests 5–10 from the design doc (Żelazo pamięta,
+  Ostatnie polowanie, Zboże dla głodnych, Most z kości, Noc ognia, Ostatni sygnał) all live there.
+- Campaign: `ACTS` lists each act's four quests and its finale (the finale opens after 3 of 4); `S.fl.akt` is the
+  current act (the Act I finale sets 2, the Act II finale 3) and `QD[..].akt` hides later quests until their act.
+  Act II „Zakon Pustej Gwiazdy” (design doc quests #12 and #13): Znak na drzwiach (Dąbrowa → king → Brzezina →
+  Mokradła), Gwiazda pod ziemią (Stare Grodzisko), Spadająca gwiazda (Krater na Grzbiecie), Dzieci szczeliny
+  (Szczelina) and the finale Noc Upadłych Gwiazd on Mglista Polana. Choices from both acts change the finale: the
+  number of seal stones (`arcyStones` in `js/battle/bosses.js`), summoned creatures, a phase that a stabilised core
+  blocks and royal crossbowmen. A site can serve several quests (`QSITE.polana` is a list, read with `qsite`).
+- Act II enemies use stand-in pictures: `ENEMIES[..].spr` borrows another enemy's sprite and `.hue` recolours it
+  (`js/gfx/sprites.js`). New PixelLab art for them goes through `tools/boss_sprites.py`; then drop `spr`/`hue`.
 - `js/world/world-map.js`: `ROADEV` – random events while travelling (an event can limit where it happens with `ok`).
 - `js/world/velesia-map.js`: `POI` – one-time events at interesting places (an option can open a dialog: `{dlg:…}`).
 
