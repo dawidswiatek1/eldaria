@@ -1,6 +1,6 @@
 /* ===== WALKA ===== */
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
-const BEASTS=['wilk','ghul','harpia','nietoperz','pajak','troll','smok','szlam','dzik','wilkolak','wilkolakA','bazyliszek','zmij'];
+const BEASTS=['wilk','ghul','harpia','nietoperz','pajak','troll','smok','szlam','dzik','wilkolak','wilkolakA','bazyliszek','zmij','wilkS','dzikS','pajakS','pomiot','rojG','zwiastun'];
 function unitFromHero(h){const c=CLASSES[h.cls],s=stats(h),A=heroA(h);return {uid:'h'+h.id,side:'h',hero:h,key:h.cls,name:h.name.split(' ')[0],cls:h.cls,A,img:A.f0,hp:Math.min(h.hp,s.maxHp),maxHp:s.maxHp,atk:s.atk,def:s.def,spd:s.spd,crit:s.crit/100,critM:1.6+s.x.critM,tal:h.tal||{},spec:specOf(h)?h.spec:null,x:s.x,fx:c.fx,dt:heroDt(h),res:s.res,miss:s.miss||0,cd:{},st:{},alive:true,skills:heroSkills(h)}}
 function makeEnemy(k,st,uid,suffix,hpMul){const e=ENEMIES[k],hm=1+.22*(st-1)+.08*Math.max(0,st-5),am=1+.14*(st-1)+.04*Math.max(0,st-5),hp=Math.round(e.hp*hm*(hpMul||1)),A=enemyAnim(k,true);
  return {uid,side:'e',key:k,name:e.name+(suffix||''),A,img:A.f0,hp,maxHp:hp,atk:Math.round(e.atk*am),def:Math.round(e.def+st*.5),spd:Math.round((e.spd+rnd(0,1))*10)/10,crit:.05,critM:1.6,tal:{},x:{},sp:e.sp,fx:e.fx||'melee',dt:e.dt||FX2DT[e.fx]||'ciete',res:e.res||{},nb:e.nb,boss:e.boss,obj:e.obj,g:e.g,fly:e.fly,eth:e.eth,claw:BEASTS.includes(k),cd:{},st:{},alive:true}}

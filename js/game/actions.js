@@ -9,7 +9,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
  case 'rlv':mapSel={r:+el.dataset.r,L:+el.dataset.l};render();break;
  case 'travel':{const k=el.dataset.k;rSel=k;travel(k);break}
  case 'rgo':{const k=el.dataset.k,N=NODES[k],r=N.r,L=mapSel&&mapSel.r===r?mapSel.L:S.reg.lv[r];if(!partyHeroes().length){toast('Najpierw ustaw drużynę w formacji!');return}if(k===hereNode())startSiteExp(k,r,L);else travel(k,()=>startSiteExp(k,r,L));break}
- case 'qsgo':{const k=el.dataset.k,Q=QSITE[k];if(!Q||!qsiteOpen(k))return;if(!partyHeroes().length){toast('Najpierw ustaw drużynę w formacji!');return}const go=()=>startSiteExp(k,Q.r,Q.L,{st:Q.st(),nm:NODES[k].n});if(hereNode()===k)go();else travel(k,go);break}
+ case 'qsgo':{const k=el.dataset.k,Q=qsite(k);if(!Q||!qsiteOpen(k))return;if(!partyHeroes().length){toast('Najpierw ustaw drużynę w formacji!');return}const go=()=>startSiteExp(k,Q.r,Q.L,{st:Q.st(),nm:NODES[k].n});if(hereNode()===k)go();else travel(k,go);break}
  case 'intown':closeModal();screen='camp';tab='town';townView=null;render();break;
  case 'rev':roadResolve(+el.dataset.i);break;
  case 'revok':{closeModal();const p=S.pend;if(p&&p.to){S.pend=null;const th=_then;_then=null;finishTravel(p.to,th)}else{screen='region';render()}break}

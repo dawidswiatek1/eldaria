@@ -151,7 +151,7 @@ MIST = [(15, 2), (28, -2), (46, 0), (47, 16), (40, 20), (30, 19), (18, 17), (11,
 BARROWS = [(36, 72), (41, 67), (51, 68), (56, 74), (52, 83), (45, 90), (38, 87), (35, 79)]
 # polany w lasach wokół miejsc (żeby budynki i znaczniki były widoczne)
 CLEAR = {'dabrowa': 44, 'kregoszew': 36, 'mokradla': 30, 'kapliczka': 18, 'krag': 22, 'polana': 24, 'wyrab': 20, 'ustronie': 34, 'kaplica': 18,
-         'jagna': 18, 'mlyn': 20, 'brzezina': 28, 'rozlewiska': 24, 'chata': 20, 'trakt': 14, 'puszcza': 10, 'jary': 14, 'doliny': 16, 'czarnybor': 16}
+         'jagna': 18, 'mlyn': 20, 'brzezina': 28, 'rozlewiska': 24, 'chata': 20, 'trakt': 14, 'puszcza': 10, 'jary': 14, 'doliny': 16, 'czarnybor': 16, 'grodzisko': 20, 'szczelina': 16}
 # pola uprawne: (miejsce, przesunięcie x, y w px, promień x, y w px)
 FARMS = [('olszynow', 0, 14, 62, 30), ('olszynow', -40, -6, 26, 18), ('pola', 0, 2, 50, 18), ('weleszow', 34, 24, 34, 18), ('brzezina', 18, 16, 26, 14),
          ('sanow', 40, -18, 40, 14), ('kurhan', -18, 6, 24, 12), ('wschodnia', -26, 10, 22, 12), ('kurhanow', -26, -2, 22, 11), ('dabrowa', 26, 16, 22, 12),
@@ -781,7 +781,8 @@ ROAD_VIA = {('weleszow', 'sanow'): [(54.5, 26), (55.5, 36)], ('sanow', 'wschodni
             ('weleszow', 'doliny'): [(45, 15)], ('olszynow', 'wschodnia'): [(71, 36)], ('wschodnia', 'jama'): [(80.5, 39), (84, 36.5), (82.5, 31), (86.5, 27), (85, 21.5), (89, 18)],
             ('wschodnia', 'grzbiet'): [(80.5, 41), (83.5, 40), (85, 36.5)], ('wschodnia', 'straznica'): [(80, 54), (83, 61)], ('ruiny', 'poludnie'): [(66, 86)],
             ('straznica', 'martwe'): [(91, 76)], ('kurhanow', 'ruiny'): [(52, 77)], ('sanow', 'pola'): [(51.5, 46.5), (47.5, 47.8), (45.2, 51.5), (46, 56)],
-            ('brzezina', 'most'): [(46, 40)], ('wschodnia', 'kuznia'): [(74, 47)], ('mlyn', 'rozlewiska'): [(29.5, 57)]}
+            ('brzezina', 'most'): [(46, 40)], ('wschodnia', 'kuznia'): [(74, 47)], ('mlyn', 'rozlewiska'): [(29.5, 57)],
+            ('brzezina', 'grodzisko'): [(41.5, 38.5)], ('wschodnia', 'krater'): [(80.5, 39), (84, 36.5), (82.5, 31)], ('mokradla', 'szczelina'): [(24.5, 85)]}
 
 
 def road_pts(a, b):
@@ -1696,6 +1697,56 @@ def lm_altar():
     return c.done()
 
 
+def lm_hillfort():
+    """Stare Grodzisko: owalny wał ziemny z resztkami palisady, w środku fioletowa poświata rdzenia"""
+    c = Cv(34, 22)
+    earth = ['#3a4a22', '#4a5e2a', '#5e7432', '#728a3c']
+    for a in np.linspace(0, math.tau, 90, endpoint=False):
+        for k, col in ((0, earth[1]), (1, earth[2]), (2, earth[3])):
+            x, y = 17 + (13 - k) * math.cos(a), 12 + (7 - k * .6) * math.sin(a)
+            c.p(x, y, earth[0] if math.sin(a) > .6 and k == 0 else col)
+    for a in np.linspace(math.pi * 1.05, math.pi * 1.95, 9):
+        x, y = 17 + 12 * math.cos(a), 12 + 6.4 * math.sin(a)
+        for yy in range(int(y) - 3, int(y)):
+            c.p(x, yy, '#6a4624')
+        c.p(x, int(y) - 4, '#8a5e30')
+    for (dx, dy, col) in [(0, 0, '#d8b0ff'), (1, 0, '#b070f0'), (-1, 0, '#b070f0'), (0, 1, '#8a50d0'), (0, -1, '#8a50d0')]:
+        c.p(17 + dx, 12 + dy, col)
+    return c.done()
+
+
+def lm_crater():
+    """krater po spadającej gwieździe: ciemna niecka, rozżarzony odłamek, odrzucone kamienie"""
+    c = Cv(30, 18)
+    for yy in range(18):
+        for xx in range(30):
+            d = ((xx - 15) / 13) ** 2 + ((yy - 10) / 6.5) ** 2
+            if d < 1:
+                c.p(xx, yy, '#5a4c46' if d > .7 else '#3a302c' if d > .35 else '#241c1a')
+    for (dx, dy, col) in [(0, 0, '#fff4c0'), (1, 0, '#ffd070'), (-1, 0, '#ffd070'), (0, -1, '#ffb040'), (0, 1, '#c87a20'), (1, -1, '#ff9a3a')]:
+        c.p(15 + dx, 9 + dy, col)
+    for (x, y) in [(1, 9), (28, 11), (4, 15), (25, 4), (7, 3)]:
+        c.p(x, y, '#7a6a5e')
+        c.p(x + 1, y, '#5a4c46')
+    return c.done()
+
+
+def lm_rift():
+    """szczelina: poszarpane pęknięcie w ziemi z zielono-turkusową poświatą"""
+    c = Cv(28, 16)
+    pts = [(2, 9), (7, 7), (11, 9), (15, 6), (19, 8), (23, 6), (26, 8)]
+    for (a, b) in zip(pts, pts[1:]):
+        for t in np.linspace(0, 1, 12):
+            x, y = a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t
+            w = 2 if 4 < x < 24 else 1
+            for k in range(-w, w + 1):
+                c.p(x, y + k, '#0c1418' if abs(k) < w else '#2a4a48')
+            c.p(x, y - w - 1, '#5ae0d0' if int(x) % 3 else '#a8fff0')
+    for (x, y) in [(5, 3), (14, 2), (21, 3), (10, 13), (18, 13)]:
+        c.p(x, y, '#5ae0d0')
+    return c.done()
+
+
 def lm_forge():
     """zatopiona kuźnia: kamienne ściany bez dachu, komin, kowadło, woda u stóp"""
     c = Cv(30, 24)
@@ -1774,6 +1825,9 @@ def landmarks():
     L['poludnie'] = (lm_sign(), -6)
     L['pola'] = (lm_scarecrow(), -6)
     L['martwe'] = (BONES, -6)
+    L['grodzisko'] = (lm_hillfort(), -6)
+    L['krater'] = (lm_crater(), -5)
+    L['szczelina'] = (lm_rift(), -5)
     return L
 
 

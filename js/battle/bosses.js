@@ -3,7 +3,7 @@
      big  – wielki cios: boss zapowiada go turę wcześniej (u.chg), a drużyna może go przerwać, zadając
             CHG_NEED jego PŻ obrażeń albo ogłuszając go (bossowie są odporni na ogłuszenie – poza zapowiedzią).
             Przerwany boss jest „odsłonięty” (+25% obrażeń, st.expose). mark – cios w oznaczonego bohatera.
-     el   – elementy do zniszczenia (ENEMIES z obj:1, rysunki: js/data/sprites-boss.js); elDie – gdy padną.
+     el   – elementy do zniszczenia (ENEMIES z obj:1, rysunki: js/data/sprites-boss.js); n może być funkcją; elDie – gdy padną.
      ph   – fazy (próg PŻ, nazwa, efekt), regen – leczenie na początku tury, taken – mnożnik otrzymywanych obrażeń,
      tip  – czytelna podpowiedź w pasku bossa, tro – trofeum za pierwsze zwycięstwo (S.bk).
    Między wielkimi ciosami boss walczy po staremu (MAI w js/world/beasts.js, enemyAct w js/battle/battle-layout.js).
@@ -90,12 +90,54 @@ const BOSS={
   big:{n:'Krwawa pełnia',d:'trzy ciosy w oznaczonego bohatera',cd:3,mark:1,ann:'wyje do księżyca i patrzy na ofiarę…',
    run:async(u,c)=>{const t=taunted(markT(c));if(t)bfx('pelnia',t);for(let i=0;i<3&&t&&t.alive&&u.alive;i++){await anim(u,[t],'melee');if(hit(u,t,.8)>0&&t.alive&&i===2)bleed(u,t,3,u.atk*.3);await sleep(150)}}},
   tip:u=>'Wyciem wzywa wilki, ranny wpada w szał. Przy Krwawej pełni osłoń oznaczonego albo przerwij.',
-  tro:{b:'oko',n:'Kieł Alfy',st:{crit:6},res:{ciete:15},d:'Trofeum: Wilkołak Alfa z Wilczych Jarów.'}}};
+  tro:{b:'oko',n:'Kieł Alfy',st:{crit:6},res:{ciete:15},d:'Trofeum: Wilkołak Alfa z Wilczych Jarów.'}},
+ /* ===== Akt II: Zakon Pustej Gwiazdy ===== */
+ /* Gwiazda pod ziemią – Stare Grodzisko */
+ straznikR:{el:{k:'iskra',n:2},
+  taken:(u,t)=>objN('iskra')?.6:1,
+  big:{n:'Wyładowanie',d:'błyskawica w całą drużynę, może osłabić',cd:3,ann:'iskry rdzenia zbiegają się w jego piersi…',run:async u=>bigAoe(u,.8+.15*objN('iskra'),'magic',t=>{if(Math.random()<.4)weaken(t,2)},'klatwa')},
+  bigTip:u=>objN('iskra')?`każda iskra (${objN('iskra')}) wzmacnia wyładowanie`:'',
+  ph:[{at:.5,n:'Przeciążenie',run:u=>{let n=0;while(n<2&&summon(u,pick(['wilkS','dzikS','pajakS'])))n++;u.atk=Math.round(u.atk*1.15);log('⚡ Rdzeń pulsuje – z korytarzy nadbiegają skażone bestie!','r')}}],
+  tip:u=>objN('iskra')?`Iskry rdzenia (${objN('iskra')}): Strażnik otrzymuje 40% mniej obrażeń, a wyładowanie jest silniejsze – rozbij je (obuch najlepszy).`:'Iskry zgasły – Strażnik stracił osłonę.',
+  elDie:(u,t)=>log(`✨ ${t.name} gaśnie!${objN('iskra')?'':' Strażnik traci osłonę!'}`,'g'),
+  tro:{b:'amulet',n:'Okruch rdzenia',st:{atk:3},res:{arkana:20,mrok:10},d:'Trofeum: Strażnik rdzenia ze Starego Grodziska.'}},
+ /* Spadająca gwiazda – Krater na Grzbiecie */
+ lowcaG:{el:{k:'odlamekG',n:1},
+  taken:(u,t)=>objN('odlamekG')?.7:1,
+  regen:u=>objN('odlamekG')?.04:0,
+  big:{n:'Deszcz gwiazd',d:'płonące okruchy w całą drużynę, podpalają',cd:3,ann:'unosi włócznię ku niebu – odłamek rozbłyska…',run:async u=>bigAoe(u,.9,'fire',t=>{if(Math.random()<.45)bleed(u,t,2,u.atk*.25,'🔥')},'zenit')},
+  ph:[{at:.4,n:'Ostatni łów',run:u=>{u.atk=Math.round(u.atk*1.3);if(summon(u,'brat'))log('🗡️ Z cienia wychodzi brat Zakonu!','r')}}],
+  tip:u=>objN('odlamekG')?'Odłamek gwiazdy: Łowczy leczy 4% PŻ co turę i otrzymuje o 30% mniej obrażeń – rozbij odłamek.':'Odłamek rozbity – Łowczy stracił źródło mocy.',
+  elDie:(u,t)=>{ring(u,'#ffd070');log('💥 Odłamek gwiazdy pęka – Łowczy traci moc!','g')},
+  tro:{b:'helm',n:'Hełm Łowczego',st:{def:3},res:{ogien:20,arkana:10},d:'Trofeum: Łowczy Gwiazd z Wielkiego Grzbietu.'}},
+ /* Dzieci szczeliny – Szczelina pod Bagnem Czarnym */
+ zwiastun:{el:{k:'kokon',n:2},
+  big:{n:'Krzyk otchłani',d:'krzyk w całą drużynę, może ogłuszyć',cd:3,ann:'rozwiera paszczę – powietrze drży…',run:async u=>bigAoe(u,.75,'magic',t=>{if(Math.random()<.35)stun(t)},'klatwa')},
+  ph:[{at:.5,n:'Szczelina się poszerza',run:u=>{let n=0;while(n<2&&summon(u,'pustak'))n++;log('🌀 Szczelina się poszerza – wychodzą z niej pustaki!','r')}}],
+  tip:u=>{const n=objN('kokon');return n?`Kokony (${n}): co kilka tur wykluwa się z nich pomiot – rozbij je (ogień i ostrza najlepsze).`:'Kokony zniszczone – Zwiastun nie ma już potomstwa.'},
+  elDie:(u,t)=>log('🥚 Kokon pęka – nic się z niego nie wykluje!','g'),
+  tro:{b:'talizman',n:'Oko otchłani',st:{crit:4},res:{arkana:25},d:'Trofeum: Zwiastun z otchłani spod Bagna Czarnego.'}},
+ /* finał Aktu II – Noc Upadłych Gwiazd na Mglistej Polanie; wybory z obu aktów zmieniają walkę (arcyStones, S.fl) */
+ arcykaplan:{el:{k:'kamienP',n:()=>arcyStones()},
+  setup:u=>{if(S.fl.met==='krol'){alive('h').forEach(h=>{h.st.rally=Math.max(h.st.rally||0,2);h.st.rallyV=Math.max(h.st.rallyV||0,.2)});B.log.push({t:'🏹 Królewscy kusznicy na skraju polany osłaniają kompanię (+20% ataku na 2 tury).',c:'g'})}
+   if(S.fl.rdz==='stabilny')B.log.push({t:'💠 Rdzeń z grodziska tłumi szczelinę – Ten, Który Słucha, nie przejdzie.',c:'g'})},
+  taken:(u,t)=>1-.15*objN('kamienP'),
+  big:{n:'Gwiezdny ogień',d:'kolumna światła w całą drużynę',cd:3,ann:'unosi ręce – kamienie pieczęci rozbłyskują…',run:async u=>bigAoe(u,.8+.1*objN('kamienP'),'magic',t=>{if(Math.random()<.3)weaken(t,2)},'zenit')},
+  bigTip:u=>objN('kamienP')?`każdy kamień (${objN('kamienP')}) wzmacnia ogień`:'',
+  ph:[{at:.6,n:'Szczelina się otwiera',run:u=>{const n=S.fl.dz==='zaszyta'?1:2;let k=0;while(k<n&&summon(u,pick(['pomiot','pustak'])))k++;log('🌀 Nad pieczęcią otwiera się szczelina – wypełzają z niej stwory!','r')}},
+   {at:.3,n:'Ten, Który Słucha',run:u=>{if(S.fl.rdz==='stabilny'){log('💠 Coś ogromnego napiera na szczelinę… ale rdzeń z grodziska ją trzyma!','g');return}
+    u.atk=Math.round(u.atk*1.25);heal(u,Math.round(u.maxHp*.1));alive('h').forEach(h=>weaken(h,2));log('👁️ Zza szczeliny patrzy Ten, Który Słucha. Arcykapłan rośnie w siłę, kompania słabnie!','r')}}],
+  tip:u=>{const n=objN('kamienP');return n?`Kamienie pieczęci (${n}): każdy chroni Arcykapłana (−15% obrażeń) i wzmacnia Gwiezdny ogień – rozbij je (świętość i obuch).`:'Kamienie rozbite – Arcykapłan stracił osłonę.'},
+  elDie:(u,t)=>log(`💥 ${t.name} pęka!${objN('kamienP')?'':' Pieczęć milknie – Arcykapłan jest odsłonięty!'}`,'g'),
+  tro:{b:'diadem',n:'Korona Pustej Gwiazdy',st:{atk:4},res:{arkana:20,mrok:20},d:'Trofeum: Arcykapłan Światomir z Mglistej Polany.'}}};
+/* kamienie pieczęci w finale Aktu II: mniej, gdy kompania odebrała Zakonowi odłamek gwiazdy, rdzeń z grodziska
+   i worek odłamków werbownika; rozbita w Akcie I pieczęć na polanie – jeden więcej (1–3, tyle mieści się w tylnym rzędzie) */
+function arcyStones(){const f=S.fl;let n=3;if(f.met==='nasz'||f.met==='wila')n--;if(f.rdz==='zniszczony'||f.rdz==='pieczec')n--;if(f.zn==='walka')n--;if(f.osa==='broken')n++;return Math.max(1,Math.min(3,n))}
 /* --- początek walki: elementy na tylnych polach (najsłabsi pomocnicy ustępują im miejsca) --- */
 function bossSetup(){const u=B.units.find(x=>x.side==='e'&&x.boss&&BOSS[x.key]);B.eAtkP=0;B.mk=null;if(!u)return;const D=BOSS[u.key];u.bc=1;u.phs=0;
- if(D.el){const occ=i=>B.units.some(e=>e.side==='e'&&e.slot===i);let free=[2,3,4].filter(i=>!occ(i));
-  for(const i of [4,3,2]){if(free.length>=D.el.n)break;const m=B.units.find(e=>e.side==='e'&&e.slot===i&&!e.boss);if(m){B.units.splice(B.units.indexOf(m),1);free.push(i)}}
-  free.sort().slice(0,D.el.n).forEach((i,n)=>{const e=makeEnemy(D.el.k,B.st||S.stage,'o'+n);e.slot=i;e.row='b';B.units.push(e)})}
+ if(D.el){const en=typeof D.el.n==='function'?D.el.n():D.el.n,occ=i=>B.units.some(e=>e.side==='e'&&e.slot===i);let free=[2,3,4].filter(i=>!occ(i));
+  for(const i of [4,3,2]){if(free.length>=en)break;const m=B.units.find(e=>e.side==='e'&&e.slot===i&&!e.boss);if(m){B.units.splice(B.units.indexOf(m),1);free.push(i)}}
+  free.sort().slice(0,en).forEach((i,n)=>{const e=makeEnemy(D.el.k,B.st||S.stage,'o'+n);e.slot=i;e.row='b';B.units.push(e)})}
  if(D.setup)D.setup(u);if(D.tip)B.log.push({t:`⚠️ ${u.name}: ${D.tip(u)}`,c:'y'})}
 /* --- tura bossa: fazy, wielki cios albo jego zapowiedź; false = zwykły ruch --- */
 async function bossAct(u){const D=BOSS[u.key];if(!D)return false;
