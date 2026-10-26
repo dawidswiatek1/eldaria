@@ -2,7 +2,8 @@
 """Efekty wielkich ciosów bossów (js/battle/bosses.js) z eksportów PixelLab w tools/art/fx/<klucz>/.
 
 Każdy efekt: klatki animacji (pierwsza animacja w Idle/animations/, np. Idle/south albo Running/west),
-a gdy jej nie ma – widok z przodu (rotations/south.png), który gra „wyrasta z ziemi” (CSS).
+klatki ułożone wprost w folderze (frame_000.png, frame_001.png… – np. kilka pojedynczych obrazków PixelLab),
+a gdy ich nie ma – widok z przodu (rotations/south.png), który gra „wyrasta z ziemi” (CSS).
 Klatki są przycinane do wspólnej ramki i sklejane w poziomy pasek: assets/fx/<klucz>.png.
 Lista: js/data/fx-boss.js (BFX: plik, rozmiar klatki, liczba klatek, kotwica, skala, czas).
 Efekty to zwykłe obrazki (gra nie czyta ich pikseli), więc są plikami w assets/, nie base64.
@@ -27,10 +28,14 @@ FX = {
     'zenit':     {'src': 'fx/zenit',     'a': 'f', 's': 1.0, 'ms': 720},   # Królowa Południc – Zenit
     'klatwa':    {'src': 'fx/klatwa',    'a': 'f', 's': 1.0, 'ms': 720},   # Baba Jaga – Klątwa chaty
     'pelnia':    {'src': 'fx/pelnia',    'a': 'c', 's': 1.0, 'ms': 480},   # Wilkołak Alfa – Krwawa pełnia
+    'drzewo':    {'src': 'fx/drzewo',    'a': 'c', 's': 1.1, 'ms': 560},   # Troll – Wyrwane drzewo, Miażdżący cios
 }
 
 
 def frames(d):
+    own = sorted(glob.glob(os.path.join(d, 'frame_*.png')))
+    if own:
+        return [Image.open(p).convert('RGBA') for p in own]
     an = sorted(glob.glob(os.path.join(d, 'Idle/animations/*/*')))
     if an:
         return [Image.open(p).convert('RGBA') for p in sorted(glob.glob(os.path.join(an[0], 'frame_*.png')))]

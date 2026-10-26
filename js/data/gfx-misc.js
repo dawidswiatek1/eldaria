@@ -37,15 +37,3 @@ GFX.BLD={
  "cmentarz":{"u":"assets/buildings/cmentarz.png","w":100,"h":89,"ax":45,"ay":83},
  "gildia":{"u":"assets/buildings/gildia.png","w":104,"h":100,"ax":46,"ay":94}
 };
-/* GFX.P – obiekty w komnatach wyprawy: obrazki w assets/objects/ */
-GFX.P={
- "chest":{"w":28,"h":26,"u":"assets/objects/chest.webp","t":[]},
- "chest_open":{"w":28,"h":30,"u":"assets/objects/chest_open.webp","t":[]},
- "camp":{"w":34,"h":32,"u":"assets/objects/camp.webp","t":[]},
- "shrine":{"w":42,"h":46,"u":"assets/objects/shrine.webp","t":[]},
- "wanderer":{"w":36,"h":44,"u":"assets/objects/wanderer.webp","t":[]},
- "trap":{"w":26,"h":16,"u":"assets/objects/trap.webp","t":[]},
- "well":{"w":30,"h":40,"u":"assets/objects/well.webp","t":[]},
- "gate":{"w":74,"h":72,"u":"assets/objects/gate.webp","t":[]},
- "cache":{"w":44,"h":34,"u":"assets/objects/cache.webp","t":[]}
-};

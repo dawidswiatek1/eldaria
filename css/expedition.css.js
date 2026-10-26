@@ -14,7 +14,18 @@ css`
 .xscene.walking #xparty .wk .spr{animation-duration:.34s}
 @keyframes bobW{50%{transform:translateY(-3px)}}
 #xparty .shadow{position:absolute;left:18%;right:18%;bottom:-3px;height:7px;background:#0006;border-radius:50%}
-#xprop img{position:absolute;z-index:2;filter:drop-shadow(0 3px 0 #0005)}
+#xprop .px{position:absolute;z-index:2;filter:drop-shadow(0 3px 0 #0005)}
+/* obiekty z GFX.P: animowany pasek klatek (ognisko w obozie) */
+.panim{background-repeat:no-repeat;image-rendering:pixelated;animation:panimA var(--ms,900ms) steps(var(--n)) infinite}
+@keyframes panimA{to{background-position-x:calc(var(--fw) * var(--n) * -1)}}
+/* splądrowana skrzynia przygasa; otwarta w oknie – złoty blask */
+#xprop .px.looted{filter:brightness(.7) saturate(.6) drop-shadow(0 3px 0 #0005)}
+.evp .lit{filter:drop-shadow(0 0 6px #ffd870) brightness(1.1);animation:litA 1.2s ease-in-out infinite}
+@keyframes litA{50%{filter:drop-shadow(0 0 12px #ffd870) brightness(1.2)}}
+/* dekoracje komnat (drzewa, krzaki, groby) za drużyną */
+#xscen,#xscen .xsc{position:absolute;inset:0;pointer-events:none}
+#xscen{z-index:1}
+#xscen .sc{position:absolute;image-rendering:pixelated;filter:drop-shadow(0 2px 0 #0004) brightness(.93)}
 .xalert{position:absolute;z-index:2;display:flex;flex-direction:column;align-items:center;transform:translateX(-50%);animation:arrowA .7s steps(2) infinite}
 .xalert b{font-size:2rem;color:#ff5a3a;text-shadow:2px 2px 0 #000;line-height:1}
 .xtop{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;gap:4px;padding:4px max(6px,env(safe-area-inset-right)) 10px max(6px,env(safe-area-inset-left));background:linear-gradient(#140d12d8,#140d1288 70%,#0000);z-index:10}
@@ -77,7 +88,7 @@ css`
 /* --- wydarzenia --- */
 .evm{display:flex;gap:10px;align-items:flex-start}
 .evp{flex:0 0 auto;width:110px;min-height:110px;display:flex;align-items:flex-end;justify-content:center;background:radial-gradient(ellipse at 50% 90%,#0003,#0000 70%);padding:4px}
-.evp img{image-rendering:pixelated;transform-origin:bottom center}
+.evp img,.evp .panim{image-rendering:pixelated;transform-origin:bottom center}
 .evt{flex:1;min-width:0}.evt h2{margin-top:2px}.evt p{margin:4px 0 8px;line-height:1.35}
 .evo{display:flex;flex-direction:column;gap:4px}.evo button{min-height:42px;justify-content:flex-start;text-align:left}
 .evr{background:#fff6;padding:4px 8px;box-shadow:inset 3px 0 0 #a87c30}

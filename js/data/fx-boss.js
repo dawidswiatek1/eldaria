@@ -10,4 +10,5 @@ const BFX={
  topiel:{"u":"assets/fx/topiel.png","fw":81,"fh":77,"n":8,"a":"f","s":1.0,"ms":720},
  zenit:{"u":"assets/fx/zenit.png","fw":87,"fh":122,"n":8,"a":"f","s":1.0,"ms":720},
  klatwa:{"u":"assets/fx/klatwa.png","fw":73,"fh":76,"n":8,"a":"f","s":1.0,"ms":720},
- pelnia:{"u":"assets/fx/pelnia.png","fw":64,"fh":80,"n":8,"a":"c","s":1.0,"ms":480}};
+ pelnia:{"u":"assets/fx/pelnia.png","fw":64,"fh":80,"n":8,"a":"c","s":1.0,"ms":480},
+ drzewo:{"u":"assets/fx/drzewo.png","fw":73,"fh":72,"n":2,"a":"c","s":1.1,"ms":560}};

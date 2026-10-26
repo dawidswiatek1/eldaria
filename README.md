@@ -46,6 +46,7 @@ js/
 tools/
   boss_sprites.py     objects in boss fights from tools/art/boss/ (js/data/sprites-boss.js)
   fx_sprites.py       boss attack effects from tools/art/fx/ (assets/fx/, js/data/fx-boss.js)
+  props.py            expedition room objects and scenery from tools/art/props/ (assets/objects/, js/data/props.js)
   velesia_map.py      draws the Velesia map (assets/maps/velesia-big.png) – see "Velesia map" below
 assets/
   fonts/              Pixelify Sans (SIL Open Font License 1.1)
@@ -56,7 +57,7 @@ assets/
   halls/              building interiors: throne hall, bank and its Sanów branch, audience picture
   buildings/          building pictures shown at the top of each town service
   portraits/          NPC portraits
-  objects/            chests, camp, shrine… shown in expedition rooms
+  objects/            chests, camp, wells, tombs, trees, bushes, graves… (expedition rooms, fallen heroes)
   events/             event illustrations
   fx/                 boss attack effects (frame strips, made by tools/fx_sprites.py)
 ```
@@ -87,6 +88,16 @@ with contracts. King Przemysław's quest chain `QD.krol` („Na służbie Korony
 The castle in Kręgoszew stays a plain contracts board. The bank (Kantor „Złota Waga”, Weleszów + branch in Sanów)
 holds the vault (`S.vault`, interest after each expedition), an item stash (`S.stash`) and loans (`S.loan`).
 A quest step with `at:'zamek'`/`at:'bank'` waits inside that building instead of popping up on arrival.
+
+## Expedition rooms and scenery
+
+Room objects and decorations are PixelLab exports in `tools/art/props/` (`<key>.png`, or a `<key>/` folder of
+`frame_*.png` for an animation such as the camp fire). `tools/props.py` crops them into `assets/objects/` and writes
+`js/data/props.js` (`GFX.P`, sizes in hero pixels via a scale per object). In `js/expedition/expedition.js`:
+`roomProp` picks the room object (chest by region, animated camp, well variants, crypt entrance before the Kurhany
+boss), `EVENTS[..].b` limits an event to some regions (the barrow and tomb events), and `SCEN` lists the trees,
+bushes and graves scattered behind the party in each region (fixed per room, they slide past while walking).
+Fallen heroes get a headstone (`graveImg` in `js/ui/camp.js`).
 
 ## Bosses
 

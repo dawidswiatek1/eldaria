@@ -2,7 +2,11 @@
 const LV_N=['','Poziom I','Poziom II','Poziom III','Leże bossa'];
 const expStage=(r,L)=>(BIOMES[r]&&BIOMES[r].sr!=null?BIOMES[r].sr:r)*5+Math.min(L,4);
 const propUrl=k=>GFX.P&&GFX.P[k]?GFX.P[k].u:'';
-const propImg=k=>{const P=GFX.P&&GFX.P[k];if(!P)return '';const s=Math.min(3,100/P.w,110/P.h);const q=Math.max(1,Math.floor(s*DPR()))/DPR();return `<img class="px" src="${P.u}" style="width:${Math.round(P.w*q)}px;height:${Math.round(P.h*q)}px" alt="">`};
+/* obiekt z GFX.P (js/data/props.js) w rozmiarze w×h px: <img> albo – gdy ma klatki (n) – animowany pasek (.panim) */
+function propEl(k,w,h,cls,st){const P=GFX.P&&GFX.P[k];if(!P)return '';
+ if(P.n)return `<div class="px panim ${cls||''}" style="width:${w}px;height:${h}px;background-image:url(${P.u});background-size:${w*P.n}px ${h}px;--n:${P.n};--fw:${w}px;--ms:${P.ms}ms;${st||''}"></div>`;
+ return `<img class="px ${cls||''}" src="${P.u}" style="width:${w}px;height:${h}px;${st||''}" alt="">`}
+const propImg=(k,cls)=>{const P=GFX.P&&GFX.P[k];if(!P)return '';const s=Math.min(3,100/P.w,110/P.h);const q=Math.max(1,Math.floor(s*DPR()))/DPR();return propEl(k,Math.round(P.w*q),Math.round(P.h*q),cls)};
 const ROOM={fight:{ic:'fight',n:'Walka'},elite:{ic:'skull',n:'Elita'},boss:{ic:'boss',n:'Boss'},chest:{ic:'chest',n:'Skrzynia'},event:{ic:'event',n:'Wydarzenie'},camp:{ic:'camp',n:'Obozowisko'}};
 let mapSel=null,_walking=false;
 function regFromStage(s){const st=Math.max(1,s.stage||1),r=Math.min(4,Math.floor((st-1)/5)),L=st>25?4:(st-1)%5+1;s.reg={lv:[0,0,0,0,0],done:[0,0,0,0,0]};for(let i=0;i<r;i++){s.reg.lv[i]=4;s.reg.done[i]=1}s.reg.lv[r]=Math.max(s.reg.lv[r],Math.min(4,L));if(st>25)s.reg.done[4]=1}
@@ -51,7 +55,9 @@ function expTypes(g,C,strict){
 function genExp(r,L){const st=expStage(r,L),n=5+Math.min(L,3),C=n-1;
  for(let t=0;t<300;t++){const g=expGraph(C);if(!g)continue;const ty=expTypes(g,C,t<240);if(ty){const E=expBuild(r,L,st,g,ty,C);if(t>=240)E.loose=1;return E}}
  return expCorridor(r,L,st,n)}
-function expBuild(r,L,st,g,ty,C){const evs=['kapliczka','wedrowiec','pulapka','studnia','oboz'].sort(()=>Math.random()-.5),rooms=[],id={};let ei=0;
+/* wydarzenia możliwe w krainie (EVENTS[..].b – lista krain; bez b – wszędzie), w losowej kolejności */
+const expEvs=r=>Object.keys(EVENTS).filter(k=>!EVENTS[k].b||EVENTS[k].b.includes(BIOMES[r]&&BIOMES[r].k)).sort(()=>Math.random()-.5);
+function expBuild(r,L,st,g,ty,C){const evs=expEvs(r),rooms=[],id={};let ei=0;
  for(let c=0;c<C;c++)for(let l=0;l<XLANES;l++)if(g.has[c][l]){const k=ty[c][l];id[c+','+l]=rooms.length;rooms.push({k,ev:k==='event'?evs[ei++%evs.length]:null,done:0,c,l})}
  const fin=rooms.length;rooms.push({k:L>=4?'boss':'elite',done:0,c:C,l:1});
  const next=rooms.map(rm=>rm.c===C?[]:rm.c===C-1?[fin]:g.ed.filter(e=>e[0]===rm.c&&e[1]===rm.l).map(e=>id[(e[0]+1)+','+e[2]]).sort((a,b)=>a-b));
@@ -61,7 +67,7 @@ function expBuild(r,L,st,g,ty,C){const evs=['kapliczka','wedrowiec','pulapka','s
 function expCorridor(r,L,st,n){const mid=['fight','fight','chest','event','camp'];
  while(mid.length<n-1)mid.push(pick(['fight','event','chest','fight']));
  let ok=false,t=0;while(!ok&&t++<50){mid.sort(()=>Math.random()-.5);ok=mid[0]!=='camp'&&mid[mid.length-1]!=='camp'}
- const evs=['kapliczka','wedrowiec','pulapka','studnia','oboz'].sort(()=>Math.random()-.5);let ei=0;
+ const evs=expEvs(r);let ei=0;
  const rooms=mid.map(k=>({k,ev:k==='event'?evs[ei++%evs.length]:null,done:0}));rooms.push({k:L>=4?'boss':'elite',done:0});
  return {r,L,st,rooms,i:-1,gold:0,loot:[],kills:0}}
 /* --- mapa wyprawy: pomocnicze --- */
@@ -156,22 +162,58 @@ const EVENTS={
  pulapka:{n:'Pułapka!',p:'trap',t:'Na ścieżce błyszczą ostrza ukrytej pułapki.',o:[
   {t:'Rozbrój',r:()=>{const ch=.45+(hasCls('lotr')?.4:0)+(hasCls('lucznik')?.15:0);if(Math.random()<ch){const g=10+S.exp.st*3;S.exp.gold+=g;return `Pułapka rozbrojona! Pod płytą leżał schowek: +${g} złota.`}return `Mechanizm zaskoczył! Pierwszy rząd ranny: ${hurtAll(.15,true)}.`}},
   {t:'Przejdź ostrożnie',r:()=>{const o=[];partyHeroes().forEach(h=>{if(Math.random()<.4){const d=Math.max(1,Math.round(mh(h)*.08));h.hp=Math.max(1,h.hp-d);o.push(`${h.name.split(' ')[0]} −${d}`)}});return o.length?`Kilka zadrapań: ${o.join(', ')}.`:'Wszyscy przeszli bez szwanku.'}}]},
- studnia:{n:'Stara studnia',p:'well',t:'Kamienna studnia. Mówią, że spełnia życzenia… albo truje.',o:[
+ studnia:{n:'Stara studnia',p:['studnia1','studnia2','studnia3','studnia4','studnia5'],t:'Kamienna studnia. Mówią, że spełnia życzenia… albo truje.',o:[
   {t:'Wrzuć monetę (10 zł)',c:()=>S.gold>=10,r:()=>{S.gold-=10;const x=Math.random();if(x<.4){const g=30+S.exp.st*4;S.exp.gold+=g;return `Z dna wypływa sakiewka: +${g} złota!`}if(x<.7)return `Woda lśni – drużyna odzyskuje ${healAll(.2)} PŻ.`;return 'Plusk… i nic.'}},
   {t:'Napij się',r:()=>Math.random()<.5?`Orzeźwiające! +${healAll(.15)} PŻ.`:`Zatruta woda! ${hurtAll(.08)}.`},
   {t:'Odejdź',r:()=>'Lepiej nie ryzykować.'}]},
- oboz:{n:'Porzucony obóz',p:'cache',t:'Ktoś zostawił tu skrzynie i worki. Wygląda na pośpiech…',o:[
+ oboz:{n:'Porzucony obóz',p:'namiot',t:'Ognisko jeszcze się tli, a w namiocie leżą czyjeś worki. Ktoś odszedł w pośpiechu…',o:[
   {t:'Przeszukaj',r:()=>{const x=Math.random();if(x<.55){if(Math.random()<.5){const it=makeItem(S.exp.st,rollRar(.1));S.exp.loot.push(it);return `Znalazłeś: ${it.n}!`}const g=18+S.exp.st*4;S.exp.gold+=g;return `W worku było ${g} złota.`}if(x<.8)return 'Tylko szmaty i pleśń.';return {amb:1,t:'Właściciele wrócili – i nie są zadowoleni!'}}},
-  {t:'Odejdź',r:()=>'Zostawiacie obóz w spokoju.'}]}
+  {t:'Odejdź',r:()=>'Zostawiacie obóz w spokoju.'}]},
+ /* b – tylko w tych krainach (BIOMES[..].k) */
+ kurhan:{n:'Kurhan przodków',p:'kurhan',b:['las','trakt','krypta','gory','pola'],t:'Spod darni wystaje kamienne wejście do starego kurhanu. Ze środka ciągnie chłodem, a na progu ktoś zostawił garść zaśniedziałych monet.',o:[
+  {t:'Zejdź do komory',r:()=>{const x=Math.random();if(x<.5){const it=makeItem(S.exp.st+1,rollRar(.25));S.exp.loot.push(it);return `W komorze grobowej spoczywa dawny wojownik. Zabieracie: ${it.n} (${RAR[it.r].n.toLowerCase()}).`}
+   if(x<.75)return `Strop się osypuje! ${hurtAll(.12)}.`;return {amb:1,t:'Z ciemności komory wypadają jej nowi lokatorzy!'}}},
+  {t:'Złóż dary przodkom (20 zł)',c:()=>S.gold>=20,r:()=>{S.gold-=20;expAddFx(S.exp,{defP:.1},'Przodkowie');const v=healAll(.15);return `Wiatr cichnie, jakby ktoś skinął głową. Przodkowie czuwają: drużyna ma +10% obrony do końca wyprawy${v?` i odzyskuje ${v} PŻ`:''}.`}},
+  {t:'Odejdź',r:()=>'Zostawiacie umarłych w spokoju.'}]},
+ grobowiec:{n:'Omszały grobowiec',p:'grobowiec',b:['krypta','chata','bagno','trakt'],t:'Na kamiennym sarkofagu klęczy anioł ze spuszczoną głową. Płyta jest lekko odsunięta…',o:[
+  {t:'Odsuń płytę',r:()=>{const x=Math.random();if(x<.45){const g=25+S.exp.st*5;S.exp.gold+=g;if(Math.random()<.5){const it=makeItem(S.exp.st,rollRar(.15));S.exp.loot.push(it);return `W środku: ${g} złota i ${it.n}!`}return `Między kośćmi leży sakiewka: +${g} złota.`}
+   if(x<.75)return `Z wnętrza bucha trujący pył! ${hurtAll(.1)}.`;return {amb:1,t:'Ktoś – albo coś – pilnowało tego grobu!'}}},
+  {t:'Odmów modlitwę',r:()=>{if(hasCls('kaplan','paladyn')||Math.random()<.5){expAddFx(S.exp,{res:{mrok:15}},'Spokój zmarłych');return 'Kamienny anioł jakby się uśmiechnął. Zmarły czuwa nad wami: +15% odporności na mrok do końca wyprawy.'}return 'Cisza. Tylko wiatr szumi w szczelinach grobowca.'}},
+  {t:'Odejdź',r:()=>'Nie wszystko trzeba wiedzieć.'}]}
 };
-function roomProp(room){if(!room)return '';if(room.k==='chest')return room.done?'chest_open':'chest';if(room.k==='camp')return 'camp';if(room.k==='boss')return 'gate';if(room.k==='event')return EVENTS[room.ev].p;return ''}
-function evModal(room,res){const E=EVENTS[room.ev];const p=propUrl(E.p);
+/* obiekt komnaty: skrzynia wg krainy, obóz, wejście do krypty bossa w Kurhanach, obrazek wydarzenia (lista = wariant wg komnaty) */
+const CHEST_OF={krypta:'skrz_mech',bagno:'skrz_mech',gory:'skrz_zelazo',jama:'skrz_zelazo',chata:'skrz_runy'};
+const bioK=()=>{const E=S.exp,b=E&&BIOMES[E.r];return b?b.k:''};
+function roomProp(room){if(!room)return '';const E=S.exp;if(room.k==='chest')return CHEST_OF[bioK()]||'skrz_drewno';if(room.k==='camp')return 'oboz';if(room.k==='boss')return bioK()==='krypta'?'krypta':'gate';
+ if(room.k==='event'){const p=EVENTS[room.ev].p;return Array.isArray(p)?p[Math.max(0,E.rooms.indexOf(room))%p.length]:p}return ''}
+/* ===== dekoracje komnat: drzewa, krzaki, groby wg krainy (GFX.P) =====
+   hz – linia horyzontu tła (ułamek wysokości sceny); d – duże (0–2 na komnatę), m – małe (1–2, mn – maks.); sz – mnożnik rozmiaru */
+const SCEN={
+ las:{hz:.55,d:['drz_dab','drz_swierk','drz_omszaly','drz_pien'],m:['krz_biale','krz_paproc','krz_paproc2','krz_okragly','krz_gaszcz']},
+ trakt:{hz:.57,d:['drz_brzoza','drz_jesien'],m:['krz_jesien','krz_jarzebina','krz_trawa','krz_suchy','krz_suchy2','krz_bukszpan']},
+ krypta:{hz:.63,d:['mauzoleum','kaplica','sarkofag','grobowiec2','ruina'],m:['grob1','grob2','grob3','grob4','grob5','grob6','grob7','grob8','grob9','grob10','grob11','grob12','grob13','grob14','grob15','grob16'],mn:3,sz:1.5},
+ gory:{hz:.56,d:['drz_snieg','drz_snieg','drz_swierk'],m:[]},
+ bagno:{hz:.63,d:['drz_wierzba','drz_korzenie','drz_bagienny'],m:['krz_placzacy','krz_pnacza','krz_gaszcz']},
+ pola:{hz:.6,d:['drz_wisnia','drz_brzoza'],m:['krz_pomarancz','krz_fiolet','krz_bukszpan','krz_jarzebina']},
+ chata:{hz:.66,d:['drz_martwy','drz_czar','drz_omszaly'],m:['krz_pnacza','krz_ciemny']}
+};
+/* stałe losowanie dla danej komnaty (dekoracje nie zmieniają się przy odświeżeniu) */
+function rngOf(t){let a=7;for(const c of t)a=Math.imul(a^c.charCodeAt(0),2654435761);return ()=>{a=a+0x6D2B79F5|0;let x=Math.imul(a^a>>>15,1|a);x=x+Math.imul(x^x>>>7,61|x)^x;return((x^x>>>14)>>>0)/4294967296}}
+function scenOf(E,i){const C=SCEN[bioK()];if(!C||i<0)return [];const R=rngOf(`${E.r}|${E.L}|${E.st}|${i}|${E.rooms.length}`),out=[],xs=[],one=a=>a[Math.floor(R()*a.length)];
+ const put=(k,big)=>{for(let t=0;t<8;t++){const x=.03+R()*.94;if(xs.every(v=>Math.abs(v-x)>(big?.17:.09))){xs.push(x);out.push({k,x,z:R()});return}}};
+ const nd=C.d.length?(R()<.2?0:R()<.55?1:2):0,nm=C.m.length?1+Math.floor(R()*(C.mn||2)):0;
+ for(let j=0;j<nd;j++)put(one(C.d),1);for(let j=0;j<nm;j++)put(one(C.m),0);return out.sort((a,b)=>a.z-b.z)}
+/* dekoracje za drużyną: stopy między horyzontem a linią drużyny (yF), dalsze – mniejsze */
+function scenHtml(E,i,W,H,yF,s){const C=SCEN[bioK()];if(!C)return '';const y0=H*C.hz;
+ return scenOf(E,i).map(o=>{const P=GFX.P[o.k];if(!P)return '';const t=.04+o.z*.32,f=s*(.55+t*.75)*(C.sz||1),w=Math.round(P.w*f),h=Math.round(P.h*f),y=Math.round(y0+(yF-y0)*t);
+  return propEl(o.k,w,h,'sc',`left:${Math.round(W*o.x-w/2)}px;top:${y-h}px;z-index:${Math.round(t*100)}`)}).join('')}
+function evModal(room,res){const E=EVENTS[room.ev];
  const body=res?`<p class="evr">${esc(res.t||res)}</p>${res.amb?`<button class="btn-main" data-act="exfight">${ic('fight',20)} Do walki!</button>`:`<button class="btn-main" data-act="evdone">${ic('walk',20)} Dalej</button>`}`
   :`<p>${E.t}</p><div class="evo">${E.o.map((o,i)=>`<button data-act="evopt" data-i="${i}" ${o.c&&!o.c()?'disabled':''}>${o.t}</button>`).join('')}</div>`;
- modal(`<div class="evm"><div class="evp">${propImg(E.p)}</div><div class="evt"><h2>${ic('event',20)} ${E.n}</h2>${body}</div></div>`)}
+ modal(`<div class="evm"><div class="evp">${propImg(roomProp(room))}</div><div class="evt"><h2>${ic('event',20)} ${E.n}</h2>${body}</div></div>`)}
 function chestModal(res){const room=S.exp.rooms[S.exp.i];
- modal(`<div class="evm"><div class="evp">${propImg(res?'chest_open':'chest')}</div><div class="evt"><h2>${ic('chest',20)} Skrzynia</h2>${res?`<p class="evr">${res}</p><button class="btn-main" data-act="evdone">${ic('walk',20)} Dalej</button>`:`<p>Okuta skrzynia stoi w cieniu. Może być pułapką…</p><div class="evo"><button class="btn-gold" data-act="chopen">${ic('chest',18)} Otwórz</button><button data-act="evskip">Zostaw</button></div>`}</div></div>`)}
-function campModal(res){modal(`<div class="evm"><div class="evp">${propImg('camp')}</div><div class="evt"><h2>${ic('camp',20)} Obozowisko</h2>${res?`<p class="evr">${res}</p><button class="btn-main" data-act="evdone">${ic('walk',20)} Dalej</button>`:`<p>Bezpieczne miejsce na odpoczynek. Ognisko, namiot, chwila ciszy.</p><div class="evo"><button class="btn-green" data-act="crest">${ic('sk_leczenie',18)} Odpocznij (+35% PŻ)</button>${S.sup&&S.sup.prowiant>0?`<button class="btn-gold" data-act="crest" data-p="1">${ic('prowiant',18)} Ucztuj z prowiantem (+60% PŻ, masz ${S.sup.prowiant})</button>`:''}<button data-act="evskip">Ruszaj dalej</button></div>`}</div></div>`)}
+ modal(`<div class="evm"><div class="evp">${propImg(roomProp(room),res?'lit':'')}</div><div class="evt"><h2>${ic('chest',20)} Skrzynia</h2>${res?`<p class="evr">${res}</p><button class="btn-main" data-act="evdone">${ic('walk',20)} Dalej</button>`:`<p>Okuta skrzynia stoi w cieniu. Może być pułapką…</p><div class="evo"><button class="btn-gold" data-act="chopen">${ic('chest',18)} Otwórz</button><button data-act="evskip">Zostaw</button></div>`}</div></div>`)}
+function campModal(res){modal(`<div class="evm"><div class="evp">${propImg('oboz')}</div><div class="evt"><h2>${ic('camp',20)} Obozowisko</h2>${res?`<p class="evr">${res}</p><button class="btn-main" data-act="evdone">${ic('walk',20)} Dalej</button>`:`<p>Bezpieczne miejsce na odpoczynek. Ognisko, namiot, chwila ciszy.</p><div class="evo"><button class="btn-green" data-act="crest">${ic('sk_leczenie',18)} Odpocznij (+35% PŻ)</button>${S.sup&&S.sup.prowiant>0?`<button class="btn-gold" data-act="crest" data-p="1">${ic('prowiant',18)} Ucztuj z prowiantem (+60% PŻ, masz ${S.sup.prowiant})</button>`:''}<button data-act="evskip">Ruszaj dalej</button></div>`}</div></div>`)}
 function enterRoom(){const E=S.exp,room=E.rooms[E.i];if(!room||room.done)return;
  if(room.k==='event'&&room.ev==='pulapka'&&litRoom(E.i)){room.done=1;save();evModal(room,'Blask pochodni ujawnia ukrytą pułapkę – omijacie ją bez szwanku.');return}
  if(room.k==='fight'||room.k==='elite'||room.k==='boss'){expFight();return}
@@ -191,7 +233,7 @@ function renderExp(){const E=S.exp;if(!E){screen='camp';render();return}const bi
  const mm=expMini(E),nx=expNext(E);
  const act=!room||room.done?(!nx.length?`<button class="btn-main" data-act="expdone">${ic('flag',20)} Zakończ wyprawę</button>`:nx.length>1?`<button class="btn-main go" data-act="xmap">${ic('map',22)} Wybierz drogę</button>`:`<button class="btn-main go" data-act="expwalk">Naprzód ${ic('walk',22)}</button>`)
   :`<button class="btn-main" data-act="exroom">${{fight:ic('fight',20)+' Walcz!',elite:ic('skull',20)+' Walcz z elitą!',boss:ic('boss',20)+' Zmierz się z bossem!',chest:ic('chest',20)+' Otwórz skrzynię',event:ic('event',20)+' Zbadaj',camp:ic('camp',20)+' Rozbij obóz'}[room.k]}</button>`;
- document.getElementById('app').innerHTML=`<div class="expv"><div id="xscene" class="scene xscene bg-${bio.k}">${sceneLayers(bio.k)}<div id="xparty"></div><div id="xprop"></div></div>
+ document.getElementById('app').innerHTML=`<div class="expv"><div id="xscene" class="scene xscene bg-${bio.k}">${sceneLayers(bio.k)}<div id="xscen"></div><div id="xparty"></div><div id="xprop"></div></div>
  <div class="xtop"><span class="pill">${ic('map',16)}<span>${esc(E.nm||bio.n)}<small>${E.nm?'Velesia':LV_N[E.L]}</small></span></span>${fxChips(E)}${mm}<span class="pill gold" title="Łupy wyprawy">${ic('gold',16)} ${E.gold}</span><span class="pill" title="Przedmioty">${ic('bag',16)} ${E.loot.length}</span><button class="btn-small" data-act="expret">${ic('back',16)}<span class="lbl">Wycofaj się</span></button></div>
  <div class="xbot"><div class="xps">${[4,3,2,1,0].map(i=>{const h=S.slots[i]!=null?getHero(S.slots[i]):null;if(!h)return `<span class="xpc empty"></span>`;const r=h.hp/mh(h);return `<span class="xpc ${i<2?'f':''}" data-act="hero" data-id="${h.id}">${bust(heroSprite(h),h.cls,28,1,-4)}<span><b>${esc(h.name.split(' ')[0])}</b>${devBadge(h)?'<i class="xb">!</i>':''}<i class="bar ${r<.35?'low':''}"><i style="width:${r*100}%"></i></i></span></span>`}).join('')}<button class="btn-small xbag" data-act="bag" data-b="0">${ic('bag',18)}<span class="lbl">Torba</span>${bagN()?`<i class="xb">${bagN()}</i>`:''}</button><button class="btn-small" data-act="formq">${ic('nav_team',18)}<span class="lbl">Formacja</span></button></div>${act}</div></div>`;
  layoutExp(false)}
@@ -201,12 +243,17 @@ function layoutExp(){const E=S.exp,sc=document.getElementById('xscene');if(!sc||
   h+=`<div class="wk" style="left:${Math.round(x-A.cw*s/2)}px;top:${Math.round(y-A.ch*s)}px;width:${Math.round(A.cw*s)}px;height:${Math.round(A.ch*s)}px;z-index:${i>=2?2:3};animation-delay:-${(i*.13).toFixed(2)}s"><div class="shadow"></div>${sprDiv(A,s)}</div>`});
  document.getElementById('xparty').innerHTML=h;
  const room=E.rooms[E.i],pk=roomProp(room),pr=document.getElementById('xprop');
- if(pk){const P=GFX.P[pk],ps=qsc(s*(pk==='gate'?1.6:pk==='camp'||pk==='cache'?1.2:1.3));pr.innerHTML=`<img class="px" src="${P.u}" style="width:${P.w*ps}px;height:${P.h*ps}px;left:${Math.round(W*.72-P.w*ps/2)}px;top:${Math.round(yF-P.h*ps+4)}px" alt="">`}
- else if(room&&!room.done){pr.innerHTML=`<div class="xalert" style="left:${Math.round(W*.72)}px;top:${Math.round(yF-120)}px">${ic(ROOM[room.k].ic,28)}<b>!</b></div>`}else pr.innerHTML=''}
+ if(pk){const P=GFX.P[pk],ps=qsc(s*(pk==='gate'||pk==='krypta'?1.6:pk==='oboz'||pk==='namiot'?1.2:1.3)),w=Math.round(P.w*ps),h=Math.round(P.h*ps);pr.innerHTML=propEl(pk,w,h,room.done&&room.k==='chest'?'looted':'',`left:${Math.round(W*.72-w/2)}px;top:${Math.round(yF-h+4)}px`)}
+ else if(room&&!room.done){pr.innerHTML=`<div class="xalert" style="left:${Math.round(W*.72)}px;top:${Math.round(yF-120)}px">${ic(ROOM[room.k].ic,28)}<b>!</b></div>`}else pr.innerHTML='';
+ /* dekoracje bieżącej komnaty (te z poprzedniej, .out, odjeżdżają w expWalk) */
+ const xs=document.getElementById('xscen');if(xs){xs.querySelectorAll('.xsc:not(.out)').forEach(g=>g.remove());const g=document.createElement('div');g.className='xsc';g.innerHTML=scenHtml(E,E.i,W,H,yF,s);xs.appendChild(g)}}
 function expWalk(to){const E=S.exp,sc=document.getElementById('xscene');if(_walking||!E||!sc)return;const room=E.rooms[E.i];if(room&&!room.done)return;const nx=expNext(E);if(to==null){if(nx.length!==1)return;to=nx[0]}if(!nx.includes(to))return;
  _walking=true;const D=RM?300:1700/Math.min(SET.speed,1.5);E.i=to;if(E.path){E.path.push(to);expNext(E).forEach(j=>{if(!E.seen.includes(j))E.seen.push(j)})}save();
- document.getElementById('xprop').innerHTML='';sc.classList.add('walking');const bb=document.querySelector('.xbot .btn-main');if(bb){bb.disabled=true;bb.innerHTML=`${ic('walk',20)} Idziecie…`}
- setTimeout(()=>{/* pojawienie się rekwizytu z prawej */layoutExp();const im=document.querySelector('#xprop img,#xprop .xalert');if(im&&!RM){const v=(sc.clientHeight*2)/4;im.animate([{transform:`translateX(${Math.round(v*D/1000*.55)}px)`},{transform:'translateX(0)'}],{duration:D*.55,easing:'linear'})}},D*.45);
+ document.getElementById('xprop').innerHTML='';sc.classList.add('walking');
+ /* dekoracje mijanej komnaty odjeżdżają w lewo z prędkością ziemi i gasną */
+ {const v=sc.clientHeight/2;document.querySelectorAll('#xscen .xsc').forEach(g=>{g.classList.add('out');if(!RM)g.animate([{transform:'translateX(0)',opacity:1},{transform:`translateX(${-Math.round(v*D/1000)}px)`,opacity:0}],{duration:D,easing:'linear',fill:'forwards'});else g.remove()})}const bb=document.querySelector('.xbot .btn-main');if(bb){bb.disabled=true;bb.innerHTML=`${ic('walk',20)} Idziecie…`}
+ setTimeout(()=>{/* pojawienie się rekwizytu z prawej */layoutExp();const im=document.querySelector('#xprop .px,#xprop .xalert');if(im&&!RM){const v=(sc.clientHeight*2)/4;im.animate([{transform:`translateX(${Math.round(v*D/1000*.55)}px)`},{transform:'translateX(0)'}],{duration:D*.55,easing:'linear'})}
+  /* dekoracje nowej komnaty nadjeżdżają z prawej */const ng=document.querySelector('#xscen .xsc:not(.out)');if(ng&&!RM){const v=sc.clientHeight/2;ng.animate([{transform:`translateX(${Math.round(v*D/1000*.55)}px)`,opacity:0},{opacity:1,offset:.4},{transform:'translateX(0)',opacity:1}],{duration:D*.55,easing:'linear'})}},D*.45);
  setTimeout(()=>{sc.classList.remove('walking');_walking=false;render();setTimeout(enterRoom,T(250))},D)}
 /* --- obsługa dotyku --- */
 document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el||!S)return;const a=el.dataset.act,E=S.exp;
