@@ -43,6 +43,8 @@ K = {
     'jama_obsydian1': 1.15, 'jama_obsydian2': 1.15, 'jama_obsydian3': 1.15,
     'jama_krysztal1': 1.0, 'jama_krysztal2': 1.0, 'jama_krysztal3': 1.0,
     'jama_lawa1': .85, 'jama_lawa2': .85, 'jama_lawa3': .85, 'jama_zloto1': .8, 'jama_zloto2': .8, 'jama_zloto3': .8,
+    # ekran tytułowy (js/ui/camp.js titleHtml): ognisko kompanii, jej sztandar, oczy w lesie (animowane)
+    'ognisko': .75, 'sztandar_k': .85, 'oczy': .6,
 }
 # groby i krzaki (małe dekoracje; groby także na liście poległych)
 for i in range(1, 17):
@@ -51,7 +53,7 @@ for k in ['krz_gaszcz', 'krz_jarzebina', 'krz_placzacy', 'krz_suchy', 'krz_suchy
           'krz_ciemny', 'krz_fiolet', 'krz_pomarancz', 'krz_paproc', 'krz_paproc2', 'krz_okragly', 'krz_jesien',
           'krz_pnacza', 'krz_trawa']:
     K[k] = .85
-MS = {'oboz': 1100}
+MS = {'oboz': 1100, 'ognisko': 900, 'sztandar_k': 1300, 'oczy': 2600}
 # obrazki przycinane wspólną ramką (skrzynia zamknięta i otwarta stoją w tym samym miejscu)
 SAME = [('skrz_drewno', 'skrz_drewno_o'), ('skrz_runy', 'skrz_runy_o'), ('skrz_mech', 'skrz_mech_o'), ('skrz_zelazo', 'skrz_zelazo_o')]
 

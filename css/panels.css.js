@@ -48,5 +48,4 @@ css`
 .xfta{display:block;width:100%;box-sizing:border-box;height:110px;margin:6px 0;padding:6px;font:inherit;font-size:.68rem;line-height:1.25;word-break:break-all;resize:vertical;background:#1a1216;color:#efe2c4;border:2px solid #6a4a30}
 @media (max-height:440px){.xfta{height:70px}.xfer h3{margin:6px 0 2px}}
 /* wąskie menu tytułowe: przycisk zapisu bez napisu */
-@media (max-width:760px){.tmenu .row button{min-width:0}.tmenu .xfb{flex:0 0 auto;padding-left:10px;padding-right:10px}.tmenu .xfb .lbl{display:none}.tmenu .sndb{padding-left:10px!important;padding-right:10px!important}}
 `;

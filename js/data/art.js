@@ -11,6 +11,8 @@ const VART={
  "p_mglista":"assets/towns/panorama-mglista.webp",
  "emblem":"assets/ui/emblem.png",
  "emblem_s":"assets/ui/emblem-s.png",
+ /* ekran tytułowy: rama z nazwą gry (PixelLab) */
+ "ui_plaque":"assets/ui/plaque.png",
  "n_wlodar":"assets/portraits/wlodar.png",
  "n_szeptucha":"assets/portraits/szeptucha.png",
  "n_starszy":"assets/portraits/starszy.png",
@@ -53,10 +55,9 @@ const VART={
  "e_husarz":"assets/events/husarz.png",
  "p_brzezina":"assets/towns/panorama-brzezina.webp",
  "p_olszynow":"assets/towns/panorama-olszynow.webp",
- /* panoramy wsi bez własnego obrazka (te same obrazki) */
- "p_mokradla":"assets/towns/panorama-mglista.webp",
- "p_ustronie":"assets/towns/panorama-mglista.webp",
- "p_wschodnia":"assets/towns/panorama-kregoszew.webp",
+ "p_mokradla":"assets/towns/panorama-mokradla.webp",
+ "p_ustronie":"assets/towns/panorama-ustronie.webp",
+ "p_wschodnia":"assets/towns/panorama-wschodnia.webp",
  /* ikony umiejętności specjalizacji (skIc w js/data/specs.js), 32×32 */
  "sk_taniec":"assets/skills/taniec.png",
  "sk_mur":"assets/skills/mur.png",
@@ -87,6 +88,10 @@ const VART18={
  "t_kurhanow":"assets/towns/scene-kurhanow.webp",
  "t_brzezina":"assets/towns/scene-brzezina.webp",
  "t_olszynow":"assets/towns/scene-olszynow.webp",
+ /* wsie Aktu II (PixelLab): Mokradła, Ustronie, Wschodnia */
+ "t_mokradla":"assets/towns/scene-mokradla.webp",
+ "t_ustronie":"assets/towns/scene-ustronie.webp",
+ "t_wschodnia":"assets/towns/scene-wschodnia.webp",
  /* wnętrza: sala tronowa, kantor „Złota Waga” i jego filia w Sanowie, audiencja u króla */
  "h_zamek":"assets/halls/zamek.webp",
  "h_kantor":"assets/halls/kantor.webp",

@@ -82,6 +82,19 @@ Townsfolk and court figures (king, banker, townsman, townswoman, herbalist) live
 tool writes a portrait and three single frames for scenes – `<name>` (facing right), `<name>_l` (left), `<name>_s`
 (front) – which `sprFrame` in `js/world/velesia-towns.js` draws in town scenes and building interiors.
 
+## Title screen and town scenes
+
+The title screen (`titleHtml` in `js/ui/camp.js`, styles in `css/title.css.js`) is the company's camp at dusk above
+Velesia: the background `assets/backgrounds/title-far.webp`, the game name written in the game font on the PixelLab
+frame `assets/ui/plaque.png` (`VART.ui_plaque`), six heroes around the animated campfire with the company banner and
+violet eyes in the bushes (`ognisko`, `sztandar_k`, `oczy` in `GFX.P`, from `tools/art/props/`), twinkling stars and a
+shooting star. `saveSum` reads the save without loading it to show the main hero, act and place under „Kontynuuj”.
+
+Towns and villages with a picture have a scene (`SCN` in `js/world/velesia-towns.js`, images `t_<key>` in `VART18`,
+1280×720 in `assets/towns/scene-<key>.webp`): clickable buildings (`b`, hotspots in % of the 16:9 picture plus the
+label position), the notice board and other spots (`x`), and townsfolk who tell rumours (`g`, feet at x/y, `RUMOR`).
+All five villages (Brzezina, Olszynów, Mokradła, Ustronie, Wschodnia) have their own scene and panorama.
+
 ## Royal court and bank
 
 `js/town/court.js`. In Weleszów the castle opens as a throne hall: a picture with clickable figures (`HALL`; talks

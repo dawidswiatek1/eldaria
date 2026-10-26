@@ -63,24 +63,7 @@ body{min-height:0}
 .htabs{position:sticky;top:0;z-index:6;background:#140d12;box-shadow:0 4px 0 #140d12;margin-bottom:6px}
 .htabs button{flex-direction:row;gap:4px;font-size:.84rem;min-height:44px;min-width:0}
 @media (max-width:780px){.htabs button{flex-direction:column;gap:0;font-size:.7rem;min-height:48px;padding:0 1px}.htabs button .ic{width:18px;height:18px}}
-@media (max-height:360px){.tmenu{gap:4px}.tmenu button{font-size:.84rem;padding:2px 4px}.tmenu .rec{font-size:.76rem}}
-/* tytuł */
-.title{position:absolute;inset:0;display:block}
-.title .tscene{position:absolute;inset:0;height:auto;margin:0;box-shadow:none}
-.title .logo{left:0;right:auto;width:60%;top:max(4%,10px)}
-.title .logo b{font-size:clamp(1.9rem,calc(6.4*var(--vh)) + calc(1*var(--vw)),3.2rem);line-height:1.05}
-.title .logo small{font-size:.85rem;margin-top:6px}
-.title .tparty{left:max(3%,env(safe-area-inset-left));right:auto;bottom:15%;padding-left:12px}
-.title .tfoes{right:auto;left:41.5%;bottom:15%;display:flex}
-.bg-title .ly-far{inset:0!important;background-size:cover!important;background-position:center 35%!important;background-repeat:no-repeat!important;animation:none!important}
-@media (max-width:720px){.title .tfoes{display:none}}
-.tmenu{position:absolute;right:max(14px,env(safe-area-inset-right));top:8px;bottom:8px;margin:auto 0;height:max-content;width:clamp(220px,calc(34*var(--vw)),320px);display:flex;flex-direction:column;gap:6px;z-index:5;border:10px solid transparent;border-image:var(--fr-panel) 10/10px stretch;background:var(--tx-wood) 0 0/320px 320px;background-clip:padding-box;padding:4px;max-height:calc(100% - 16px);overflow-y:auto}
-.tmenu .btn-main{min-height:52px}.tmenu button{min-height:44px;font-size:.92rem}
-.tmenu .row{gap:6px}.tmenu .note{margin:0}
-.tmenu .feat{margin:2px 0 0;grid-template-columns:1fr 1fr;font-size:.76rem;gap:2px 6px}
-.tmenu .rec{text-align:center;color:var(--gold);font-size:.86rem}
 .howto2 p{margin:6px 0;font-size:.9rem;line-height:1.4}
-@media (max-height:360px){.tmenu .feat{display:none}.tmenu .btn-main{min-height:46px}.tmenu button{min-height:40px}}
 /* miasto */
 .town{width:min(100%,calc((calc(100*var(--vh)) - 92px) * var(--ta,1.95)));margin:2px auto 8px}
 .townbtns{grid-template-columns:repeat(3,1fr);gap:6px}
