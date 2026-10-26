@@ -3,6 +3,11 @@ let _view='';
 function toast(t){document.querySelectorAll('.toast').forEach(x=>x.remove());const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2100)}
 function modal(html){const m=document.getElementById('modal');m.innerHTML=`<div class="box">${html}</div>`;m.classList.remove('hidden')}
 function closeModal(){document.getElementById('modal').classList.add('hidden');if(B)B.paused=false}
+/* okna, z których gra idzie dalej tylko przyciskiem (koniec walki i gry, wskrzeszenie, rozmowa z wyborem, wynik
+   wydarzenia): klik obok okna ani Esc ich nie zamykają – inaczej po walce zostaje ekran bez przycisku „Dalej”,
+   a wydarzenie albo czekająca rozmowa przepada */
+const MODAL_LOCK=['tocamp','expback','gameover','rev','revok','qdlg','dopt','dclose','evdone','exfight'].map(a=>`[data-act=${a}]:not([disabled])`).join(',');
+function modalLocked(){const m=document.getElementById('modal');return !!(m&&!m.classList.contains('hidden')&&m.querySelector(MODAL_LOCK))}
 /* nagrobek poległego (GFX.P z js/data/props.js): stały dla danego bohatera */
 const GRAVES=['grob1','grob2','grob3','grob4','grob8','grob9','grob10','grob11','grob12','grob14','grob15'];
 function graveImg(f,hh){const k=GRAVES[Math.abs(hsh(f.name+'|'+f.stage))%GRAVES.length],P=GFX.P[k];return P?`<div class="av gravav">${propEl(k,Math.round(P.w*hh/P.h),hh)}</div>`:''}
