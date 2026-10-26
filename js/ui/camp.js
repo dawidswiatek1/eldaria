@@ -63,14 +63,24 @@ function howtoHtml(){return `<h2>${ic('map',20)} Jak grać?</h2><div class="howt
  <p>${ic('nav_team',16)} <b>Formacja</b>: 2 miejsca z przodu, 3 z tyłu. Walczący <b>wręcz</b> trafiają tylko 1. rząd wroga, dopóki ktoś w nim stoi; <b>dystansowi</b> – dowolny cel.</p>
  <p>${ic('fight',16)} W walce wybierz umiejętność na dolnym pasku, potem dotknij celu. Przytrzymaj postać, by zobaczyć jej odporności. Co 5 etapów czeka <b>boss</b>, a kraina się zmienia.</p>
  <p>${crown(1.2)} Twój <b>bohater główny</b> nigdy nie ginie – najwyżej zostaje pokonany. ${ic('skull',16)} Towarzysz przy 0 PŻ leży <b>na skraju śmierci</b>: wygrana albo odwrót go ratują (czeka go szpital i może odnieść trwały uraz), ale przegrana lub dobicie oznacza <b>śmierć na zawsze</b> – razem z ekwipunkiem.</p></div><button class="btn-main" data-act="close">Rozumiem!</button>`}
-function titleHtml(){const has=hasSave(),ps=LH()<360?1.5:2;
- const party=['wojownik','lucznik','mag','kaplan','lotr','paladyn'].map((k,i)=>animBox(heroAnim(k,{},null,i%2?'k':'m'),ps,'tu',`margin:0 -${Math.round(11*ps)}px;z-index:${i%2?2:3};top:${i%2?Math.round(4*ps):0}px`)).join('');
- const foes=[['goblin',0],['wilk',4],['ork',0]].map(([k,dy])=>animBox(enemyAnim(k,true),ps*.75,'tu',`margin-left:-${Math.round(4*ps)}px;top:${dy}px`)).join('');
- return `<div class="title"><div class="tscene bg-title">${sceneLayers('trakt')}<div class="logo">${emb(40)}<b>Eldaria</b><small>Kronika wędrownej kompanii</small></div><div class="tparty">${party}</div><div class="tfoes">${foes}</div></div>
- <div class="tmenu">${loadMsg?`<div class="note">${esc(loadMsg)}</div>`:''}${has?`<button class="btn-main" data-act="continue">${ic('auto',22)} Kontynuuj</button>`:''}<button class="${has?'':'btn-main'}" data-act="new">${ic('xp',20)} Nowa gra</button>
- <div class="row"><button data-act="howto">${ic('map',18)} Jak grać?</button><button data-act="xfer" class="xfb" aria-label="Przenieś zapis" title="Przenieś zapis (telefon ↔ komputer)">${ic('contract',18)}<span class="lbl"> Zapis</span></button><button data-act="snd" class="sndb" aria-label="Dźwięk" style="flex:0 0 auto;padding-left:12px;padding-right:12px">${ic('sk_ballada',20)}</button></div>${canFs()?`<button data-act="fs" id="b-fs">${ic('speed',18)} Pełny ekran</button>`:''}
- <div class="feat"><span>${ic('nav_team',16)} 9 klas</span><span>${ic('map',16)} Królestwo Velesii</span><span>${ic('nav_town',16)} 5 miast</span><span>${ic('contract',16)} Zadania i rozmowy</span><span>${ic('boss',16)} Bossowie</span></div>
- ${best()?`<div class="rec">${ic('boss',16)} Rekord: etap ${best()}</div>`:''}</div></div>`}
+/* opis zapisu na ekranie tytułowym (bez wczytywania gry): bohater główny, akt, miejsce */
+function saveSum(){try{const s=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');if(!s||!Array.isArray(s.roster))return '';
+ const m=s.roster.find(h=>h.main)||s.roster[0],ak=(s.fl&&s.fl.akt)||1,A=ACTS[Math.min(ak,ACTS.length)-1].n.split(':')[0];
+ const E=s.exp,where=E?'wyprawa: '+((E.site&&NODES[E.site]&&NODES[E.site].n)||(BIOMES[E.r]&&BIOMES[E.r].n)||''):(NODES[s.loc]&&NODES[s.loc].n)||'';
+ return [m?`${m.name.split(' ')[0]}, poz. ${m.lvl}`:'',ak>ACTS.length?A+' ukończony':A,where].filter(Boolean).join(' · ')}catch(e){return ''}}
+/* ekran tytułowy: obóz kompanii o zmierzchu nad Velesią – drużyna przy ognisku, sztandar, oczy w lesie, spadająca gwiazda */
+function titleHtml(){const has=hasSave(),ps=LH()<360?1.4:LH()<520?1.7:2,sum=has?saveSum():'';
+ const hero=(k,g,fl,i)=>animBox(heroAnim(k,{},null,g),ps,'tu'+(fl?' fl':'')+(i%2?' bk':''),'');
+ const L=[['lucznik','k'],['mag','m'],['wojownik','m']].map(([k,g],i)=>hero(k,g,0,i)).join(''),R=[['paladyn','k'],['kaplan','k'],['lotr','m']].map(([k,g],i)=>hero(k,g,1,i+1)).join('');
+ const P=k=>GFX.P[k]||{w:0,h:0},F=P('ognisko'),B=P('sztandar_k'),O=P('oczy');
+ const sparks=Array.from({length:9},(_,i)=>`<i style="left:${(i*37)%60-30}%;--dx:${((i*53)%41)-20}px;animation-delay:-${(i*0.37).toFixed(2)}s"></i>`).join('');
+ const stars=Array.from({length:12},(_,i)=>`<i style="left:${(i*23+7)%96}%;top:${(i*17+3)%38}%;animation-delay:-${(i*0.53).toFixed(2)}s;animation-duration:${(2.4+(i%4)*0.7).toFixed(1)}s"></i>`).join('');
+ return `<div class="title"><div class="tscene bg-title">${sceneLayers('trakt')}<div class="tstars">${stars}<b class="shoot"></b></div>
+ <div class="logo"><img class="px plq" src="${VART.ui_plaque}" alt=""><div class="lgt"><b>Eldaria</b><small>Kronika wędrownej kompanii</small></div></div>
+ <div class="tcamp">${propEl('sztandar_k',Math.round(B.w*ps),Math.round(B.h*ps),'tban')}<div class="tgrp">${L}</div><div class="tfire"><i class="tglow"></i>${propEl('ognisko',Math.round(F.w*ps),Math.round(F.h*ps),'')}<div class="tsp">${sparks}</div></div><div class="tgrp">${R}</div>${propEl('oczy',Math.round(O.w*ps),Math.round(O.h*ps),'teyes')}</div></div>
+ <div class="tmenu">${loadMsg?`<div class="note">${esc(loadMsg)}</div>`:''}${has?`<button class="btn-main tcont" data-act="continue">${ic('auto',22)}<span class="tc"><b>Kontynuuj</b>${sum?`<small>${esc(sum)}</small>`:''}</span></button>`:''}<button class="${has?'':'btn-main'}" data-act="new">${ic('xp',20)} Nowa gra</button>
+ <div class="trow"><button data-act="howto">${ic('map',18)}<small>Jak grać?</small></button><button data-act="xfer" title="Przenieś zapis (telefon ↔ komputer)">${ic('contract',18)}<small>Zapis</small></button><button data-act="snd">${ic('sk_ballada',18)}<small>Dźwięk</small></button>${canFs()?`<button data-act="fs" id="b-fs">${ic('speed',18)}<small>Ekran</small></button>`:''}</div>
+ ${best()?`<div class="rec">${ic('boss',14)} Rekord: etap ${best()}</div>`:''}</div></div>`}
 function render(){const m=document.querySelector('.main'),st=m?m.scrollTop:0,k=_view;_render();const n=document.querySelector('.main');if(n&&_view===k&&st)n.scrollTop=st}
 function _render(){applySpeed();if(S){syncForm();townOk()}const app=document.getElementById('app');if(!GFX_READY)return;
  if(screen==='title'){enterAnim('title');app.innerHTML=titleHtml();return}

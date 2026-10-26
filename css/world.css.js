@@ -102,7 +102,6 @@ css`
 .lorelist{display:flex;flex-direction:column;gap:5px;margin-bottom:6px}.lorelist button{justify-content:flex-start;text-align:left}
 .lore p{line-height:1.4;font-size:.92rem;margin:0 0 7px}
 .lhead{display:flex;gap:10px;align-items:center;margin:4px 0 8px}.lhead h1{margin:0;font-size:1.8rem}.lhead small{color:#6a5038}
-.title .logo .emb{display:block;margin:0 auto 2px;filter:drop-shadow(2px 2px 0 #000)}
 @media (max-height:500px){.pano{display:none}.wside .rlv button{min-height:28px}.wside .mp{width:26px;height:30px}.wside .mparty .bust{transform:scale(.8);transform-origin:bottom}.rgorow .btn-main{min-height:40px;font-size:.9rem}.wside .nd{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.wside{flex-basis:clamp(190px,32%,280px);padding:2px 6px;gap:3px}.wside p{font-size:.78rem}.wside h2{font-size:1rem}.kpin b,.npin b{font-size:.62rem;padding:0 3px}.npin i{width:20px;height:20px}.npin.n-town i{width:22px;height:22px}
  .svc,.talk{min-height:42px}.talk img{width:32px;height:36px}.svcs,.talks{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}.dpor{width:66px;height:74px}.dtx p{font-size:.82rem}.dopts button{min-height:34px;font-size:.82rem}.stcap b{font-size:1rem}}
 @media (max-width:640px){.wbody{flex-direction:column}.wside{flex:0 0 auto;max-height:45%}.stbody{flex-direction:column}.stpano{flex:0 0 110px}}

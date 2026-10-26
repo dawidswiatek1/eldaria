@@ -28,8 +28,8 @@ css`
 .shake{animation:shakeA calc(.32s * var(--sp)) steps(6)}
 @keyframes shakeA{0%{transform:translate(0,0)}20%{transform:translate(-4px,2px)}40%{transform:translate(4px,-2px)}60%{transform:translate(-3px,-1px)}80%{transform:translate(2px,2px)}100%{transform:none}}
 .loading{margin:auto;text-align:center;color:var(--gold);font-size:1.2rem}
-@media (max-height:720px){.tscene{height:min(calc(50*var(--vh)),330px)}.log{height:44px;font-size:.72rem}.skills button{min-height:42px;font-size:.84rem}.skills button .si{width:22px;height:22px}.hint{min-height:0;font-size:.76rem;margin-top:3px}.panel .who{margin-bottom:3px}.bt{gap:3px}.bt .top{padding:3px 0 0}.bt .btn-small{min-height:36px}.order{min-height:30px}.order img{width:26px;height:26px}.panel .btn-main{min-height:44px;font-size:1rem}}
+@media (max-height:720px){.log{height:44px;font-size:.72rem}.skills button{min-height:42px;font-size:.84rem}.skills button .si{width:22px;height:22px}.hint{min-height:0;font-size:.76rem;margin-top:3px}.panel .who{margin-bottom:3px}.bt{gap:3px}.bt .top{padding:3px 0 0}.bt .btn-small{min-height:36px}.order{min-height:30px}.order img{width:26px;height:26px}.panel .btn-main{min-height:44px;font-size:1rem}}
 @media (max-height:600px){.bt{gap:2px}.bt .top{padding:0}.bt .pill{white-space:nowrap;font-size:.9rem;min-height:34px}.bt .btn-small{min-height:34px}.log{height:32px;font-size:.7rem;line-height:1.2}.skills button{min-height:38px;font-size:.8rem}.skills{gap:3px}.panel .who img,.panel .who canvas,.panel .who .pf{max-height:30px}.hint{font-size:.7rem;line-height:1.15}.order{min-height:26px;padding:1px 2px}.order img{width:22px;height:22px}}
-@media (max-width:360px){html,body{font-size:14px}.tabs button{font-size:.8rem}.logo b{font-size:2rem}}
-@media (prefers-reduced-motion:reduce){.ly-far,.ly-mid,.ly-cl,.logo,.amb i,.badge,.hot span,.item.r3::after,.banner .rays{animation:none!important}.spr,.spr.il{animation-duration:2.6s}#app.enter>*{animation:none}}
+@media (max-width:360px){html,body{font-size:14px}.tabs button{font-size:.8rem}}
+@media (prefers-reduced-motion:reduce){.ly-far,.ly-mid,.ly-cl,.amb i,.badge,.hot span,.item.r3::after,.banner .rays{animation:none!important}.spr,.spr.il{animation-duration:2.6s}#app.enter>*{animation:none}}
 `;
