@@ -185,7 +185,8 @@ const EVENTS={
 /* obiekt komnaty: skrzynia wg krainy, obóz, wejście do krypty bossa w Kurhanach, obrazek wydarzenia (lista = wariant wg komnaty) */
 const CHEST_OF={krypta:'skrz_mech',bagno:'skrz_mech',gory:'skrz_zelazo',jama:'skrz_zelazo',chata:'skrz_runy'};
 const bioK=()=>{const E=S.exp,b=E&&BIOMES[E.r];return b?b.k:''};
-function roomProp(room){if(!room)return '';const E=S.exp;if(room.k==='chest')return CHEST_OF[bioK()]||'skrz_drewno';if(room.k==='camp')return 'oboz';if(room.k==='boss')return bioK()==='krypta'?'krypta':'gate';
+/* skrzynia: po otwarciu ta sama skrzynia otwarta (klucz z _o, GFX.P) */
+function roomProp(room){if(!room)return '';const E=S.exp;if(room.k==='chest'){const c=CHEST_OF[bioK()]||'skrz_drewno';return room.done&&GFX.P[c+'_o']?c+'_o':c}if(room.k==='camp')return 'oboz';if(room.k==='boss')return bioK()==='krypta'?'krypta':'gate';
  if(room.k==='event'){const p=EVENTS[room.ev].p;return Array.isArray(p)?p[Math.max(0,E.rooms.indexOf(room))%p.length]:p}return ''}
 /* ===== dekoracje komnat: drzewa, krzaki, groby wg krainy (GFX.P) =====
    hz – linia horyzontu tła (ułamek wysokości sceny); d – duże (0–2 na komnatę), m – małe (1–2, mn – maks.); sz – mnożnik rozmiaru */
@@ -196,7 +197,8 @@ const SCEN={
  gory:{hz:.56,d:['drz_snieg','drz_snieg','drz_swierk'],m:[]},
  bagno:{hz:.63,d:['drz_wierzba','drz_korzenie','drz_bagienny'],m:['krz_placzacy','krz_pnacza','krz_gaszcz']},
  pola:{hz:.6,d:['drz_wisnia','drz_brzoza'],m:['krz_pomarancz','krz_fiolet','krz_bukszpan','krz_jarzebina']},
- chata:{hz:.66,d:['drz_martwy','drz_czar','drz_omszaly'],m:['krz_pnacza','krz_ciemny']}
+ chata:{hz:.66,d:['drz_martwy','drz_czar','drz_omszaly'],m:['krz_pnacza','krz_ciemny']},
+ jama:{hz:.6,d:['jama_zebra1','jama_zebra2','jama_komin1','jama_komin2','jama_obsydian1','jama_obsydian2','jama_obsydian3','jama_krysztal1','jama_krysztal2','jama_krysztal3'],m:['jama_lawa1','jama_lawa2','jama_lawa3','jama_zloto1','jama_zloto2','jama_zloto3'],sz:1.2}
 };
 /* stałe losowanie dla danej komnaty (dekoracje nie zmieniają się przy odświeżeniu) */
 function rngOf(t){let a=7;for(const c of t)a=Math.imul(a^c.charCodeAt(0),2654435761);return ()=>{a=a+0x6D2B79F5|0;let x=Math.imul(a^a>>>15,1|a);x=x+Math.imul(x^x>>>7,61|x)^x;return((x^x>>>14)>>>0)/4294967296}}

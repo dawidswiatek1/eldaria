@@ -1,0 +1,34 @@
+{
+  "id": "385af418-602c-4974-9e29-c8b73b53d6a9",
+  "name": "base",
+  "prompt": "Violet lightning bolt striking down onto the ground and bursting into crackling sparks.",
+  "size": {
+    "width": 80,
+    "height": 80
+  },
+  "directions": 1,
+  "view": "low top-down",
+  "rotations": {
+    "unknown": "rotations/Violet_lightning_bolt_striking.png"
+  },
+  "animations": {
+    "striking_down": {
+      "directions": {
+        "unknown": {
+          "frames": [
+            "animations/striking_down/unknown/frame_000.png",
+            "animations/striking_down/unknown/frame_001.png",
+            "animations/striking_down/unknown/frame_002.png",
+            "animations/striking_down/unknown/frame_003.png",
+            "animations/striking_down/unknown/frame_004.png",
+            "animations/striking_down/unknown/frame_005.png",
+            "animations/striking_down/unknown/frame_006.png",
+            "animations/striking_down/unknown/frame_007.png",
+            "animations/striking_down/unknown/frame_008.png"
+          ],
+          "frame_count": 9
+        }
+      }
+    }
+  }
+}

@@ -47,13 +47,35 @@ const VART={
  "n_leszy":"assets/portraits/leszy.png",
  "n_utopiec":"assets/portraits/utopiec.png",
  "n_strzyga":"assets/portraits/strzyga.png",
+ /* Akt II: arcykapłan Światomir, brat Wawrzyniec (tools/portraits.py) */
+ "n_swiatomir":"assets/portraits/swiatomir.png",
+ "n_wawrzyniec":"assets/portraits/wawrzyniec.png",
  "e_husarz":"assets/events/husarz.png",
  "p_brzezina":"assets/towns/panorama-brzezina.webp",
  "p_olszynow":"assets/towns/panorama-olszynow.webp",
  /* panoramy wsi bez własnego obrazka (te same obrazki) */
  "p_mokradla":"assets/towns/panorama-mglista.webp",
  "p_ustronie":"assets/towns/panorama-mglista.webp",
- "p_wschodnia":"assets/towns/panorama-kregoszew.webp"
+ "p_wschodnia":"assets/towns/panorama-kregoszew.webp",
+ /* ikony umiejętności specjalizacji (skIc w js/data/specs.js), 32×32 */
+ "sk_taniec":"assets/skills/taniec.png",
+ "sk_mur":"assets/skills/mur.png",
+ "sk_serce":"assets/skills/serce.png",
+ "sk_sidla":"assets/skills/sidla.png",
+ "sk_slup":"assets/skills/slup.png",
+ "sk_runy":"assets/skills/runy.png",
+ "sk_stos":"assets/skills/stos.png",
+ "sk_cud":"assets/skills/cud.png",
+ "sk_ostrze":"assets/skills/ostrze.png",
+ "sk_sztuczka":"assets/skills/sztuczka.png",
+ "sk_sadboz":"assets/skills/sadboz.png",
+ "sk_wyrok":"assets/skills/wyrok.png",
+ "sk_wilki":"assets/skills/wilki.png",
+ "sk_krag":"assets/skills/krag.png",
+ "sk_dusze":"assets/skills/dusze.png",
+ "sk_piekl":"assets/skills/piekl.png",
+ "sk_wojenna":"assets/skills/wojenna.png",
+ "sk_zwierciadlo":"assets/skills/zwierciadlo.png"
 };
 /* grafika v18 (mapa Velesii, miasta, tła walk) – generowane przez src/art/v18/v18art.py */
 const VART18={

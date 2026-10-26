@@ -55,8 +55,10 @@ const devPend=h=>!!(h.free||tFree(h)||specPend(h));
 /* umiejętności klasy + umiejętność specjalizacji */
 const poolOf=h=>(POOL[h.cls]||[]).concat(specOf(h)?[specOf(h).sk]:[]);
 const specOfSk=k=>Object.keys(SPEC).find(x=>SPEC[x].sk===k);
-/* ikona umiejętności: umiejętności specjalizacji używają ikon z pola ico i mają złotą poświatę (.spk) */
-const skIc=(k,s,c)=>{const x=SK[k];return ic(x&&x.ico||'sk_'+k,s,(c||'')+(x&&x.spec?' spk':''))};
+/* ikona umiejętności: własny obrazek 32×32 (VART sk_<klucz>, assets/skills/ – umiejętności specjalizacji),
+   inaczej ikona z arkusza (pole ico albo sk_<klucz>); umiejętności specjalizacji mają złotą poświatę (.spk) */
+const skIc=(k,s,c)=>{const x=SK[k],cl=(c||'')+(x&&x.spec?' spk':''),u=typeof VART!=='undefined'&&VART['sk_'+k];
+ return u?`<img class="px ic ${cl}" src="${u}" alt="" style="width:${s||18}px;height:${s||18}px">`:ic(x&&x.ico||'sk_'+k,s,cl)};
 
 /* ===== haki walki ===== */
 const UNDEAD=['szkielet','ghul','upior','strzyga','utopiec','utopiecS','nekromanta'];
