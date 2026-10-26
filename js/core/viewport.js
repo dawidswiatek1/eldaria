@@ -32,7 +32,7 @@ document.addEventListener('contextmenu',e=>{const el=e.target.closest('.unit');i
 /* klawiatura: 1–9 umiejętności, Enter/Spacja – użyj/dalej, Esc – zamknij/wróć, A – auto */
 document.addEventListener('keydown',e=>{if(e.ctrlKey||e.altKey||e.metaKey)return;const t=e.target;if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'))return;
  const md=document.getElementById('modal'),open=md&&!md.classList.contains('hidden'),k=e.key,q=s=>document.querySelector(s),press=el=>{if(el&&!el.disabled){el.click();e.preventDefault();return true}return false};
- if(k==='Escape'){if(open){press(md.querySelector('[data-act=close],[data-act=evskip],[data-act=dclose],[data-act=introok]'))||(md.querySelector('[data-act=tocamp],[data-act=expback],[data-act=rev],[data-act=revok],[data-act=qdlg]')?0:(closeModal(),e.preventDefault()));return}
+ if(k==='Escape'){if(open){press(md.querySelector('[data-act=close],[data-act=evskip],[data-act=dclose],[data-act=introok]'))||(modalLocked()?0:(closeModal(),e.preventDefault()));return}
   {const de=q('[data-esc]');if(de){press(de);return}}
   if(screen==='hero'||screen==='map'){press(q('[data-act=back]'));return}if(screen==='camp'&&townView){press(q('[data-act=town][data-v=""]'));return}return}
  if(open){if(k==='Enter'||k===' '){press(md.querySelector('.btn-main:not([disabled])'))}return}

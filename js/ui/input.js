@@ -1,6 +1,6 @@
 /* ===== OBSŁUGA DOTYKU ===== */
 document.addEventListener('click',e=>{if(_lp){_lp=false;e.preventDefault();return}const el=e.target.closest('[data-act]');if(!el)return;const a=el.dataset.act;
- if(el.id==='modal'){if(e.target.closest('.box'))return;closeModal();return}
+ if(el.id==='modal'){if(e.target.closest('.box')||modalLocked())return;closeModal();return}
  switch(a){
  case 'close':closeModal();break;
  case 'new':if(hasSave()){modal(`<h2>${ic('flag',20)} Nowa gra?</h2><p>Obecny postęp zostanie utracony.</p><div class="actions"><button class="btn-red" data-act="newok">Tak, zacznij od nowa</button><button data-act="close">Anuluj</button></div>`);return}modal(creatorHtml());break;
