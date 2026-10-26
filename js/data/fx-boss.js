@@ -11,4 +11,8 @@ const BFX={
  zenit:{"u":"assets/fx/zenit.png","fw":87,"fh":122,"n":8,"a":"f","s":1.0,"ms":720},
  klatwa:{"u":"assets/fx/klatwa.png","fw":73,"fh":76,"n":8,"a":"f","s":1.0,"ms":720},
  pelnia:{"u":"assets/fx/pelnia.png","fw":64,"fh":80,"n":8,"a":"c","s":1.0,"ms":480},
- drzewo:{"u":"assets/fx/drzewo.png","fw":73,"fh":72,"n":2,"a":"c","s":1.1,"ms":560}};
+ drzewo:{"u":"assets/fx/drzewo.png","fw":73,"fh":72,"n":2,"a":"c","s":1.1,"ms":560},
+ wyladowanie:{"u":"assets/fx/wyladowanie.png","fw":60,"fh":73,"n":9,"a":"f","s":1.15,"ms":640},
+ deszcz:{"u":"assets/fx/deszcz.png","fw":76,"fh":85,"n":8,"a":"f","s":1.0,"ms":720},
+ krzyk:{"u":"assets/fx/krzyk.png","fw":85,"fh":79,"n":9,"a":"c","s":1.0,"ms":640},
+ gwiezdny:{"u":"assets/fx/gwiezdny.png","fw":86,"fh":128,"n":9,"a":"f","s":0.95,"ms":760}};

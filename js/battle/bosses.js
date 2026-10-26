@@ -95,7 +95,7 @@ const BOSS={
  /* Gwiazda pod ziemią – Stare Grodzisko */
  straznikR:{el:{k:'iskra',n:2},
   taken:(u,t)=>objN('iskra')?.6:1,
-  big:{n:'Wyładowanie',d:'błyskawica w całą drużynę, może osłabić',cd:3,ann:'iskry rdzenia zbiegają się w jego piersi…',run:async u=>bigAoe(u,.8+.15*objN('iskra'),'magic',t=>{if(Math.random()<.4)weaken(t,2)},'klatwa')},
+  big:{n:'Wyładowanie',d:'błyskawica w całą drużynę, może osłabić',cd:3,ann:'iskry rdzenia zbiegają się w jego piersi…',run:async u=>bigAoe(u,.8+.15*objN('iskra'),'magic',t=>{if(Math.random()<.4)weaken(t,2)},'wyladowanie')},
   bigTip:u=>objN('iskra')?`każda iskra (${objN('iskra')}) wzmacnia wyładowanie`:'',
   ph:[{at:.5,n:'Przeciążenie',run:u=>{let n=0;while(n<2&&summon(u,pick(['wilkS','dzikS','pajakS'])))n++;u.atk=Math.round(u.atk*1.15);log('⚡ Rdzeń pulsuje – z korytarzy nadbiegają skażone bestie!','r')}}],
   tip:u=>objN('iskra')?`Iskry rdzenia (${objN('iskra')}): Strażnik otrzymuje 40% mniej obrażeń, a wyładowanie jest silniejsze – rozbij je (obuch najlepszy).`:'Iskry zgasły – Strażnik stracił osłonę.',
@@ -105,14 +105,14 @@ const BOSS={
  lowcaG:{el:{k:'odlamekG',n:1},
   taken:(u,t)=>objN('odlamekG')?.7:1,
   regen:u=>objN('odlamekG')?.04:0,
-  big:{n:'Deszcz gwiazd',d:'płonące okruchy w całą drużynę, podpalają',cd:3,ann:'unosi włócznię ku niebu – odłamek rozbłyska…',run:async u=>bigAoe(u,.9,'fire',t=>{if(Math.random()<.45)bleed(u,t,2,u.atk*.25,'🔥')},'zenit')},
+  big:{n:'Deszcz gwiazd',d:'płonące okruchy w całą drużynę, podpalają',cd:3,ann:'unosi włócznię ku niebu – odłamek rozbłyska…',run:async u=>bigAoe(u,.9,'fire',t=>{if(Math.random()<.45)bleed(u,t,2,u.atk*.25,'🔥')},'deszcz')},
   ph:[{at:.4,n:'Ostatni łów',run:u=>{u.atk=Math.round(u.atk*1.3);if(summon(u,'brat'))log('🗡️ Z cienia wychodzi brat Zakonu!','r')}}],
   tip:u=>objN('odlamekG')?'Odłamek gwiazdy: Łowczy leczy 4% PŻ co turę i otrzymuje o 30% mniej obrażeń – rozbij odłamek.':'Odłamek rozbity – Łowczy stracił źródło mocy.',
   elDie:(u,t)=>{ring(u,'#ffd070');log('💥 Odłamek gwiazdy pęka – Łowczy traci moc!','g')},
   tro:{b:'helm',n:'Hełm Łowczego',st:{def:3},res:{ogien:20,arkana:10},d:'Trofeum: Łowczy Gwiazd z Wielkiego Grzbietu.'}},
  /* Dzieci szczeliny – Szczelina pod Bagnem Czarnym */
  zwiastun:{el:{k:'kokon',n:2},
-  big:{n:'Krzyk otchłani',d:'krzyk w całą drużynę, może ogłuszyć',cd:3,ann:'rozwiera paszczę – powietrze drży…',run:async u=>bigAoe(u,.75,'magic',t=>{if(Math.random()<.35)stun(t)},'klatwa')},
+  big:{n:'Krzyk otchłani',d:'krzyk w całą drużynę, może ogłuszyć',cd:3,ann:'rozwiera paszczę – powietrze drży…',run:async u=>bigAoe(u,.75,'magic',t=>{if(Math.random()<.35)stun(t)},'krzyk')},
   ph:[{at:.5,n:'Szczelina się poszerza',run:u=>{let n=0;while(n<2&&summon(u,'pustak'))n++;log('🌀 Szczelina się poszerza – wychodzą z niej pustaki!','r')}}],
   tip:u=>{const n=objN('kokon');return n?`Kokony (${n}): co kilka tur wykluwa się z nich pomiot – rozbij je (ogień i ostrza najlepsze).`:'Kokony zniszczone – Zwiastun nie ma już potomstwa.'},
   elDie:(u,t)=>log('🥚 Kokon pęka – nic się z niego nie wykluje!','g'),
@@ -122,7 +122,7 @@ const BOSS={
   setup:u=>{if(S.fl.met==='krol'){alive('h').forEach(h=>{h.st.rally=Math.max(h.st.rally||0,2);h.st.rallyV=Math.max(h.st.rallyV||0,.2)});B.log.push({t:'🏹 Królewscy kusznicy na skraju polany osłaniają kompanię (+20% ataku na 2 tury).',c:'g'})}
    if(S.fl.rdz==='stabilny')B.log.push({t:'💠 Rdzeń z grodziska tłumi szczelinę – Ten, Który Słucha, nie przejdzie.',c:'g'})},
   taken:(u,t)=>1-.15*objN('kamienP'),
-  big:{n:'Gwiezdny ogień',d:'kolumna światła w całą drużynę',cd:3,ann:'unosi ręce – kamienie pieczęci rozbłyskują…',run:async u=>bigAoe(u,.8+.1*objN('kamienP'),'magic',t=>{if(Math.random()<.3)weaken(t,2)},'zenit')},
+  big:{n:'Gwiezdny ogień',d:'kolumna światła w całą drużynę',cd:3,ann:'unosi ręce – kamienie pieczęci rozbłyskują…',run:async u=>bigAoe(u,.8+.1*objN('kamienP'),'magic',t=>{if(Math.random()<.3)weaken(t,2)},'gwiezdny')},
   bigTip:u=>objN('kamienP')?`każdy kamień (${objN('kamienP')}) wzmacnia ogień`:'',
   ph:[{at:.6,n:'Szczelina się otwiera',run:u=>{const n=S.fl.dz==='zaszyta'?1:2;let k=0;while(k<n&&summon(u,pick(['pomiot','pustak'])))k++;log('🌀 Nad pieczęcią otwiera się szczelina – wypełzają z niej stwory!','r')}},
    {at:.3,n:'Ten, Który Słucha',run:u=>{if(S.fl.rdz==='stabilny'){log('💠 Coś ogromnego napiera na szczelinę… ale rdzeń z grodziska ją trzyma!','g');return}

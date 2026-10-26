@@ -25,8 +25,9 @@ OLD = {
 }
 # klucz: skala k; ms – czas pętli animacji
 K = {
-    # skrzynie (drewniana, runiczna, omszała kamienna, żelazna)
+    # skrzynie (drewniana, runiczna, omszała kamienna, żelazna) i te same otwarte (_o – po otwarciu)
     'skrz_drewno': .5, 'skrz_runy': .5, 'skrz_mech': .5, 'skrz_zelazo': .5,
+    'skrz_drewno_o': .5, 'skrz_runy_o': .5, 'skrz_mech_o': .5, 'skrz_zelazo_o': .5,
     # studnie, obóz (animowany ogień), porzucony namiot
     'studnia1': .9, 'studnia2': .9, 'studnia3': .9, 'studnia4': .9, 'studnia5': .9,
     'oboz': 1.3, 'namiot': 1.2,
@@ -37,6 +38,11 @@ K = {
     'drz_dab': 2.3, 'drz_swierk': 2.3, 'drz_pien': 1.3, 'drz_omszaly': 2.3, 'drz_brzoza': 2.2, 'drz_jesien': 2.2,
     'drz_wierzba': 2.2, 'drz_korzenie': 2.2, 'drz_bagienny': 2.2, 'drz_martwy': 2.2, 'drz_czar': 2.2,
     'drz_snieg': 2.2, 'drz_wisnia': 2.0,
+    # Smocza Jama: żebra smoka, dymiące kominy lawy, obsydian, kryształy (duże), skały z lawą i złoto (małe)
+    'jama_zebra1': 1.3, 'jama_zebra2': 1.3, 'jama_komin1': 1.2, 'jama_komin2': 1.2,
+    'jama_obsydian1': 1.15, 'jama_obsydian2': 1.15, 'jama_obsydian3': 1.15,
+    'jama_krysztal1': 1.0, 'jama_krysztal2': 1.0, 'jama_krysztal3': 1.0,
+    'jama_lawa1': .85, 'jama_lawa2': .85, 'jama_lawa3': .85, 'jama_zloto1': .8, 'jama_zloto2': .8, 'jama_zloto3': .8,
 }
 # groby i krzaki (małe dekoracje; groby także na liście poległych)
 for i in range(1, 17):
@@ -46,6 +52,8 @@ for k in ['krz_gaszcz', 'krz_jarzebina', 'krz_placzacy', 'krz_suchy', 'krz_suchy
           'krz_pnacza', 'krz_trawa']:
     K[k] = .85
 MS = {'oboz': 1100}
+# obrazki przycinane wspólną ramką (skrzynia zamknięta i otwarta stoją w tym samym miejscu)
+SAME = [('skrz_drewno', 'skrz_drewno_o'), ('skrz_runy', 'skrz_runy_o'), ('skrz_mech', 'skrz_mech_o'), ('skrz_zelazo', 'skrz_zelazo_o')]
 
 
 def frames(k):
@@ -59,8 +67,9 @@ def main():
     out = {k: {'w': w, 'h': h, 'u': 'assets/objects/%s.webp' % k} for k, (w, h) in OLD.items()}
     for k, sc in K.items():
         fr = frames(k)
+        grp = next((g for g in SAME if k in g), (k,))
         bb = fr[0].getbbox()
-        for f in fr[1:]:
+        for f in fr[1:] + [f for g in grp if g != k for f in frames(g)]:
             b = f.getbbox()
             bb = (min(bb[0], b[0]), min(bb[1], b[1]), max(bb[2], b[2]), max(bb[3], b[3]))
         fw, fh = bb[2] - bb[0], bb[3] - bb[1]

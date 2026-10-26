@@ -47,6 +47,7 @@ tools/
   boss_sprites.py     enemies and boss-fight objects from tools/art/enemies/ and tools/art/boss/ (js/data/sprites-boss.js)
   fx_sprites.py       boss attack effects from tools/art/fx/ (assets/fx/, js/data/fx-boss.js)
   props.py            expedition room objects and scenery from tools/art/props/ (assets/objects/, js/data/props.js)
+  portraits.py        dialog portraits picked from PixelLab face sheets in tools/art/portraits/ (assets/portraits/)
   velesia_map.py      draws the Velesia map (assets/maps/velesia-big.png) – see "Velesia map" below
 assets/
   fonts/              Pixelify Sans (SIL Open Font License 1.1)
@@ -57,6 +58,7 @@ assets/
   halls/              building interiors: throne hall, bank and its Sanów branch, audience picture
   buildings/          building pictures shown at the top of each town service
   portraits/          NPC portraits
+  skills/             specialization skill icons (32×32)
   objects/            chests, camp, wells, tombs, trees, bushes, graves… (expedition rooms, fallen heroes)
   events/             event illustrations
   fx/                 boss attack effects (frame strips, made by tools/fx_sprites.py)
@@ -94,9 +96,11 @@ A quest step with `at:'zamek'`/`at:'bank'` waits inside that building instead of
 Room objects and decorations are PixelLab exports in `tools/art/props/` (`<key>.png`, or a `<key>/` folder of
 `frame_*.png` for an animation such as the camp fire). `tools/props.py` crops them into `assets/objects/` and writes
 `js/data/props.js` (`GFX.P`, sizes in hero pixels via a scale per object). In `js/expedition/expedition.js`:
-`roomProp` picks the room object (chest by region, animated camp, well variants, crypt entrance before the Kurhany
-boss), `EVENTS[..].b` limits an event to some regions (the barrow and tomb events), and `SCEN` lists the trees,
-bushes and graves scattered behind the party in each region (fixed per room, they slide past while walking).
+`roomProp` picks the room object (chest by region – shown open once looted, `<key>_o`, cropped together with the
+closed one by `SAME` in the tool –, animated camp, well variants, crypt entrance before the Kurhany boss),
+`EVENTS[..].b` limits an event to some regions (the barrow and tomb events), and `SCEN` lists the trees, bushes,
+graves and, in Smocza Jama, dragon bones, lava vents, obsidian, crystals and gold scattered behind the party in each
+region (fixed per room, they slide past while walking).
 Fallen heroes get a headstone (`graveImg` in `js/ui/camp.js`).
 
 ## Bosses
@@ -118,7 +122,8 @@ The first win over each boss gives a named legendary trophy (`S.bk`).
 `js/data/specs.js` (`SPEC`): from level 10 (`SPEC_LVL`) every hero picks one of two paths for their class in the
 Talenty tab (e.g. warrior → Mistrz miecza or Strażnik, mage → Piromanta or Mistrz runów); the choice is `h.spec` and is
 undone only by the temple talent reset. A path gives stat bonuses (`e`, counted with talents in `talFx`), its own skill
-(`sk`, an `SK` entry in `js/data/skills.js` with `spec:1` and an icon name in `ico`, drawn by `skIc`) and a passive
+(`sk`, an `SK` entry in `js/data/skills.js` with `spec:1`; its 32×32 icon is `assets/skills/<key>.png`, listed in `VART` as
+`sk_<key>` and drawn by `skIc`) and a passive
 trait. The traits run through small hooks in battle (`specStart`, `specGuard`, `specAm`, `specCrit`, `specAfter`,
 `specKill`, `specDown`, `specHeal`, `specEcho`) called from `js/battle/battle.js` and `battle-layout.js`.
 Styles: `css/specs.css.js`.

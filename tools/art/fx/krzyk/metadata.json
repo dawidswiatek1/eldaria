@@ -1,0 +1,34 @@
+{
+  "id": "07751022-6f16-4f83-bd45-938b143a5235",
+  "name": "base",
+  "prompt": "Teal shockwave rings expanding outward with distorted, wavy air.",
+  "size": {
+    "width": 96,
+    "height": 96
+  },
+  "directions": 1,
+  "view": "low top-down",
+  "rotations": {
+    "unknown": "rotations/Teal_shockwave_rings_expanding.png"
+  },
+  "animations": {
+    "expanding_outward": {
+      "directions": {
+        "unknown": {
+          "frames": [
+            "animations/expanding_outward/unknown/frame_000.png",
+            "animations/expanding_outward/unknown/frame_001.png",
+            "animations/expanding_outward/unknown/frame_002.png",
+            "animations/expanding_outward/unknown/frame_003.png",
+            "animations/expanding_outward/unknown/frame_004.png",
+            "animations/expanding_outward/unknown/frame_005.png",
+            "animations/expanding_outward/unknown/frame_006.png",
+            "animations/expanding_outward/unknown/frame_007.png",
+            "animations/expanding_outward/unknown/frame_008.png"
+          ],
+          "frame_count": 9
+        }
+      }
+    }
+  }
+}

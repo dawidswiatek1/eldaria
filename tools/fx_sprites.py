@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Efekty wielkich ciosów bossów (js/battle/bosses.js) z eksportów PixelLab w tools/art/fx/<klucz>/.
 
-Każdy efekt: klatki animacji (pierwsza animacja w Idle/animations/, np. Idle/south albo Running/west),
-klatki ułożone wprost w folderze (frame_000.png, frame_001.png… – np. kilka pojedynczych obrazków PixelLab),
+Każdy efekt: klatki animacji (pierwsza animacja w Idle/animations/, np. Idle/south albo Running/west,
+albo – eksport obiektu PixelLab – w animations/<nazwa>/unknown/), klatki ułożone wprost w folderze (frame_000.png, frame_001.png… – np. kilka pojedynczych obrazków PixelLab),
 a gdy ich nie ma – widok z przodu (rotations/south.png), który gra „wyrasta z ziemi” (CSS).
 Klatki są przycinane do wspólnej ramki i sklejane w poziomy pasek: assets/fx/<klucz>.png.
 Lista: js/data/fx-boss.js (BFX: plik, rozmiar klatki, liczba klatek, kotwica, skala, czas).
@@ -29,6 +29,11 @@ FX = {
     'klatwa':    {'src': 'fx/klatwa',    'a': 'f', 's': 1.0, 'ms': 720},   # Baba Jaga – Klątwa chaty
     'pelnia':    {'src': 'fx/pelnia',    'a': 'c', 's': 1.0, 'ms': 480},   # Wilkołak Alfa – Krwawa pełnia
     'drzewo':    {'src': 'fx/drzewo',    'a': 'c', 's': 1.1, 'ms': 560},   # Troll – Wyrwane drzewo, Miażdżący cios
+    # Akt II
+    'wyladowanie': {'src': 'fx/wyladowanie', 'a': 'f', 's': 1.15, 'ms': 640},  # Strażnik rdzenia – Wyładowanie
+    'deszcz':    {'src': 'fx/deszcz',    'a': 'f', 's': 1.0, 'ms': 720},   # Łowczy Gwiazd – Deszcz gwiazd
+    'krzyk':     {'src': 'fx/krzyk',     'a': 'c', 's': 1.0, 'ms': 640},   # Zwiastun z otchłani – Krzyk otchłani
+    'gwiezdny':  {'src': 'fx/gwiezdny',  'a': 'f', 's': .95, 'ms': 760},   # Arcykapłan – Gwiezdny ogień
 }
 
 
@@ -36,7 +41,7 @@ def frames(d):
     own = sorted(glob.glob(os.path.join(d, 'frame_*.png')))
     if own:
         return [Image.open(p).convert('RGBA') for p in own]
-    an = sorted(glob.glob(os.path.join(d, 'Idle/animations/*/*')))
+    an = sorted(glob.glob(os.path.join(d, 'Idle/animations/*/*'))) or sorted(glob.glob(os.path.join(d, 'animations/*/*')))
     if an:
         return [Image.open(p).convert('RGBA') for p in sorted(glob.glob(os.path.join(an[0], 'frame_*.png')))]
     return [Image.open(os.path.join(d, 'Idle/rotations/south.png')).convert('RGBA')]

@@ -1,0 +1,33 @@
+{
+  "id": "1dcbb4da-4d25-45b0-aa2e-ebdae5631509",
+  "name": "base",
+  "prompt": "Small burning stars falling from the sky and exploding into golden sparks on impact.",
+  "size": {
+    "width": 96,
+    "height": 96
+  },
+  "directions": 1,
+  "view": "low top-down",
+  "rotations": {
+    "unknown": "rotations/Small_burning_stars_falling_fr.png"
+  },
+  "animations": {
+    "falling_from_the_sky": {
+      "directions": {
+        "unknown": {
+          "frames": [
+            "animations/falling_from_the_sky/unknown/frame_000.png",
+            "animations/falling_from_the_sky/unknown/frame_001.png",
+            "animations/falling_from_the_sky/unknown/frame_002.png",
+            "animations/falling_from_the_sky/unknown/frame_003.png",
+            "animations/falling_from_the_sky/unknown/frame_004.png",
+            "animations/falling_from_the_sky/unknown/frame_005.png",
+            "animations/falling_from_the_sky/unknown/frame_006.png",
+            "animations/falling_from_the_sky/unknown/frame_007.png"
+          ],
+          "frame_count": 8
+        }
+      }
+    }
+  }
+}
