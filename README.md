@@ -21,6 +21,10 @@ It plays exactly the same as before.
   "Add to Home Screen") and plays offline: `js/core/pwa.js` adds `manifest.webmanifest` and the service worker
   `sw.js` (file list and version written by `tools/pwa_files.py` at publish time). Opened from disk it does nothing.
   App icons: `tools/make_icons.py`.
+- **One file for a phone browser:** `python3 tools/single_file.py Eldaria.html` packs the whole game – every script,
+  style, picture and the font – into one HTML file (about 13 MB) that plays when opened in Chrome from the phone's
+  downloads, with no server or app. If the browser refuses storage for a page opened that way, the file keeps the save
+  in memory and the title screen asks the player to export it with "Zapis" before leaving.
 - **On a phone or to share it:** upload the whole folder to any static web host
   (GitHub Pages, Netlify, itch.io as an HTML5 zip, …) and open the link.
   Keep the folder structure as it is.
